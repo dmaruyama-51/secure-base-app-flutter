@@ -1,12 +1,3 @@
----
-name: PR template
-about: PR を作成する際のテンプレート
-title: ''
-labels: ''
-assignees: ''
-
----
-
 ## issueリンク
 
 ## やったこと
