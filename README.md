@@ -1,6 +1,8 @@
 # secure-base-app-flutter
 心の安全基地を育むアプリ
 
+アプリの設計資料は [こちら](https://www.notion.so/20_secure-base-1c31f8583e6f80cc88f1d676d9c0f7b0?pvs=4)
+
 ## チーム開発ルール
 
 ### 1. ブランチ戦略
