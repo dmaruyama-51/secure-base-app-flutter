@@ -10,6 +10,3 @@ final membersProvider = Provider<List<Member>>((ref) {
     Member(name: 'ももちゃん', category: 'Friends'),
   ];
 });
-
-// ボトムナビゲーションの選択中のタブを管理するプロバイダー
-final selectedTabProvider = StateProvider<int>((ref) => 1); // デフォルトはmemberタブ

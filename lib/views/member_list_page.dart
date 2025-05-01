@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/member.dart';
 import '../view_models/member_list_view_model.dart';
 import '../widgets/member_list_item.dart';
+import '../widgets/common_bottom_navigation.dart';
 
 // Riverpodを使用するConsumerWidget
 class MemberListPage extends ConsumerWidget {
@@ -12,7 +13,6 @@ class MemberListPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // プロバイダーからデータを読み取る
     final members = ref.watch(membersProvider);
-    final selectedTab = ref.watch(selectedTabProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -54,23 +54,8 @@ class MemberListPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.grey,
-        currentIndex: selectedTab,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.people), label: 'member'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.favorite_border),
-            label: 'Reflection',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
-        ],
-        onTap: (index) {
-          // タブの状態を更新
-          ref.read(selectedTabProvider.notifier).state = index;
+      bottomNavigationBar: CommonBottomNavigation(
+        onTabChanged: (index) {
           // UIのみのため実装は省略、表示だけ行う
           ScaffoldMessenger.of(
             context,
