@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/member.dart';
 import '../view_models/member_list_view_model.dart';
 import '../widgets/member_list_item.dart';
-import '../widgets/common_bottom_navigation.dart';
+import '../widgets/common/bottom_navigation.dart';
 
 // Riverpodを使用するConsumerWidget
 class MemberListPage extends ConsumerWidget {
@@ -54,7 +54,7 @@ class MemberListPage extends ConsumerWidget {
         },
         child: const Icon(Icons.add),
       ),
-      bottomNavigationBar: CommonBottomNavigation(
+      bottomNavigationBar: BottomNavigation(
         onTabChanged: (index) {
           // UIのみのため実装は省略、表示だけ行う
           ScaffoldMessenger.of(

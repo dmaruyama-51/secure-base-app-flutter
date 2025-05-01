@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../view_models/navigation_view_model.dart';
+import '../../view_models/navigation_view_model.dart';
 
-class CommonBottomNavigation extends ConsumerWidget {
+class BottomNavigation extends ConsumerWidget {
   // オプション：タブ切り替え時のコールバック
   final Function(int)? onTabChanged;
 
-  const CommonBottomNavigation({Key? key, this.onTabChanged}) : super(key: key);
+  const BottomNavigation({Key? key, this.onTabChanged}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
