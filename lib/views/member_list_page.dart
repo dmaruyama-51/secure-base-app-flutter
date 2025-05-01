@@ -1,25 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/member.dart';
+import '../view_models/member_list_view_model.dart';
 import '../widgets/member_list_item.dart';
 
-class MemberListPage extends StatefulWidget {
+// Riverpodを使用するConsumerWidget
+class MemberListPage extends ConsumerWidget {
   const MemberListPage({Key? key}) : super(key: key);
 
   @override
-  _MemberListPageState createState() => _MemberListPageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    // プロバイダーからデータを読み取る
+    final members = ref.watch(membersProvider);
+    final selectedTab = ref.watch(selectedTabProvider);
 
-class _MemberListPageState extends State<MemberListPage> {
-  // サンプルデータ
-  final List<Member> _members = [
-    Member(name: 'お母さん', category: 'Family'),
-    Member(name: 'お父さん', category: 'Family'),
-    Member(name: 'たろー', category: 'Friends'),
-    Member(name: 'ももちゃん', category: 'Friends'),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -37,13 +31,15 @@ class _MemberListPageState extends State<MemberListPage> {
         ),
       ),
       body: ListView.builder(
-        itemCount: _members.length,
+        itemCount: members.length,
         itemBuilder: (context, index) {
           return MemberListItem(
-            member: _members[index],
+            member: members[index],
             onEditPressed: () {
-              // 編集ボタンが押されたときの処理
-              print('Edit ${_members[index].name}');
+              // UIのみのため実装は省略、表示だけ行う
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('編集: ${members[index].name}')),
+              );
             },
           );
         },
@@ -51,8 +47,10 @@ class _MemberListPageState extends State<MemberListPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
         onPressed: () {
-          // 追加ボタンが押されたときの処理
-          print('Add new member');
+          // UIのみのため実装は省略、表示だけ行う
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('新しいメンバーを追加します')));
         },
         child: const Icon(Icons.add),
       ),
@@ -60,7 +58,7 @@ class _MemberListPageState extends State<MemberListPage> {
         type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.brown,
         unselectedItemColor: Colors.grey,
-        currentIndex: 1,
+        currentIndex: selectedTab,
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.people), label: 'member'),
@@ -71,7 +69,12 @@ class _MemberListPageState extends State<MemberListPage> {
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
         ],
         onTap: (index) {
-          // タブが押されたときの処理
+          // タブの状態を更新
+          ref.read(selectedTabProvider.notifier).state = index;
+          // UIのみのため実装は省略、表示だけ行う
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('タブを切り替え: $index')));
         },
       ),
     );
