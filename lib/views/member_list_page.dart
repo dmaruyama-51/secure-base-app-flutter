@@ -25,6 +25,8 @@ class _MemberListPageState extends State<MemberListPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: false,
         title: const Text(
           'Members',
           style: TextStyle(
@@ -55,6 +57,7 @@ class _MemberListPageState extends State<MemberListPage> {
         child: const Icon(Icons.add),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
         selectedItemColor: Colors.brown,
         unselectedItemColor: Colors.grey,
         currentIndex: 1,
