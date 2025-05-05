@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:secure_base/views/login_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -92,8 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
             formSpacer,
             TextButton(
               onPressed: () {
-                // TODO: ログインページが実装できたらコメントを外す
-                // Navigator.of(context).push(LoginPage.route());
+                Navigator.of(context).push(LoginPage.route());
               },
               child: const Text('すでにアカウントをお持ちの方はこちら'),
             )
