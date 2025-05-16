@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:secure_base/utils/app_colors.dart';
 import '../widgets/common/bottom_navigation.dart';
 import '../view_models/member_add_view_model.dart';
 
@@ -27,23 +28,18 @@ class _MemberAddPageState extends State<MemberAddPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // テーマを取得
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: const Text(
-          'Add new member',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
+        title: Text('Add new member', style: theme.textTheme.titleLarge),
       ),
       body: AnimatedBuilder(
         animation: _viewModel,
@@ -86,13 +82,13 @@ class _MemberAddPageState extends State<MemberAddPage> {
                     height: 120,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.orange.shade100,
+                      color: AppColors.primaryLight,
                     ),
                     child: Center(
                       child: Icon(
                         _viewModel.getGenderIcon(_viewModel.selectedGender),
                         size: 80,
-                        color: Colors.orange,
+                        color: theme.colorScheme.primary,
                       ),
                     ),
                   ),
@@ -115,29 +111,49 @@ class _MemberAddPageState extends State<MemberAddPage> {
                 const SizedBox(height: 24),
 
                 // 名前/ニックネーム入力
-                const Text(
+                Text(
                   '名前 / ニックネーム',
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface.withAlpha(153),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 TextField(
                   controller: _viewModel.nameController,
                   decoration: InputDecoration(
                     filled: true,
-                    fillColor: Colors.grey.shade200,
-                    border: OutlineInputBorder(
+                    fillColor: theme.colorScheme.secondary,
+                    enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide.none,
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.secondary,
+                        width: 1,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: theme.colorScheme.primary,
+                        width: 1.5,
+                      ),
                     ),
                     errorText: _viewModel.errorMessage,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
 
                 // 関係性選択
-                const Text(
+                Text(
                   '関係性',
-                  style: TextStyle(fontSize: 14, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: theme.colorScheme.onSurface.withAlpha(153),
+                  ),
                 ),
                 const SizedBox(height: 8),
                 SingleChildScrollView(
@@ -161,19 +177,12 @@ class _MemberAddPageState extends State<MemberAddPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _viewModel.isSaving ? null : _saveMember,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
                     child:
                         _viewModel.isSaving
-                            ? const CircularProgressIndicator(
-                              color: Colors.white,
+                            ? CircularProgressIndicator(
+                              color: theme.colorScheme.onPrimary,
                             )
-                            : const Text(
+                            : Text(
                               'Save',
                               style: TextStyle(
                                 fontSize: 16,
@@ -195,6 +204,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
 
   // 性別選択オプションを構築
   Widget _buildGenderOption(String gender) {
+    final theme = Theme.of(context);
     final isSelected = _viewModel.selectedGender == gender;
 
     return GestureDetector(
@@ -204,20 +214,29 @@ class _MemberAddPageState extends State<MemberAddPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.orange : Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color:
+              isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.secondary,
+          borderRadius: BorderRadius.circular(24),
         ),
         child: Row(
           children: [
             Icon(
               _viewModel.getGenderIcon(gender),
-              color: isSelected ? Colors.white : Colors.black,
+              color:
+                  isSelected
+                      ? theme.colorScheme.onPrimary
+                      : theme.colorScheme.onSecondary,
             ),
             const SizedBox(width: 4),
             Text(
               gender,
               style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black,
+                color:
+                    isSelected
+                        ? theme.colorScheme.onPrimary
+                        : theme.colorScheme.onSecondary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
             ),
@@ -229,6 +248,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
 
   // 関係性選択オプションを構築
   Widget _buildRelationOption(String relation) {
+    final theme = Theme.of(context);
     final isSelected = _viewModel.selectedRelation == relation;
 
     return GestureDetector(
@@ -238,13 +258,19 @@ class _MemberAddPageState extends State<MemberAddPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
-          color: isSelected ? Colors.orange : Colors.white,
+          color:
+              isSelected
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.secondary,
           borderRadius: BorderRadius.circular(20),
         ),
         child: Text(
           relation,
           style: TextStyle(
-            color: isSelected ? Colors.white : Colors.black,
+            color:
+                isSelected
+                    ? theme.colorScheme.onPrimary
+                    : theme.colorScheme.onSecondary,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
           ),
         ),
