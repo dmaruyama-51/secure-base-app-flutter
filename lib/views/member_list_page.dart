@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../view_models/member_list_view_model.dart';
 import '../widgets/member_list_item.dart';
 import '../widgets/common/bottom_navigation.dart';
+import 'package:go_router/go_router.dart';
 
 class MemberListPage extends StatefulWidget {
   const MemberListPage({Key? key}) : super(key: key);
@@ -28,48 +29,41 @@ class _MemberListPageState extends State<MemberListPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context); // テーマを取得
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
         centerTitle: false,
-        title: const Text(
-          'Members',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-            fontSize: 24,
-          ),
-        ),
+        title: Text('Members', style: theme.textTheme.titleLarge),
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.orange,
+        backgroundColor: theme.colorScheme.primary,
         onPressed: () {
-          // UIのみのため実装は省略、表示だけ行う
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('新しいメンバーを追加します')));
+          GoRouter.of(context).push('/member/add');
         },
-        child: const Icon(Icons.add),
+        child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
       ),
-      bottomNavigationBar: BottomNavigation(
+      bottomNavigationBar: const BottomNavigation(
         currentIndex: 1, // memberタブを選択済みとして表示
-        onTabChanged: (index) {
-          // ToDo: GoRouterでルーティングを実装
-        },
       ),
     );
   }
 
   Widget _buildBody() {
+    final theme = Theme.of(context);
+
     return AnimatedBuilder(
       animation: _viewModel,
       builder: (context, child) {
         if (_viewModel.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return Center(
+            child: CircularProgressIndicator(color: theme.colorScheme.primary),
+          );
         }
 
         // エラーがある場合
@@ -78,7 +72,7 @@ class _MemberListPageState extends State<MemberListPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(_viewModel.error!),
+                Text(_viewModel.error!, style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: _loadMembers,
@@ -91,7 +85,9 @@ class _MemberListPageState extends State<MemberListPage> {
 
         // メンバーがいない場合
         if (_viewModel.members.isEmpty) {
-          return const Center(child: Text('メンバーがいません'));
+          return Center(
+            child: Text('メンバーがいません', style: theme.textTheme.bodyMedium),
+          );
         }
 
         // メンバーがいる場合

@@ -13,32 +13,37 @@ class MemberListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return ListTile(
       leading: CircleAvatar(
-        backgroundColor: Colors.grey[300],
+        backgroundColor: theme.colorScheme.surface,
         backgroundImage:
             member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
         child:
             member.avatarUrl == null
-                ? Icon(Icons.person, color: Colors.grey[700])
+                ? Icon(
+                  Icons.person,
+                  color: theme.colorScheme.onSurface.withAlpha(153),
+                )
                 : null,
       ),
       title: Text(
         member.name,
-        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+        style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
         member.category,
         style: TextStyle(
           fontSize: 14,
-          color:
-              member.category == 'Family'
-                  ? Colors.brown[400]
-                  : Colors.orange[400],
+          color: theme.colorScheme.primary.withAlpha(200),
         ),
       ),
       trailing: IconButton(
-        icon: const Icon(Icons.edit, color: Colors.black54),
+        icon: Icon(
+          Icons.edit,
+          color: theme.colorScheme.onSurface.withAlpha(153),
+        ),
         onPressed: onEditPressed,
       ),
     );
