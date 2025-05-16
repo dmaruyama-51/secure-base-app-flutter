@@ -3,6 +3,7 @@ import '../views/login_page.dart';
 import '../views/register_page.dart';
 import '../views/member_list_page.dart';
 import '../views/home_page.dart';
+import '../views/member_add_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -16,6 +17,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/members',
       builder: (context, state) => const MemberListPage(),
+    ),
+    GoRoute(
+      path: '/member/add',
+      builder: (context, state) => const MemberAddPage(),
     ),
   ],
 );

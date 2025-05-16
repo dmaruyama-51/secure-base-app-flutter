@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../view_models/member_list_view_model.dart';
 import '../widgets/member_list_item.dart';
 import '../widgets/common/bottom_navigation.dart';
+import 'package:go_router/go_router.dart';
 
 class MemberListPage extends StatefulWidget {
   const MemberListPage({Key? key}) : super(key: key);
@@ -48,10 +49,7 @@ class _MemberListPageState extends State<MemberListPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.orange,
         onPressed: () {
-          // UIのみのため実装は省略、表示だけ行う
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('新しいメンバーを追加します')));
+          GoRouter.of(context).push('/member/add');
         },
         child: const Icon(Icons.add),
       ),
