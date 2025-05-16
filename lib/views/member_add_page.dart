@@ -160,13 +160,13 @@ class _MemberAddPageState extends State<MemberAddPage> {
                   scrollDirection: Axis.horizontal,
                   child: Row(
                     children: [
-                      _buildRelationOption('Family'),
+                      _buildRelationOption('家族'),
                       const SizedBox(width: 8),
-                      _buildRelationOption('Friend'),
+                      _buildRelationOption('友人'),
                       const SizedBox(width: 8),
-                      _buildRelationOption('Partner'),
+                      _buildRelationOption('パートナー'),
                       const SizedBox(width: 8),
-                      _buildRelationOption('Pet'),
+                      _buildRelationOption('ペット'),
                     ],
                   ),
                 ),
@@ -212,18 +212,19 @@ class _MemberAddPageState extends State<MemberAddPage> {
         _viewModel.selectGender(gender);
       },
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         decoration: BoxDecoration(
           color:
               isSelected
                   ? theme.colorScheme.primary
                   : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(24),
+          borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
             Icon(
               _viewModel.getGenderIcon(gender),
+              size: 16,
               color:
                   isSelected
                       ? theme.colorScheme.onPrimary
@@ -238,6 +239,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
                         ? theme.colorScheme.onPrimary
                         : theme.colorScheme.onSecondary,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
               ),
             ),
           ],
