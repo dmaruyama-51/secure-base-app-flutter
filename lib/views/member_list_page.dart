@@ -57,9 +57,6 @@ class _MemberListPageState extends State<MemberListPage> {
       ),
       bottomNavigationBar: BottomNavigation(
         currentIndex: 1, // memberタブを選択済みとして表示
-        onTabChanged: (index) {
-          // ToDo: GoRouterでルーティングを実装
-        },
       ),
     );
   }

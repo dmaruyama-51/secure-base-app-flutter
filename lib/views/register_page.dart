@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:secure_base/views/login_page.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
 
   static Route<void> route({bool isRegistering = false}) {
-    return MaterialPageRoute(
-      builder: (context) => const RegisterPage(),
-    );
+    return MaterialPageRoute(builder: (context) => const RegisterPage());
   }
 
   @override
@@ -32,8 +30,7 @@ class _RegisterPageState extends State<RegisterPage> {
     final email = _emailController.text;
     final password = _passwordController.text;
     try {
-      await supabase.auth.signUp(
-          email: email, password: password);
+      await supabase.auth.signUp(email: email, password: password);
       // TODO: 遷移先ページを追加
       // Navigator.of(context)
       //     .pushAndRemoveUntil(NextPage.route(), (route) => false);
@@ -47,9 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('登録'),
-      ),
+      appBar: AppBar(title: const Text('登録')),
       body: Form(
         key: _formKey,
         child: ListView(
@@ -57,9 +52,7 @@ class _RegisterPageState extends State<RegisterPage> {
           children: [
             TextFormField(
               controller: _emailController,
-              decoration: const InputDecoration(
-                label: Text('メールアドレス'),
-              ),
+              decoration: const InputDecoration(label: Text('メールアドレス')),
               validator: (val) {
                 if (val == null || val.isEmpty) {
                   return '必須';
@@ -72,9 +65,7 @@ class _RegisterPageState extends State<RegisterPage> {
             TextFormField(
               controller: _passwordController,
               obscureText: true,
-              decoration: const InputDecoration(
-                label: Text('パスワード'),
-              ),
+              decoration: const InputDecoration(label: Text('パスワード')),
               validator: (val) {
                 if (val == null || val.isEmpty) {
                   return '必須';
@@ -93,10 +84,10 @@ class _RegisterPageState extends State<RegisterPage> {
             formSpacer,
             TextButton(
               onPressed: () {
-                Navigator.of(context).push(LoginPage.route());
+                context.go('/login');
               },
               child: const Text('すでにアカウントをお持ちの方はこちら'),
-            )
+            ),
           ],
         ),
       ),
