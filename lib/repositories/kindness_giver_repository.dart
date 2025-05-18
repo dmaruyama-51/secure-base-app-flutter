@@ -6,10 +6,10 @@ class KindnessGiverRepository {
   Future<List<KindnessGiver>> fetchKindnessGivers() async {
     // サンプルデータ
     return [
-      KindnessGiver(name: 'お母さん', category: '家族', gender: '女性'),
-      KindnessGiver(name: 'お父さん', category: '家族', gender: '男性'),
-      KindnessGiver(name: 'たろー', category: '友達', gender: '男性'),
-      KindnessGiver(name: 'ももちゃん', category: '友達', gender: '女性'),
+      KindnessGiver(name: 'お母さん', relationship: '家族', gender: '女性'),
+      KindnessGiver(name: 'お父さん', relationship: '家族', gender: '男性'),
+      KindnessGiver(name: 'たろー', relationship: '友達', gender: '男性'),
+      KindnessGiver(name: 'ももちゃん', relationship: '友達', gender: '女性'),
     ];
   }
 

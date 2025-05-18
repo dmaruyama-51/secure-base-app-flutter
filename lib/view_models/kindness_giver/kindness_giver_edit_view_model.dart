@@ -27,7 +27,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   }) : _repository = repository ?? KindnessGiverRepository(),
        originalKindnessGiver = kindnessGiver,
        selectedGender = kindnessGiver.gender,
-       selectedRelation = kindnessGiver.category,
+       selectedRelation = kindnessGiver.relationship,
        nameController = TextEditingController(text: kindnessGiver.name);
 
   // 性別選択
@@ -75,7 +75,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       final updatedKindnessGiver = KindnessGiver(
         name: nameController.text.trim(),
         gender: selectedGender,
-        category: selectedRelation,
+        relationship: selectedRelation,
         avatarUrl: originalKindnessGiver.avatarUrl,
       );
 

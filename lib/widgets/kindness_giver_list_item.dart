@@ -35,7 +35,7 @@ class KindnessGiverListItem extends StatelessWidget {
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        kindnessGiver.category,
+        kindnessGiver.relationship,
         style: TextStyle(
           fontSize: 14,
           color: theme.colorScheme.primary.withAlpha(200),

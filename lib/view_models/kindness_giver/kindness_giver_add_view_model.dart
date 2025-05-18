@@ -66,7 +66,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
       final kindnessGiver = KindnessGiver(
         name: nameController.text.trim(),
         gender: selectedGender,
-        category: selectedRelation,
+        relationship: selectedRelation,
       );
 
       // リポジトリを通じて保存
