@@ -19,15 +19,15 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterPage(),
     ),
     GoRoute(
-      path: '/kindness_giver',
+      path: '/kindness-givers',
       builder: (context, state) => const KindnessGiverListPage(),
     ),
     GoRoute(
-      path: '/kindness_giver/add',
+      path: '/kindness-givers/add',
       builder: (context, state) => const KindnessGiverAddPage(),
     ),
     GoRoute(
-      path: '/kindness_giver/edit/:id',
+      path: '/kindness-givers/edit/:id',
       builder: (context, state) {
         final kindnessGiver = state.extra as KindnessGiver;
         return KindnessGiverEditPage(kindnessGiver: kindnessGiver);

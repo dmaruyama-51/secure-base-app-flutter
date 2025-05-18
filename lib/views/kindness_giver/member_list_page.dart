@@ -44,7 +44,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: theme.colorScheme.primary,
         onPressed: () {
-          GoRouter.of(context).push('/kindness_giver/add');
+          GoRouter.of(context).push('/kindness-givers/add');
         },
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
       ),
@@ -98,7 +98,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
               kindnessGiver: _viewModel.kindnessGivers[index],
               onEditPressed: () {
                 GoRouter.of(context).push(
-                  '/kindness_giver/edit/${_viewModel.kindnessGivers[index].name}',
+                  '/kindness-givers/edit/${_viewModel.kindnessGivers[index].name}',
                   extra: _viewModel.kindnessGivers[index],
                 );
               },
