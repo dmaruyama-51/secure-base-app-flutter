@@ -36,6 +36,13 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text('メンバー一覧ページへ'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                context.go('/kindness-records');
+              },
+              child: const Text('優しさ記録ページへ'),
+            ),
           ],
         ),
       ),

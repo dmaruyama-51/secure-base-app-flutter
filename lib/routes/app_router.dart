@@ -4,6 +4,8 @@ import '../views/register_page.dart';
 import '../views/member_list_page.dart';
 import '../views/home_page.dart';
 import '../views/member_add_page.dart';
+import '../views/kindness_record_list_page.dart';
+import '../views/kindness_record_add_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -21,6 +23,14 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/member/add',
       builder: (context, state) => const MemberAddPage(),
+    ),
+    GoRoute(
+      path: '/kindness-records',
+      builder: (context, state) => const KindnessRecordListPage(),
+    ),
+    GoRoute(
+      path: '/kindness-record/add',
+      builder: (context, state) => const KindnessRecordAddPage(),
     ),
   ],
 );
