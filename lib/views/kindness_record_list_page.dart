@@ -47,12 +47,12 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: theme.colorScheme.primary,
         onPressed: () {
-          GoRouter.of(context).push('/kindness-record/add');
+          GoRouter.of(context).push('/kindness-records/add');
         },
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
       ),
       bottomNavigationBar: const BottomNavigation(
-        currentIndex: 2, // Historyタブを選択済みとして表示
+        currentIndex: 0, // Historyタブを選択済みとして表示
       ),
     );
   }
