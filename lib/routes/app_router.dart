@@ -4,6 +4,8 @@ import '../views/register_page.dart';
 import '../views/member_list_page.dart';
 import '../views/home_page.dart';
 import '../views/member_add_page.dart';
+import '../views/member_edit_page.dart';
+import '../models/member.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -21,6 +23,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/member/add',
       builder: (context, state) => const MemberAddPage(),
+    ),
+    GoRoute(
+      path: '/member/edit/:id',
+      builder: (context, state) {
+        final member = state.extra as Member;
+        return MemberEditPage(member: member);
+      },
     ),
   ],
 );

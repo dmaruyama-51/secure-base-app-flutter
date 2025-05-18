@@ -97,10 +97,9 @@ class _MemberListPageState extends State<MemberListPage> {
             return MemberListItem(
               member: _viewModel.members[index],
               onEditPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('編集: ${_viewModel.members[index].name}'),
-                  ),
+                GoRouter.of(context).push(
+                  '/member/edit/${_viewModel.members[index].name}',
+                  extra: _viewModel.members[index],
                 );
               },
             );

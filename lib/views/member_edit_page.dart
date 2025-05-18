@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
 import '../widgets/common/bottom_navigation.dart';
-import '../view_models/member_add_view_model.dart';
+import '../view_models/member_edit_view_model.dart';
+import '../models/member.dart';
 
-class MemberAddPage extends StatefulWidget {
-  const MemberAddPage({Key? key}) : super(key: key);
+class MemberEditPage extends StatefulWidget {
+  final Member member;
+
+  const MemberEditPage({super.key, required this.member});
 
   @override
-  State<MemberAddPage> createState() => _MemberAddPageState();
+  State<MemberEditPage> createState() => _MemberEditPageState();
 }
 
-class _MemberAddPageState extends State<MemberAddPage> {
+class _MemberEditPageState extends State<MemberEditPage> {
   // ViewModelのインスタンス
-  late MemberAddViewModel _viewModel;
+  late MemberEditViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = MemberAddViewModel();
+    _viewModel = MemberEditViewModel(member: widget.member);
   }
 
   @override
@@ -39,7 +42,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('メンバー追加', style: theme.textTheme.titleLarge),
+        title: Text('メンバー編集', style: theme.textTheme.titleLarge),
       ),
       body: AnimatedBuilder(
         animation: _viewModel,
@@ -172,18 +175,18 @@ class _MemberAddPageState extends State<MemberAddPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // 保存ボタン
+                // 更新ボタン
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _saveMember,
+                    onPressed: _viewModel.isSaving ? null : _updateMember,
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
                               color: theme.colorScheme.onPrimary,
                             )
                             : Text(
-                              'Save',
+                              '更新',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -280,8 +283,8 @@ class _MemberAddPageState extends State<MemberAddPage> {
     );
   }
 
-  // メンバー保存処理
-  Future<void> _saveMember() async {
-    await _viewModel.saveMember();
+  // メンバー更新処理
+  Future<void> _updateMember() async {
+    await _viewModel.updateMember();
   }
 }
