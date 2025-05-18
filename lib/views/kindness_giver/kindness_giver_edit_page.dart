@@ -1,23 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../view_models/member/member_add_view_model.dart';
+import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
+import '../../models/kindness_giver.dart';
 
-class KindnessGiverAddPage extends StatefulWidget {
-  const KindnessGiverAddPage({Key? key}) : super(key: key);
+class KindnessGiverEditPage extends StatefulWidget {
+  final KindnessGiver kindnessGiver;
+
+  const KindnessGiverEditPage({super.key, required this.kindnessGiver});
 
   @override
-  State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
+  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
 }
 
-class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
+class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
   // ViewModelのインスタンス
-  late KindnessGiverAddViewModel _viewModel;
+  late KindnessGiverEditViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverAddViewModel();
+    _viewModel = KindnessGiverEditViewModel(
+      kindnessGiver: widget.kindnessGiver,
+    );
   }
 
   @override
@@ -39,7 +44,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('メンバー追加', style: theme.textTheme.titleLarge),
+        title: Text('メンバー編集', style: theme.textTheme.titleLarge),
       ),
       body: AnimatedBuilder(
         animation: _viewModel,
@@ -172,18 +177,19 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // 保存ボタン
+                // 更新ボタン
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _saveKindnessGiver,
+                    onPressed:
+                        _viewModel.isSaving ? null : _updateKindnessGiver,
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
                               color: theme.colorScheme.onPrimary,
                             )
                             : Text(
-                              '保存',
+                              '更新',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -197,7 +203,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
         },
       ),
       bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memberタブを選択
+        currentIndex: 1, // memnberタブを選択
       ),
     );
   }
@@ -280,8 +286,8 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
     );
   }
 
-  // メンバー保存処理
-  Future<void> _saveKindnessGiver() async {
-    await _viewModel.saveKindnessGiver();
+  // メンバー更新処理
+  Future<void> _updateKindnessGiver() async {
+    await _viewModel.updateKindnessGiver();
   }
 }

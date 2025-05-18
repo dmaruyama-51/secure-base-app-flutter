@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
 import '../views/login_page.dart';
 import '../views/register_page.dart';
-import '../views/member/member_list_page.dart';
+import '../views/kindness_giver/kindness_giver_list_page.dart';
 import '../views/home_page.dart';
-import '../views/member/member_add_page.dart';
-import '../views/member/member_edit_page.dart';
+import '../views/kindness_giver/kindness_giver_add_page.dart';
+import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../models/kindness_giver.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
