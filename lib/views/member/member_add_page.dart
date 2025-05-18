@@ -1,28 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
-import '../widgets/common/bottom_navigation.dart';
-import '../view_models/member_edit_view_model.dart';
-import '../models/kindness_giver.dart';
+import '../../widgets/common/bottom_navigation.dart';
+import '../../view_models/member/member_add_view_model.dart';
 
-class KindnessGiverEditPage extends StatefulWidget {
-  final KindnessGiver kindnessGiver;
-
-  const KindnessGiverEditPage({super.key, required this.kindnessGiver});
+class KindnessGiverAddPage extends StatefulWidget {
+  const KindnessGiverAddPage({Key? key}) : super(key: key);
 
   @override
-  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
+  State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
 }
 
-class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
+class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   // ViewModelのインスタンス
-  late KindnessGiverEditViewModel _viewModel;
+  late KindnessGiverAddViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverEditViewModel(
-      kindnessGiver: widget.kindnessGiver,
-    );
+    _viewModel = KindnessGiverAddViewModel();
   }
 
   @override
@@ -44,7 +39,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('メンバー編集', style: theme.textTheme.titleLarge),
+        title: Text('メンバー追加', style: theme.textTheme.titleLarge),
       ),
       body: AnimatedBuilder(
         animation: _viewModel,
@@ -167,7 +162,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                     children: [
                       _buildRelationOption('家族'),
                       const SizedBox(width: 8),
-                      _buildRelationOption('友人'),
+                      _buildRelationOption('友達'),
                       const SizedBox(width: 8),
                       _buildRelationOption('パートナー'),
                       const SizedBox(width: 8),
@@ -177,19 +172,18 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                 ),
                 const SizedBox(height: 32),
 
-                // 更新ボタン
+                // 保存ボタン
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed:
-                        _viewModel.isSaving ? null : _updateKindnessGiver,
+                    onPressed: _viewModel.isSaving ? null : _saveKindnessGiver,
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
                               color: theme.colorScheme.onPrimary,
                             )
                             : Text(
-                              '更新',
+                              '保存',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -203,7 +197,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
         },
       ),
       bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memnberタブを選択
+        currentIndex: 1, // memberタブを選択
       ),
     );
   }
@@ -286,8 +280,8 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
   }
 
-  // メンバー更新処理
-  Future<void> _updateKindnessGiver() async {
-    await _viewModel.updateKindnessGiver();
+  // メンバー保存処理
+  Future<void> _saveKindnessGiver() async {
+    await _viewModel.saveKindnessGiver();
   }
 }

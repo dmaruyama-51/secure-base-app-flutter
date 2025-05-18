@@ -1,10 +1,10 @@
 import 'package:go_router/go_router.dart';
 import '../views/login_page.dart';
 import '../views/register_page.dart';
-import '../views/member_list_page.dart';
+import '../views/member/member_list_page.dart';
 import '../views/home_page.dart';
-import '../views/member_add_page.dart';
-import '../views/member_edit_page.dart';
+import '../views/member/member_add_page.dart';
+import '../views/member/member_edit_page.dart';
 import '../models/kindness_giver.dart';
 
 final GoRouter appRouter = GoRouter(

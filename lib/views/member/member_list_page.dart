@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../view_models/member/member_list_view_model.dart';
+import '../../view_models/member/member_list_view_model.dart';
 import '../../widgets/member_list_item.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';

@@ -1,34 +1,25 @@
 import 'package:flutter/material.dart';
-import '../repositories/kindness_giver_repository.dart';
-import '../models/kindness_giver.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../models/kindness_giver.dart';
 
-class KindnessGiverEditViewModel extends ChangeNotifier {
+class KindnessGiverAddViewModel extends ChangeNotifier {
   // リポジトリの注入
   final KindnessGiverRepository _repository;
 
-  // 編集対象の優しさをくれる人
-  final KindnessGiver originalKindnessGiver;
-
   // 状態管理
-  String selectedGender;
-  String selectedRelation;
+  String selectedGender = '女性';
+  String selectedRelation = '家族';
   String? errorMessage;
   String? successMessage;
   bool isSaving = false;
   bool shouldNavigateBack = false;
 
-  // テキスト入力の管理
-  final TextEditingController nameController;
+  // テキスト入力の管理 (Viewからコントローラを移動)
+  final TextEditingController nameController = TextEditingController();
 
   // コンストラクタでリポジトリの注入と初期値の設定
-  KindnessGiverEditViewModel({
-    required KindnessGiver kindnessGiver,
-    KindnessGiverRepository? repository,
-  }) : _repository = repository ?? KindnessGiverRepository(),
-       originalKindnessGiver = kindnessGiver,
-       selectedGender = kindnessGiver.gender,
-       selectedRelation = kindnessGiver.category,
-       nameController = TextEditingController(text: kindnessGiver.name);
+  KindnessGiverAddViewModel({KindnessGiverRepository? repository})
+    : _repository = repository ?? KindnessGiverRepository();
 
   // 性別選択
   void selectGender(String gender) {
@@ -50,13 +41,19 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       return false;
     }
 
+    if (selectedRelation.isEmpty) {
+      errorMessage = '関係性を選択してください';
+      notifyListeners();
+      return false;
+    }
+
     errorMessage = null;
     notifyListeners();
     return true;
   }
 
-  // 優しさをくれる人更新処理
-  Future<void> updateKindnessGiver() async {
+  // メンバー保存処理
+  Future<void> saveKindnessGiver() async {
     if (!_validateInput()) {
       return;
     }
@@ -65,22 +62,21 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       isSaving = true;
       notifyListeners();
 
-      // 更新用のKindnessGiverモデルの作成
-      final updatedKindnessGiver = KindnessGiver(
+      // KindnessGiverモデルの作成
+      final kindnessGiver = KindnessGiver(
         name: nameController.text.trim(),
         gender: selectedGender,
         category: selectedRelation,
-        avatarUrl: originalKindnessGiver.avatarUrl,
       );
 
       // リポジトリを通じて保存
-      final result = await _repository.saveKindnessGiver(updatedKindnessGiver);
+      final result = await _repository.saveKindnessGiver(kindnessGiver);
 
       if (result) {
-        successMessage = 'メンバー情報を更新しました';
+        successMessage = 'メンバーを保存しました';
         shouldNavigateBack = true;
       } else {
-        errorMessage = '更新に失敗しました';
+        errorMessage = '保存に失敗しました';
       }
     } catch (e) {
       errorMessage = 'エラーが発生しました: ${e.toString()}';
