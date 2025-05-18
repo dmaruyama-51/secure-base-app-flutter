@@ -17,7 +17,7 @@ class KindnessRecordListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final dateFormat = DateFormat('yyyy/MM/dd HH:mm');
+    final dateFormat = DateFormat('yyyy/MM/dd');
 
     return ListTile(
       leading: CircleAvatar(
