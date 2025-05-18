@@ -5,7 +5,7 @@ import '../views/member_list_page.dart';
 import '../views/home_page.dart';
 import '../views/member_add_page.dart';
 import '../views/member_edit_page.dart';
-import '../models/member.dart';
+import '../models/kindness_giver.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -17,18 +17,18 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterPage(),
     ),
     GoRoute(
-      path: '/members',
-      builder: (context, state) => const MemberListPage(),
+      path: '/kindness_giver',
+      builder: (context, state) => const KindnessGiverListPage(),
     ),
     GoRoute(
-      path: '/member/add',
-      builder: (context, state) => const MemberAddPage(),
+      path: '/kindness_giver/add',
+      builder: (context, state) => const KindnessGiverAddPage(),
     ),
     GoRoute(
-      path: '/member/edit/:id',
+      path: '/kindness_giver/edit/:id',
       builder: (context, state) {
-        final member = state.extra as Member;
-        return MemberEditPage(member: member);
+        final kindnessGiver = state.extra as KindnessGiver;
+        return KindnessGiverEditPage(kindnessGiver: kindnessGiver);
       },
     ),
   ],

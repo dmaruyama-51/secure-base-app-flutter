@@ -1,10 +1,10 @@
-class Member {
+class KindnessGiver {
   final String name;
   final String category;
   final String gender;
   final String? avatarUrl;
 
-  Member({
+  KindnessGiver({
     required this.name,
     required this.category,
     required this.gender,

@@ -2,25 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
 import '../widgets/common/bottom_navigation.dart';
 import '../view_models/member_edit_view_model.dart';
-import '../models/member.dart';
+import '../models/kindness_giver.dart';
 
-class MemberEditPage extends StatefulWidget {
-  final Member member;
+class KindnessGiverEditPage extends StatefulWidget {
+  final KindnessGiver kindnessGiver;
 
-  const MemberEditPage({super.key, required this.member});
+  const KindnessGiverEditPage({super.key, required this.kindnessGiver});
 
   @override
-  State<MemberEditPage> createState() => _MemberEditPageState();
+  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
 }
 
-class _MemberEditPageState extends State<MemberEditPage> {
+class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
   // ViewModelのインスタンス
-  late MemberEditViewModel _viewModel;
+  late KindnessGiverEditViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = MemberEditViewModel(member: widget.member);
+    _viewModel = KindnessGiverEditViewModel(
+      kindnessGiver: widget.kindnessGiver,
+    );
   }
 
   @override
@@ -179,7 +181,8 @@ class _MemberEditPageState extends State<MemberEditPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _updateMember,
+                    onPressed:
+                        _viewModel.isSaving ? null : _updateKindnessGiver,
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
@@ -200,7 +203,7 @@ class _MemberEditPageState extends State<MemberEditPage> {
         },
       ),
       bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memberタブを選択
+        currentIndex: 1, // memnberタブを選択
       ),
     );
   }
@@ -284,7 +287,7 @@ class _MemberEditPageState extends State<MemberEditPage> {
   }
 
   // メンバー更新処理
-  Future<void> _updateMember() async {
-    await _viewModel.updateMember();
+  Future<void> _updateKindnessGiver() async {
+    await _viewModel.updateKindnessGiver();
   }
 }

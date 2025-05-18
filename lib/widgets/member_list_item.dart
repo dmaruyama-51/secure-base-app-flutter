@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../models/member.dart';
+import '../models/kindness_giver.dart';
 
-class MemberListItem extends StatelessWidget {
-  final Member member;
+class KindnessGiverListItem extends StatelessWidget {
+  final KindnessGiver kindnessGiver;
   final VoidCallback onEditPressed;
 
-  const MemberListItem({
+  const KindnessGiverListItem({
     Key? key,
-    required this.member,
+    required this.kindnessGiver,
     required this.onEditPressed,
   }) : super(key: key);
 
@@ -19,9 +19,11 @@ class MemberListItem extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.surface,
         backgroundImage:
-            member.avatarUrl != null ? NetworkImage(member.avatarUrl!) : null,
+            kindnessGiver.avatarUrl != null
+                ? NetworkImage(kindnessGiver.avatarUrl!)
+                : null,
         child:
-            member.avatarUrl == null
+            kindnessGiver.avatarUrl == null
                 ? Icon(
                   Icons.person,
                   color: theme.colorScheme.onSurface.withAlpha(153),
@@ -29,11 +31,11 @@ class MemberListItem extends StatelessWidget {
                 : null,
       ),
       title: Text(
-        member.name,
+        kindnessGiver.name,
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        member.category,
+        kindnessGiver.category,
         style: TextStyle(
           fontSize: 14,
           color: theme.colorScheme.primary.withAlpha(200),

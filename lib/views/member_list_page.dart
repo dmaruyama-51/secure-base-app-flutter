@@ -4,27 +4,27 @@ import '../widgets/member_list_item.dart';
 import '../widgets/common/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
 
-class MemberListPage extends StatefulWidget {
-  const MemberListPage({Key? key}) : super(key: key);
+class KindnessGiverListPage extends StatefulWidget {
+  const KindnessGiverListPage({Key? key}) : super(key: key);
 
   @override
-  State<MemberListPage> createState() => _MemberListPageState();
+  State<KindnessGiverListPage> createState() => _KindnessGiverListPageState();
 }
 
-class _MemberListPageState extends State<MemberListPage> {
-  late MemberListViewModel _viewModel;
+class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
+  late KindnessGiverListViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
     // ViewModelのインスタンス化
-    _viewModel = MemberListViewModel();
+    _viewModel = KindnessGiverListViewModel();
     // データの読み込み
-    _loadMembers();
+    _loadKindnessGivers();
   }
 
-  Future<void> _loadMembers() async {
-    await _viewModel.loadMembers();
+  Future<void> _loadKindnessGivers() async {
+    await _viewModel.loadKindnessGivers();
   }
 
   @override
@@ -38,18 +38,18 @@ class _MemberListPageState extends State<MemberListPage> {
         elevation: 0,
         automaticallyImplyLeading: false,
         centerTitle: false,
-        title: Text('Members', style: theme.textTheme.titleLarge),
+        title: Text('メンバー一覧', style: theme.textTheme.titleLarge),
       ),
       body: _buildBody(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: theme.colorScheme.primary,
         onPressed: () {
-          GoRouter.of(context).push('/member/add');
+          GoRouter.of(context).push('/kindness_giver/add');
         },
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary),
       ),
       bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memberタブを選択済みとして表示
+        currentIndex: 1, // メンバータブを選択済みとして表示
       ),
     );
   }
@@ -75,7 +75,7 @@ class _MemberListPageState extends State<MemberListPage> {
                 Text(_viewModel.error!, style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: _loadMembers,
+                  onPressed: _loadKindnessGivers,
                   child: const Text('再試行'),
                 ),
               ],
@@ -84,7 +84,7 @@ class _MemberListPageState extends State<MemberListPage> {
         }
 
         // メンバーがいない場合
-        if (_viewModel.members.isEmpty) {
+        if (_viewModel.kindnessGivers.isEmpty) {
           return Center(
             child: Text('メンバーがいません', style: theme.textTheme.bodyMedium),
           );
@@ -92,14 +92,14 @@ class _MemberListPageState extends State<MemberListPage> {
 
         // メンバーがいる場合
         return ListView.builder(
-          itemCount: _viewModel.members.length,
+          itemCount: _viewModel.kindnessGivers.length,
           itemBuilder: (context, index) {
-            return MemberListItem(
-              member: _viewModel.members[index],
+            return KindnessGiverListItem(
+              kindnessGiver: _viewModel.kindnessGivers[index],
               onEditPressed: () {
                 GoRouter.of(context).push(
-                  '/member/edit/${_viewModel.members[index].name}',
-                  extra: _viewModel.members[index],
+                  '/kindness_giver/edit/${_viewModel.kindnessGivers[index].name}',
+                  extra: _viewModel.kindnessGivers[index],
                 );
               },
             );

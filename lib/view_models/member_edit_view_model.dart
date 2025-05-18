@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../repositories/member_repository.dart';
-import '../models/member.dart';
+import '../repositories/kindness_giver_repository.dart';
+import '../models/kindness_giver.dart';
 
-class MemberEditViewModel extends ChangeNotifier {
+class KindnessGiverEditViewModel extends ChangeNotifier {
   // リポジトリの注入
-  final MemberRepository _repository;
+  final KindnessGiverRepository _repository;
 
-  // 編集対象のメンバー
-  final Member originalMember;
+  // 編集対象の優しさをくれる人
+  final KindnessGiver originalKindnessGiver;
 
   // 状態管理
   String selectedGender;
@@ -21,12 +21,14 @@ class MemberEditViewModel extends ChangeNotifier {
   final TextEditingController nameController;
 
   // コンストラクタでリポジトリの注入と初期値の設定
-  MemberEditViewModel({required Member member, MemberRepository? repository})
-    : _repository = repository ?? MemberRepository(),
-      originalMember = member,
-      selectedGender = member.gender,
-      selectedRelation = member.category,
-      nameController = TextEditingController(text: member.name);
+  KindnessGiverEditViewModel({
+    required KindnessGiver kindnessGiver,
+    KindnessGiverRepository? repository,
+  }) : _repository = repository ?? KindnessGiverRepository(),
+       originalKindnessGiver = kindnessGiver,
+       selectedGender = kindnessGiver.gender,
+       selectedRelation = kindnessGiver.category,
+       nameController = TextEditingController(text: kindnessGiver.name);
 
   // 性別選択
   void selectGender(String gender) {
@@ -53,8 +55,8 @@ class MemberEditViewModel extends ChangeNotifier {
     return true;
   }
 
-  // メンバー更新処理
-  Future<void> updateMember() async {
+  // 優しさをくれる人更新処理
+  Future<void> updateKindnessGiver() async {
     if (!_validateInput()) {
       return;
     }
@@ -63,16 +65,16 @@ class MemberEditViewModel extends ChangeNotifier {
       isSaving = true;
       notifyListeners();
 
-      // 更新用のMemberモデルの作成
-      final updatedMember = Member(
+      // 更新用のKindnessGiverモデルの作成
+      final updatedKindnessGiver = KindnessGiver(
         name: nameController.text.trim(),
         gender: selectedGender,
         category: selectedRelation,
-        avatarUrl: originalMember.avatarUrl,
+        avatarUrl: originalKindnessGiver.avatarUrl,
       );
 
       // リポジトリを通じて保存
-      final result = await _repository.saveMember(updatedMember);
+      final result = await _repository.saveKindnessGiver(updatedKindnessGiver);
 
       if (result) {
         successMessage = 'メンバー情報を更新しました';
