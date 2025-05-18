@@ -1,0 +1,46 @@
+import '../models/kindness_record.dart';
+
+class KindnessRecordRepository {
+  Future<List<KindnessRecord>> fetchKindnessRecords() async {
+    // TODO: データベースから取得する実装に変更
+    // サンプルデータ
+    return [
+      KindnessRecord(
+        id: 1,
+        userId: 1,
+        giverId: 1,
+        content: '朝食を作ってくれました',
+        createdAt: DateTime.now().subtract(const Duration(hours: 1)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 1)),
+        giverName: 'お母さん',
+        giverAvatarUrl: null,
+      ),
+      KindnessRecord(
+        id: 2,
+        userId: 1,
+        giverId: 2,
+        content: '仕事の相談に乗ってくれました',
+        createdAt: DateTime.now().subtract(const Duration(hours: 2)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
+        giverName: 'お父さん',
+        giverAvatarUrl: null,
+      ),
+      KindnessRecord(
+        id: 3,
+        userId: 1,
+        giverId: 3,
+        content: '誕生日にプレゼントをくれました',
+        createdAt: DateTime.now().subtract(const Duration(hours: 3)),
+        updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
+        giverName: 'たろー',
+        giverAvatarUrl: null,
+      ),
+    ];
+  }
+
+  Future<bool> saveKindnessRecord(KindnessRecord record) async {
+    // TODO: 実際のデータベースに保存する処理を実装
+    // 現在はダミー実装として成功を返す
+    return true;
+  }
+} 
