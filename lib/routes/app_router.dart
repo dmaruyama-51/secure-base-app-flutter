@@ -29,7 +29,7 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const KindnessRecordListPage(),
     ),
     GoRoute(
-      path: '/kindness-record/add',
+      path: '/kindness-records/add',
       builder: (context, state) => const KindnessRecordAddPage(),
     ),
   ],
