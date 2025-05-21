@@ -4,11 +4,13 @@ import '../models/kindness_giver.dart';
 class KindnessGiverListItem extends StatelessWidget {
   final KindnessGiver kindnessGiver;
   final VoidCallback onEditPressed;
+  final VoidCallback onDeletePressed;
 
   const KindnessGiverListItem({
     Key? key,
     required this.kindnessGiver,
     required this.onEditPressed,
+    required this.onDeletePressed,
   }) : super(key: key);
 
   @override
@@ -41,12 +43,24 @@ class KindnessGiverListItem extends StatelessWidget {
           color: theme.colorScheme.primary.withAlpha(200),
         ),
       ),
-      trailing: IconButton(
-        icon: Icon(
-          Icons.edit,
-          color: theme.colorScheme.onSurface.withAlpha(153),
-        ),
-        onPressed: onEditPressed,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          IconButton(
+            icon: Icon(
+              Icons.edit,
+              color: theme.colorScheme.onSurface.withAlpha(153),
+            ),
+            onPressed: onEditPressed,
+          ),
+          IconButton(
+            icon: Icon(
+              Icons.delete,
+              color: theme.colorScheme.error.withAlpha(153),
+            ),
+            onPressed: onDeletePressed,
+          ),
+        ],
       ),
     );
   }

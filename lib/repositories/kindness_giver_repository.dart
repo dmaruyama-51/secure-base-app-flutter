@@ -118,4 +118,26 @@ class KindnessGiverRepository {
       return [];
     }
   }
+
+  /// メンバー削除
+  Future<bool> deleteKindnessGiver(int kindnessGiverId) async {
+    try {
+      // ユーザーIDがない場合は削除できない
+      final userId = _currentUserId;
+      if (userId == null) {
+        return false;
+      }
+
+      // 自分のデータのみ削除可能
+      await _supabase
+          .from('kindness_givers')
+          .delete()
+          .eq('id', kindnessGiverId)
+          .eq('user_id', userId);
+      return true;
+    } catch (e) {
+      print('削除エラー: $e');
+      return false;
+    }
+  }
 }

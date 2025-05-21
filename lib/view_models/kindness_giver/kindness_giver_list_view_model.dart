@@ -30,4 +30,20 @@ class KindnessGiverListViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  // メンバーの削除
+  Future<bool> deleteKindnessGiver(int kindnessGiverId) async {
+    try {
+      final result = await _repository.deleteKindnessGiver(kindnessGiverId);
+      if (result) {
+        // 削除成功したら、リストを更新
+        await loadKindnessGivers();
+      }
+      return result;
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 }

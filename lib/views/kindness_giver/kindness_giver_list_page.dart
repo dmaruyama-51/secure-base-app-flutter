@@ -4,6 +4,7 @@ import '../../widgets/kindness_giver_list_item.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
 import '../../utils/constants.dart';
+import '../../models/kindness_giver.dart';
 
 class KindnessGiverListPage extends StatefulWidget {
   const KindnessGiverListPage({Key? key}) : super(key: key);
@@ -118,10 +119,51 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
                   extra: _viewModel.kindnessGivers[index],
                 );
               },
+              onDeletePressed: () {
+                _showDeleteConfirmationDialog(_viewModel.kindnessGivers[index]);
+              },
             );
           },
         );
       },
+    );
+  }
+
+  // 削除確認ダイアログを表示するメソッドを追加
+  void _showDeleteConfirmationDialog(KindnessGiver kindnessGiver) {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('削除の確認'),
+            content: Text('${kindnessGiver.name}を削除してもよろしいですか？'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // ダイアログを閉じる
+                },
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () async {
+                  Navigator.of(context).pop(); // ダイアログを閉じる
+                  // 削除処理を実行
+                  final result = await _viewModel.deleteKindnessGiver(
+                    kindnessGiver.id!,
+                  );
+                  if (result && mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('メンバーを削除しました')),
+                    );
+                  }
+                },
+                child: Text(
+                  '削除',
+                  style: TextStyle(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            ],
+          ),
     );
   }
 }
