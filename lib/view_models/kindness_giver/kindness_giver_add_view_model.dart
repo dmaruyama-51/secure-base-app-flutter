@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../models/kindness_giver.dart';
+import '../../utils/constants.dart';
 
 class KindnessGiverAddViewModel extends ChangeNotifier {
   // リポジトリの注入
@@ -107,6 +108,9 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
       if (result) {
         successMessage = 'メンバーを保存しました';
         shouldNavigateBack = true;
+
+        // 保存に成功したら、リストを更新するためのイベントを発火
+        kindnessGiverListUpdateNotifier.notifyListeners();
       } else {
         errorMessage = '保存に失敗しました';
       }

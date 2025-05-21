@@ -4,9 +4,13 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 /// Supabase にアクセスするためのクライアントインスタンス
 final supabase = Supabase.instance.client;
 
+/// KindnessGiverリストの更新を通知するためのNotifier
+final kindnessGiverListUpdateNotifier = ChangeNotifier();
+
 /// シンプルなプリローダー
-const preloader =
-Center(child: CircularProgressIndicator(color: Colors.orange));
+const preloader = Center(
+  child: CircularProgressIndicator(color: Colors.orange),
+);
 
 /// ちょっとした隙間を作るのに便利なウィジェット
 const formSpacer = SizedBox(width: 16, height: 16);
@@ -24,10 +28,9 @@ extension ShowSnackBar on BuildContext {
     required String message,
     Color backgroundColor = Colors.white,
   }) {
-    ScaffoldMessenger.of(this).showSnackBar(SnackBar(
-      content: Text(message),
-      backgroundColor: backgroundColor,
-    ));
+    ScaffoldMessenger.of(this).showSnackBar(
+      SnackBar(content: Text(message), backgroundColor: backgroundColor),
+    );
   }
 
   /// エラーが起きた際のSnackbarを表示

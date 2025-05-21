@@ -3,6 +3,7 @@ import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/kindness_giver_list_item.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
+import '../../utils/constants.dart';
 
 class KindnessGiverListPage extends StatefulWidget {
   const KindnessGiverListPage({Key? key}) : super(key: key);
@@ -20,6 +21,21 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     // ViewModelのインスタンス化
     _viewModel = KindnessGiverListViewModel();
     // データの読み込み
+    _loadKindnessGivers();
+
+    // 更新通知をリッスンする
+    kindnessGiverListUpdateNotifier.addListener(_onListUpdate);
+  }
+
+  @override
+  void dispose() {
+    // リスナーの解除
+    kindnessGiverListUpdateNotifier.removeListener(_onListUpdate);
+    super.dispose();
+  }
+
+  // リストの更新が通知されたときに呼ばれる
+  void _onListUpdate() {
     _loadKindnessGivers();
   }
 
