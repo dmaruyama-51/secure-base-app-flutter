@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../models/kindness_giver.dart';
+import '../../utils/constants.dart';
 
 class KindnessGiverEditViewModel extends ChangeNotifier {
   // リポジトリの注入
@@ -20,6 +21,14 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   // テキスト入力の管理
   final TextEditingController nameController;
 
+  // マスターデータ保持用の変数を追加
+  List<Map<String, dynamic>> relationships = [];
+  List<Map<String, dynamic>> genders = [];
+
+  // IDを保持する変数を追加
+  int relationshipId;
+  int genderId;
+
   // コンストラクタでリポジトリの注入と初期値の設定
   KindnessGiverEditViewModel({
     required KindnessGiver kindnessGiver,
@@ -28,17 +37,40 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
        originalKindnessGiver = kindnessGiver,
        selectedGender = kindnessGiver.gender,
        selectedRelation = kindnessGiver.relationship,
-       nameController = TextEditingController(text: kindnessGiver.name);
+       relationshipId = kindnessGiver.relationshipId,
+       genderId = kindnessGiver.genderId,
+       nameController = TextEditingController(text: kindnessGiver.name) {
+    _loadMasterData(); // 初期化時にマスターデータ読み込み
+  }
+
+  // マスターデータ読み込みメソッド
+  Future<void> _loadMasterData() async {
+    relationships = await _repository.fetchRelationships();
+    genders = await _repository.fetchGenders();
+    notifyListeners();
+  }
 
   // 性別選択
   void selectGender(String gender) {
     selectedGender = gender;
+    // IDを取得
+    final selectedGenderData = genders.firstWhere(
+      (g) => g['name'] == gender,
+      orElse: () => {'id': genderId}, // 元のIDをデフォルト値として使用
+    );
+    genderId = selectedGenderData['id'];
     notifyListeners();
   }
 
   // 関係性選択
   void selectRelation(String relation) {
     selectedRelation = relation;
+    // IDを取得
+    final selectedRelationData = relationships.firstWhere(
+      (r) => r['name'] == relation,
+      orElse: () => {'id': relationshipId}, // 元のIDをデフォルト値として使用
+    );
+    relationshipId = selectedRelationData['id'];
     notifyListeners();
   }
 
@@ -79,8 +111,8 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
         relationship: selectedRelation,
         avatarUrl: originalKindnessGiver.avatarUrl,
         userId: originalKindnessGiver.userId,
-        relationshipId: originalKindnessGiver.relationshipId,
-        genderId: originalKindnessGiver.genderId,
+        relationshipId: relationshipId, // 更新されたID
+        genderId: genderId, // 更新されたID
       );
 
       // リポジトリを通じて保存
@@ -89,6 +121,9 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       if (result) {
         successMessage = 'メンバー情報を更新しました';
         shouldNavigateBack = true;
+
+        // 保存に成功したら、リストを更新するためのイベントを発火
+        kindnessGiverListUpdateNotifier.notifyListeners();
       } else {
         errorMessage = '更新に失敗しました';
       }
