@@ -31,9 +31,10 @@ class _RegisterPageState extends State<RegisterPage> {
     final password = _passwordController.text;
     try {
       await supabase.auth.signUp(email: email, password: password);
-      // TODO: 遷移先ページを追加
-      // Navigator.of(context)
-      //     .pushAndRemoveUntil(NextPage.route(), (route) => false);
+      // 登録後はホーム画面に遷移
+      if (mounted) {
+        context.go('/');
+      }
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (error) {

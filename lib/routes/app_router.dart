@@ -8,9 +8,39 @@ import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../models/kindness_giver.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
+import '../utils/constants.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
+  redirect: (context, state) {
+    // 現在のユーザー情報を取得
+    final currentUser = supabase.auth.currentUser;
+
+    // 現在のパス
+    final currentPath = state.uri.path;
+
+    // 認証が必要なパスのリスト
+    final requiresAuth = ['/kindness-givers', '/kindness-givers/add'];
+
+    // 現在のパスが認証が必要なパスかどうか
+    final requiresAuthForCurrentPath = requiresAuth.any(
+      (path) => currentPath.startsWith(path),
+    );
+
+    // 認証が必要なパスにアクセスしようとしているが、ログインしていない場合
+    if (requiresAuthForCurrentPath && currentUser == null) {
+      return '/login';
+    }
+
+    // ログイン済みでログインページにアクセスしようとしている場合
+    if ((currentPath == '/login' || currentPath == '/register') &&
+        currentUser != null) {
+      return '/';
+    }
+
+    // それ以外の場合は通常のルーティング
+    return null;
+  },
   routes: [
     GoRoute(path: '/', builder: (context, state) => const HomePage()),
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),

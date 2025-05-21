@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -27,9 +28,10 @@ class LoginPageState extends State<LoginPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // TODO: ログイン後遷移先ページを追加
-      // Navigator.of(context)
-      //     .pushAndRemoveUntil(NextPage.route(), (route) => false);
+      // ログイン後はホーム画面に遷移
+      if (mounted) {
+        context.go('/');
+      }
     } on AuthException catch (error) {
       context.showErrorSnackBar(message: error.message);
     } catch (_) {

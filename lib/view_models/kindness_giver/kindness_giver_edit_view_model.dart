@@ -73,10 +73,14 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
 
       // 更新用のKindnessGiverモデルの作成
       final updatedKindnessGiver = KindnessGiver(
+        id: originalKindnessGiver.id,
         name: nameController.text.trim(),
         gender: selectedGender,
         relationship: selectedRelation,
         avatarUrl: originalKindnessGiver.avatarUrl,
+        userId: originalKindnessGiver.userId,
+        relationshipId: originalKindnessGiver.relationshipId,
+        genderId: originalKindnessGiver.genderId,
       );
 
       // リポジトリを通じて保存
