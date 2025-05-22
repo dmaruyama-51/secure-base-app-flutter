@@ -32,14 +32,12 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   // 保存成功時に画面を戻すかどうか
   bool shouldNavigateBack = false;
 
-  // コンストラクタ。リポジトリのDI対応
+  // コンストラクタ。リポジトリは外部から注入
   KindnessRecordAddViewModel({
-    KindnessGiverRepository? kindnessGiverRepository,
-    KindnessRecordRepository? kindnessRecordRepository,
-  }) : _kindnessGiverRepository =
-           kindnessGiverRepository ?? KindnessGiverRepository(),
-       _kindnessRecordRepository =
-           kindnessRecordRepository ?? KindnessRecordRepository();
+    required KindnessGiverRepository kindnessGiverRepository,
+    required KindnessRecordRepository kindnessRecordRepository,
+  }) : _kindnessGiverRepository = kindnessGiverRepository,
+       _kindnessRecordRepository = kindnessRecordRepository;
 
   // メンバー一覧を取得する
   Future<void> loadMembers() async {
