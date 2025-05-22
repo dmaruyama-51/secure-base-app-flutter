@@ -60,8 +60,8 @@ class KindnessGiverRepository {
     }
   }
 
-  /// 優しさをくれる人を保存する
-  Future<bool> saveKindnessGiver(KindnessGiver kindnessGiver) async {
+  /// メンバー新規作成
+  Future<bool> createKindnessGiver(KindnessGiver kindnessGiver) async {
     try {
       // ユーザーIDがない場合は保存できない
       final userId = _currentUserId;
@@ -73,20 +73,43 @@ class KindnessGiverRepository {
       // 現在のユーザーIDを設定
       data['user_id'] = userId;
 
-      if (kindnessGiver.id != null) {
-        // 既存データの更新（自分のデータのみ更新可能）
-        await _supabase
-            .from('kindness_givers')
-            .update(data)
-            .eq('id', kindnessGiver.id as int)
-            .eq('user_id', userId);
-      } else {
-        // 新規データの追加
-        await _supabase.from('kindness_givers').insert(data);
-      }
+      // 新規データの追加
+      await _supabase.from('kindness_givers').insert(data);
       return true;
     } catch (e) {
-      print('保存エラー: $e');
+      print('作成エラー: $e');
+      return false;
+    }
+  }
+
+  /// 優しさをくれる人を更新する
+  Future<bool> updateKindnessGiver(KindnessGiver kindnessGiver) async {
+    try {
+      // ユーザーIDがない場合は更新できない
+      final userId = _currentUserId;
+      if (userId == null) {
+        return false;
+      }
+
+      // IDがない場合は更新できない
+      if (kindnessGiver.id == null) {
+        print('更新エラー: IDがありません。');
+        return false;
+      }
+
+      final data = kindnessGiver.toMap();
+      // 現在のユーザーIDを設定（念のため）
+      data['user_id'] = userId;
+
+      // 既存データの更新（自分のデータのみ更新可能）
+      await _supabase
+          .from('kindness_givers')
+          .update(data)
+          .eq('id', kindnessGiver.id as int)
+          .eq('user_id', userId);
+      return true;
+    } catch (e) {
+      print('更新エラー: $e');
       return false;
     }
   }

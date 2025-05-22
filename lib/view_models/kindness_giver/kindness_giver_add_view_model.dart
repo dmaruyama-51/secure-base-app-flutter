@@ -5,9 +5,9 @@ import '../../utils/constants.dart';
 import 'kindness_giver_base_view_model.dart';
 
 class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
-  KindnessGiverAddViewModel({KindnessGiverRepository? repository})
+  KindnessGiverAddViewModel(KindnessGiverRepository repository)
     : super(
-        repository: repository ?? KindnessGiverRepository(),
+        repository: repository,
         selectedGender: '女性',
         selectedRelation: '家族',
         relationshipId: 1,
@@ -16,7 +16,7 @@ class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
       );
 
   @override
-  Future<void> saveKindnessGiver() async {
+  Future<void> createKindnessGiver() async {
     if (!validateInput()) {
       return;
     }
@@ -36,7 +36,7 @@ class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
       );
 
       // リポジトリを通じて保存
-      final result = await repository.saveKindnessGiver(kindnessGiver);
+      final result = await repository.createKindnessGiver(kindnessGiver);
 
       if (result) {
         successMessage = 'メンバーを保存しました';
@@ -53,5 +53,21 @@ class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
       isSaving = false;
       notifyListeners();
     }
+  }
+
+  @override
+  Future<void> updateKindnessGiver() async {
+    // この ViewModel では更新処理は行わない
+    throw UnimplementedError(
+      'Update operation is not supported in AddViewModel.',
+    );
+  }
+
+  @override
+  Future<void> deleteKindnessGiver(int kindnessGiverId) async {
+    // この ViewModel では削除処理は行わない
+    throw UnimplementedError(
+      'Delete operation is not supported in AddViewModel.',
+    );
   }
 }

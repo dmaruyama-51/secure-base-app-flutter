@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
+import '../../repositories/kindness_giver_repository.dart';
 
 class KindnessGiverAddPage extends StatefulWidget {
-  const KindnessGiverAddPage({Key? key}) : super(key: key);
+  const KindnessGiverAddPage({super.key});
 
   @override
   State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
@@ -17,7 +18,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverAddViewModel();
+    _viewModel = KindnessGiverAddViewModel(KindnessGiverRepository());
   }
 
   @override
@@ -176,7 +177,10 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _saveKindnessGiver,
+                    onPressed:
+                        _viewModel.isSaving
+                            ? null
+                            : () => _viewModel.createKindnessGiver(),
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
@@ -278,10 +282,5 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
         ),
       ),
     );
-  }
-
-  // メンバー保存処理
-  Future<void> _saveKindnessGiver() async {
-    await _viewModel.saveKindnessGiver();
   }
 }

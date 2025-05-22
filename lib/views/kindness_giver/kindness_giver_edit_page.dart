@@ -182,7 +182,9 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed:
-                        _viewModel.isSaving ? null : _updateKindnessGiver,
+                        _viewModel.isSaving
+                            ? null
+                            : () => _viewModel.updateKindnessGiver(),
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
@@ -284,10 +286,5 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
         ),
       ),
     );
-  }
-
-  // メンバー更新処理
-  Future<void> _updateKindnessGiver() async {
-    await _viewModel.updateKindnessGiver();
   }
 }

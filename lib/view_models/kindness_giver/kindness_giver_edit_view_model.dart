@@ -21,12 +21,8 @@ class KindnessGiverEditViewModel extends KindnessGiverBaseViewModel {
          nameController: TextEditingController(text: kindnessGiver.name),
        );
 
-  @override
-  Future<void> saveKindnessGiver() async {
-    return updateKindnessGiver();
-  }
-
   // メンバー更新処理
+  @override
   Future<void> updateKindnessGiver() async {
     if (!validateInput()) {
       return;
@@ -48,8 +44,8 @@ class KindnessGiverEditViewModel extends KindnessGiverBaseViewModel {
         genderId: genderId,
       );
 
-      // リポジトリを通じて保存
-      final result = await repository.saveKindnessGiver(updatedKindnessGiver);
+      // リポジトリを通じて更新
+      final result = await repository.updateKindnessGiver(updatedKindnessGiver);
 
       if (result) {
         successMessage = 'メンバー情報を更新しました';
@@ -66,5 +62,20 @@ class KindnessGiverEditViewModel extends KindnessGiverBaseViewModel {
       isSaving = false;
       notifyListeners();
     }
+  }
+
+  @override
+  Future<void> createKindnessGiver() async {
+    // この ViewModel では新規作成処理は行わない
+    throw UnimplementedError(
+      'Create operation is not supported in EditViewModel.',
+    );
+  }
+
+  @override
+  Future<void> deleteKindnessGiver(int kindnessGiverId) async {
+    throw UnimplementedError(
+      'Delete operation is not implemented yet in EditViewModel.',
+    );
   }
 }

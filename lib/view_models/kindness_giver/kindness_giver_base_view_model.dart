@@ -87,9 +87,6 @@ abstract class KindnessGiverBaseViewModel extends ChangeNotifier {
     return true;
   }
 
-  // 保存処理の抽象メソッド
-  Future<void> saveKindnessGiver();
-
   // エラーメッセージと成功メッセージをクリアする
   void clearMessages() {
     errorMessage = null;
@@ -111,6 +108,15 @@ abstract class KindnessGiverBaseViewModel extends ChangeNotifier {
         return Icons.person;
     }
   }
+
+  // メンバー追加
+  Future<void> createKindnessGiver();
+
+  /// メンバー更新
+  Future<void> updateKindnessGiver();
+
+  /// メンバー削除
+  Future<void> deleteKindnessGiver(int kindnessGiverId);
 
   @override
   void dispose() {
