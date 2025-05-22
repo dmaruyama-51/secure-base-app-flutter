@@ -14,7 +14,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   bool isSaving = false;
   bool shouldNavigateBack = false;
 
-  // テキスト入力の管理 (Viewからコントローラを移動)
+  // テキスト入力の管理
   final TextEditingController nameController = TextEditingController();
 
   // コンストラクタでリポジトリの注入と初期値の設定
@@ -69,10 +69,11 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
         category: selectedRelation,
       );
 
-      // リポジトリを通じて保存
-      final result = await _repository.saveKindnessGiver(kindnessGiver);
+      // リポジトリを通じて新規作成
+      final createdGiver = await _repository.createKindnessGiver(kindnessGiver);
 
-      if (result) {
+      // IDが付与されていれば成功
+      if (createdGiver.id != null) {
         successMessage = 'メンバーを保存しました';
         shouldNavigateBack = true;
       } else {
