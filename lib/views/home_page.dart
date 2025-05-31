@@ -43,6 +43,13 @@ class _HomePageState extends State<HomePage> {
               },
               child: const Text('優しさ記録ページへ'),
             ),
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: () {
+                context.go('/reflection');
+              },
+              child: const Text('リフレクションページへ'),
+            ),
           ],
         ),
       ),

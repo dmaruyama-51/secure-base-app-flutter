@@ -24,7 +24,7 @@ class BottomNavigation extends StatelessWidget {
             context.go('/kindness-givers');
             break;
           case 2:
-            context.go('/'); // Reflectionページ用（未実装）
+            context.go('/reflection');
             break;
           case 3:
             context.go('/'); // Settingページ用（未実装）

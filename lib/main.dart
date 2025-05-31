@@ -53,6 +53,9 @@ class _MyAppState extends State<MyApp> {
           onError: Colors.white,
           surface: AppColors.background,
           onSurface: AppColors.text,
+          surfaceContainerHighest: AppColors.reflectionCardBackground,
+          outline: AppColors.reflectionCardBorder,
+          outlineVariant: AppColors.textLight,
         ),
         scaffoldBackgroundColor: AppColors.background,
         textTheme: TextTheme(

@@ -5,6 +5,7 @@ import '../views/kindness_giver/kindness_giver_list_page.dart';
 import '../views/home_page.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
+import '../views/reflection_page.dart';
 import '../models/kindness_giver.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
@@ -70,6 +71,10 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/kindness-records/add',
       builder: (context, state) => const KindnessRecordAddPage(),
+    ),
+    GoRoute(
+      path: '/reflection',
+      builder: (context, state) => const ReflectionPage(),
     ),
   ],
 );
