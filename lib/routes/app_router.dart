@@ -74,11 +74,11 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const KindnessRecordAddPage(),
     ),
     GoRoute(
-      path: '/reflection',
+      path: '/reflections',
       builder: (context, state) => const ReflectionPage(),
     ),
     GoRoute(
-      path: '/reflection/summary/:id',
+      path: '/reflections/summary/:id',
       builder: (context, state) {
         final summaryId = state.pathParameters['id']!;
         return ReflectionSummaryPage(summaryId: summaryId);

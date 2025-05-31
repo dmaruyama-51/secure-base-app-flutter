@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                context.go('/reflection');
+                context.go('/reflections');
               },
               child: const Text('リフレクションページへ'),
             ),

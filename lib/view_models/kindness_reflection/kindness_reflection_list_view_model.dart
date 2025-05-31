@@ -38,6 +38,6 @@ class KindnessReflectionListViewModel extends ChangeNotifier {
 
   // リストアイテムタップ時の処理
   void onReflectionItemTap(BuildContext context, KindnessReflection item) {
-    GoRouter.of(context).push('/reflection/summary/${item.id}');
+    GoRouter.of(context).push('/reflections/summary/${item.id}');
   }
 }
