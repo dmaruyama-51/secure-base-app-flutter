@@ -7,7 +7,7 @@ import '../../utils/constants.dart';
 import '../../models/kindness_giver.dart';
 
 class KindnessGiverListPage extends StatefulWidget {
-  const KindnessGiverListPage({Key? key}) : super(key: key);
+  const KindnessGiverListPage({super.key});
 
   @override
   State<KindnessGiverListPage> createState() => _KindnessGiverListPageState();

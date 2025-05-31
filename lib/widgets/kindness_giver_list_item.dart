@@ -7,11 +7,11 @@ class KindnessGiverListItem extends StatelessWidget {
   final VoidCallback onDeletePressed;
 
   const KindnessGiverListItem({
-    Key? key,
+    super.key,
     required this.kindnessGiver,
     required this.onEditPressed,
     required this.onDeletePressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

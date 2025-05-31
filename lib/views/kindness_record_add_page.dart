@@ -3,7 +3,7 @@ import '../view_models/kindness_record_add_view_model.dart';
 
 // やさしさ記録追加ページの画面Widget
 class KindnessRecordAddPage extends StatefulWidget {
-  const KindnessRecordAddPage({Key? key}) : super(key: key);
+  const KindnessRecordAddPage({super.key});
 
   @override
   State<KindnessRecordAddPage> createState() => _KindnessRecordAddPageState();

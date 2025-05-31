@@ -8,10 +8,7 @@ class KindnessRecordListItem extends StatelessWidget {
   final KindnessRecord record;
 
   // コンストラクタ
-  const KindnessRecordListItem({
-    Key? key,
-    required this.record,
-  }) : super(key: key);
+  const KindnessRecordListItem({super.key, required this.record});
 
   // UI構築処理
   @override
@@ -23,7 +20,9 @@ class KindnessRecordListItem extends StatelessWidget {
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.surface,
         backgroundImage:
-            record.giverAvatarUrl != null ? NetworkImage(record.giverAvatarUrl!) : null,
+            record.giverAvatarUrl != null
+                ? NetworkImage(record.giverAvatarUrl!)
+                : null,
         child:
             record.giverAvatarUrl == null
                 ? Icon(
@@ -45,4 +44,4 @@ class KindnessRecordListItem extends StatelessWidget {
       ),
     );
   }
-} 
+}

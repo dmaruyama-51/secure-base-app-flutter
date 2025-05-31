@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 
 // やさしさ記録一覧ページの画面Widget
 class KindnessRecordListPage extends StatefulWidget {
-  const KindnessRecordListPage({Key? key}) : super(key: key);
+  const KindnessRecordListPage({super.key});
 
   @override
   State<KindnessRecordListPage> createState() => _KindnessRecordListPageState();
@@ -95,12 +95,10 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
         return ListView.builder(
           itemCount: _viewModel.records.length,
           itemBuilder: (context, index) {
-            return KindnessRecordListItem(
-              record: _viewModel.records[index],
-            );
+            return KindnessRecordListItem(record: _viewModel.records[index]);
           },
         );
       },
     );
   }
-} 
+}
