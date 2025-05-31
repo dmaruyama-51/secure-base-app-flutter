@@ -22,7 +22,12 @@ final GoRouter appRouter = GoRouter(
     final currentPath = state.uri.path;
 
     // 認証が必要なパスのリスト
-    final requiresAuth = ['/kindness-givers', '/kindness-givers/add'];
+    final requiresAuth = [
+      '/kindness-givers',
+      '/kindness-givers/add',
+      '/reflections',
+      '/reflections/summary',
+    ];
 
     // 現在のパスが認証が必要なパスかどうか
     final requiresAuthForCurrentPath = requiresAuth.any(
