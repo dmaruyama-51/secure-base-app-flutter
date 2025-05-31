@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/common/bottom_navigation.dart';
 import '../widgets/reflection_list_item.dart';
+import '../view_models/kindness_reflection_view_model.dart';
 
 // Reflectionページの画面Widget
 class ReflectionPage extends StatefulWidget {
@@ -12,24 +13,25 @@ class ReflectionPage extends StatefulWidget {
 
 // Reflectionページの状態管理クラス
 class _ReflectionPageState extends State<ReflectionPage> {
-  // サンプルデータ（DBとの接続時に置き換え予定）
-  final List<ReflectionItem> _reflectionItems = [
-    ReflectionItem(
-      title: 'Monthly Reflection',
-      date: 'Feb 28',
-      type: ReflectionType.monthly,
-    ),
-    ReflectionItem(
-      title: 'バレンタインデー',
-      date: 'Feb 14',
-      type: ReflectionType.custom,
-    ),
-    ReflectionItem(
-      title: 'Monthly Reflection',
-      date: 'Jan 31',
-      type: ReflectionType.monthly,
-    ),
-  ];
+  late ReflectionViewModel _viewModel;
+
+  @override
+  void initState() {
+    super.initState();
+    _viewModel = ReflectionViewModel();
+    _loadReflectionItems();
+  }
+
+  // Reflectionアイテムの読み込み処理
+  Future<void> _loadReflectionItems() async {
+    await _viewModel.loadReflectionItems();
+  }
+
+  @override
+  void dispose() {
+    _viewModel.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,38 +59,55 @@ class _ReflectionPageState extends State<ReflectionPage> {
 
   // リスト部分のUI構築処理
   Widget _buildBody() {
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: _reflectionItems.length,
-      itemBuilder: (context, index) {
-        return ReflectionListItem(
-          item: _reflectionItems[index],
-          onTap: () {
-            // 詳細画面への遷移（今後実装予定）
-            _onReflectionItemTap(_reflectionItems[index]);
+    final theme = Theme.of(context);
+
+    return AnimatedBuilder(
+      animation: _viewModel,
+      builder: (context, child) {
+        if (_viewModel.isLoading) {
+          return Center(
+            child: CircularProgressIndicator(color: theme.colorScheme.primary),
+          );
+        }
+
+        if (_viewModel.error != null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(_viewModel.error!, style: theme.textTheme.bodyMedium),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: _loadReflectionItems,
+                  child: const Text('再試行'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        if (_viewModel.reflectionItems.isEmpty) {
+          return Center(
+            child: Text('リフレクションがありません', style: theme.textTheme.bodyMedium),
+          );
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: _viewModel.reflectionItems.length,
+          itemBuilder: (context, index) {
+            return ReflectionListItem(
+              item: _viewModel.reflectionItems[index],
+              onTap: () {
+                _viewModel.onReflectionItemTap(
+                  context,
+                  _viewModel.reflectionItems[index],
+                );
+              },
+            );
           },
         );
       },
     );
   }
-
-  // リストアイテムタップ時の処理
-  void _onReflectionItemTap(ReflectionItem item) {
-    // 詳細画面への遷移処理（今後実装予定）
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('${item.title} が選択されました')));
-  }
 }
-
-// Reflectionアイテムのデータモデル
-class ReflectionItem {
-  final String title;
-  final String date;
-  final ReflectionType type;
-
-  ReflectionItem({required this.title, required this.date, required this.type});
-}
-
-// Reflectionの種類を表すEnum
-enum ReflectionType { monthly, custom }

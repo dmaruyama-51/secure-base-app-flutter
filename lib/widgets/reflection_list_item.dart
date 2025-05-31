@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../views/reflection_page.dart';
+import '../models/kindness_reflection.dart';
+import 'package:intl/intl.dart';
 
 // ReflectionリストアイテムのWidget
 class ReflectionListItem extends StatelessWidget {
-  final ReflectionItem item;
+  final KindnessReflection item;
   final VoidCallback onTap;
 
   const ReflectionListItem({
@@ -16,6 +17,11 @@ class ReflectionListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+
+    // 日付フォーマット用
+    final dateFormat = DateFormat('MMM dd');
+    final displayDate =
+        '${dateFormat.format(item.reflectionStartDate)} - ${dateFormat.format(item.reflectionEndDate)}';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -37,7 +43,7 @@ class ReflectionListItem extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: colorScheme.outline), // ボーダー色
+                  border: Border.all(color: colorScheme.outline),
                 ),
                 child: Icon(
                   Icons.calendar_today,
@@ -52,15 +58,15 @@ class ReflectionListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.title,
+                      item.reflectionTitle,
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w500,
-                        color: colorScheme.onSurface, // メインテキスト色
+                        color: colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      item.date,
+                      displayDate,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colorScheme.outlineVariant,
                         fontSize: 13,
