@@ -3,14 +3,14 @@ import '../models/kindness_reflection.dart';
 import '../repositories/kindness_reflection_repository.dart';
 
 // ReflectionページのViewModel
-class ReflectionViewModel extends ChangeNotifier {
+class KindnessReflectionListViewModel extends ChangeNotifier {
   final ReflectionRepository _repository = ReflectionRepository();
 
   List<KindnessReflection> _reflectionItems = [];
   bool _isLoading = false;
   String? _error;
 
-  ReflectionViewModel();
+  KindnessReflectionListViewModel();
 
   // ゲッター
   List<KindnessReflection> get reflectionItems => _reflectionItems;
