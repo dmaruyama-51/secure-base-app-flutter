@@ -15,23 +15,23 @@ CREATE TABLE public.kindness_givers (
 alter table kindness_givers enable row level security;
 
 -- ポリシーを作成
-create policy "Users can create a kindness_giver."
-on kindness_givers for insert
-to authenticated
-with check ( (select auth.uid()) = user_id );
+CREATE POLICY "Users can create a kindness_giver."
+ON kindness_givers FOR INSERT
+TO authenticated
+WITH CHECK ( (SELECT auth.uid()) = user_id );
 
-create policy "Users can update their own kindness_giver."
-on kindness_givers for update
-to authenticated
-using ( (select auth.uid()) = user_id )
-with check ( (select auth.uid()) = user_id );
+CREATE POLICY "Users can update their own kindness_giver."
+ON kindness_givers FOR UPDATE
+TO authenticated
+USING ( (SELECT auth.uid()) = user_id )
+WITH CHECK ( (SELECT auth.uid()) = user_id );
 
-create policy "Users can delete a kindness_giver."
-on kindness_givers for delete
-to authenticated
-using ( (select auth.uid()) = user_id );
+CREATE POLICY "Users can delete a kindness_giver."
+ON kindness_givers FOR DELETE
+TO authenticated
+USING ( (SELECT auth.uid()) = user_id );
 
-create policy "Users can view their own kindness_giver."
-on kindness_givers for select
-to authenticated
-using ( (select auth.uid()) = user_id );
+CREATE POLICY "Users can view their own kindness_giver."
+ON kindness_givers FOR SELECT
+TO authenticated
+USING ( (SELECT auth.uid()) = user_id );
