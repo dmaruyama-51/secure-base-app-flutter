@@ -3,8 +3,8 @@ import '../../repositories/kindness_giver_repository.dart';
 import '../../models/kindness_giver.dart';
 
 class KindnessGiverAddViewModel extends ChangeNotifier {
-  // リポジトリの注入
-  final KindnessGiverRepository _repository;
+  // リポジトリを内部でインスタンス化
+  final KindnessGiverRepository _repository = KindnessGiverRepository();
 
   // 状態管理
   String selectedGender = '女性';
@@ -17,9 +17,8 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   // テキスト入力の管理
   final TextEditingController nameController = TextEditingController();
 
-  // コンストラクタでリポジトリの注入と初期値の設定
-  KindnessGiverAddViewModel({KindnessGiverRepository? repository})
-    : _repository = repository ?? KindnessGiverRepository();
+  // コンストラクタ
+  KindnessGiverAddViewModel();
 
   // 性別選択
   void selectGender(String gender) {

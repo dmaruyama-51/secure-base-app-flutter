@@ -7,10 +7,11 @@ import 'package:collection/collection.dart';
 
 // やさしさ記録追加ページ用のViewModel
 class KindnessRecordAddViewModel extends ChangeNotifier {
-  // メンバー取得用リポジトリ
-  final KindnessGiverRepository _kindnessGiverRepository;
-  // やさしさ記録保存用リポジトリ
-  final KindnessRecordRepository _kindnessRecordRepository;
+  // リポジトリのインスタンス化
+  final KindnessGiverRepository _kindnessGiverRepository =
+      KindnessGiverRepository();
+  final KindnessRecordRepository _kindnessRecordRepository =
+      KindnessRecordRepository();
 
   // メンバー一覧
   List<KindnessGiver> kindnessGivers = [];
@@ -32,12 +33,8 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   // 保存成功時に画面を戻すかどうか
   bool shouldNavigateBack = false;
 
-  // コンストラクタ。リポジトリは外部から注入
-  KindnessRecordAddViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  }) : _kindnessGiverRepository = kindnessGiverRepository,
-       _kindnessRecordRepository = kindnessRecordRepository;
+  // コンストラクタ
+  KindnessRecordAddViewModel();
 
   // メンバー一覧を取得する
   Future<void> loadMembers() async {

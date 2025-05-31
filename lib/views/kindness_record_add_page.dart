@@ -19,10 +19,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessRecordAddViewModel(
-      kindnessGiverRepository: KindnessGiverRepository(),
-      kindnessRecordRepository: KindnessRecordRepository(),
-    );
+    _viewModel = KindnessRecordAddViewModel();
     _viewModel.loadMembers();
   }
 
