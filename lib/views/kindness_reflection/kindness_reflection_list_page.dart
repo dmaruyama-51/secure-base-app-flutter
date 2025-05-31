@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../widgets/common/bottom_navigation.dart';
-import '../widgets/reflection_list_item.dart';
-import '../view_models/kindness_reflection_list_view_model.dart';
+import '../../widgets/common/bottom_navigation.dart';
+import '../../widgets/reflection_list_item.dart';
+import '../../view_models/kindness_reflection/kindness_reflection_list_view_model.dart';
 
 // Reflectionページの画面Widget
 class ReflectionPage extends StatefulWidget {

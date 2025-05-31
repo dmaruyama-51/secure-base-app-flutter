@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import '../models/kindness_reflection.dart';
-import '../repositories/kindness_reflection_repository.dart';
+import 'package:go_router/go_router.dart';
+import '../../models/kindness_reflection.dart';
+import '../../repositories/kindness_reflection_repository.dart';
 
 // ReflectionページのViewModel
 class KindnessReflectionListViewModel extends ChangeNotifier {
@@ -36,9 +37,6 @@ class KindnessReflectionListViewModel extends ChangeNotifier {
 
   // リストアイテムタップ時の処理
   void onReflectionItemTap(BuildContext context, KindnessReflection item) {
-    // 詳細画面への遷移処理（今後実装予定）
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text('${item.reflectionTitle} が選択されました')));
+    GoRouter.of(context).push('/reflection/summary/${item.id}');
   }
 }

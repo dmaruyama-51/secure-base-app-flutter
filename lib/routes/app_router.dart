@@ -5,11 +5,12 @@ import '../views/kindness_giver/kindness_giver_list_page.dart';
 import '../views/home_page.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
-import '../views/reflection_page.dart';
+import '../views/kindness_reflection/kindness_reflection_list_page.dart';
 import '../models/kindness_giver.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
 import '../utils/constants.dart';
+import '../views/kindness_reflection/kindness_reflection_summary_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -75,6 +76,13 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/reflection',
       builder: (context, state) => const ReflectionPage(),
+    ),
+    GoRoute(
+      path: '/reflection/summary/:id',
+      builder: (context, state) {
+        final summaryId = state.pathParameters['id']!;
+        return ReflectionSummaryPage(summaryId: summaryId);
+      },
     ),
   ],
 );
