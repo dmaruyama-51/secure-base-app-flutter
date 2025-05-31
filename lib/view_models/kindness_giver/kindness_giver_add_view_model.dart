@@ -4,20 +4,58 @@ import '../../models/kindness_giver.dart';
 import '../../utils/constants.dart';
 import 'kindness_giver_base_view_model.dart';
 
-class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
-  KindnessGiverAddViewModel(KindnessGiverRepository repository)
-    : super(
-        repository: repository,
-        selectedGender: '女性',
-        selectedRelation: '家族',
-        relationshipId: 1,
-        genderId: 1,
-        nameController: TextEditingController(),
-      );
+class KindnessGiverAddViewModel extends ChangeNotifier {
+  // リポジトリを内部でインスタンス化
+  final KindnessGiverRepository _repository = KindnessGiverRepository();
 
-  @override
-  Future<void> createKindnessGiver() async {
-    if (!validateInput()) {
+  // 状態管理
+  String selectedGender = '女性';
+  String selectedRelation = '家族';
+  String? errorMessage;
+  String? successMessage;
+  bool isSaving = false;
+  bool shouldNavigateBack = false;
+
+  // テキスト入力の管理 (Viewからコントローラを移動)
+  final TextEditingController nameController = TextEditingController();
+
+  // コンストラクタ
+  KindnessGiverAddViewModel();
+
+  // 性別選択
+  void selectGender(String gender) {
+    selectedGender = gender;
+    notifyListeners();
+  }
+
+  // 関係性選択
+  void selectRelation(String relation) {
+    selectedRelation = relation;
+    notifyListeners();
+  }
+
+  // バリデーション
+  bool _validateInput() {
+    if (nameController.text.trim().isEmpty) {
+      errorMessage = '名前を入力してください';
+      notifyListeners();
+      return false;
+    }
+
+    if (selectedRelation.isEmpty) {
+      errorMessage = '関係性を選択してください';
+      notifyListeners();
+      return false;
+    }
+
+    errorMessage = null;
+    notifyListeners();
+    return true;
+  }
+
+  // メンバー保存処理
+  Future<void> saveKindnessGiver() async {
+    if (!_validateInput()) {
       return;
     }
 
@@ -35,10 +73,11 @@ class KindnessGiverAddViewModel extends KindnessGiverBaseViewModel {
         genderId: genderId,
       );
 
-      // リポジトリを通じて保存
-      final result = await repository.createKindnessGiver(kindnessGiver);
+      // リポジトリを通じて新規作成
+      final createdGiver = await _repository.createKindnessGiver(kindnessGiver);
 
-      if (result) {
+      // IDが付与されていれば成功
+      if (createdGiver.id != null) {
         successMessage = 'メンバーを保存しました';
         shouldNavigateBack = true;
 
