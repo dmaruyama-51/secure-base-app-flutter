@@ -79,7 +79,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
       final now = DateTime.now();
       final record = KindnessRecord(
         // TODO: 入力値やリポジトリから取得したデータを使用する
-        userId: 1,
+        userId: '1',
         giverId: 1,
         content: contentController.text.trim(),
         createdAt: now,

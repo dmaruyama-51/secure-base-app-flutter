@@ -232,7 +232,7 @@ class _ReflectionSummaryPageState extends State<ReflectionSummaryPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  record.content,
+                  record.content ?? '',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.onSurface,
                   ),

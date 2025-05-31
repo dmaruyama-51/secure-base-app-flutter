@@ -7,7 +7,7 @@ class KindnessRecordRepository {
     return [
       KindnessRecord(
         id: 1,
-        userId: 1,
+        userId: '1',
         giverId: 1,
         content: '朝食を作ってくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 1)),
@@ -17,7 +17,7 @@ class KindnessRecordRepository {
       ),
       KindnessRecord(
         id: 2,
-        userId: 1,
+        userId: '1',
         giverId: 2,
         content: '仕事の相談に乗ってくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 2)),
@@ -27,7 +27,7 @@ class KindnessRecordRepository {
       ),
       KindnessRecord(
         id: 3,
-        userId: 1,
+        userId: '1',
         giverId: 3,
         content: '誕生日にプレゼントをくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 3)),
@@ -43,4 +43,4 @@ class KindnessRecordRepository {
     // 現在はダミー実装として成功を返す
     return true;
   }
-} 
+}

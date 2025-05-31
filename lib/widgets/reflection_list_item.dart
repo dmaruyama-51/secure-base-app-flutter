@@ -21,7 +21,9 @@ class ReflectionListItem extends StatelessWidget {
     // 日付フォーマット用
     final dateFormat = DateFormat('MMM dd');
     final displayDate =
-        '${dateFormat.format(item.reflectionStartDate)} - ${dateFormat.format(item.reflectionEndDate)}';
+        (item.reflectionStartDate != null && item.reflectionEndDate != null)
+            ? '${dateFormat.format(item.reflectionStartDate!)} - ${dateFormat.format(item.reflectionEndDate!)}'
+            : 'Date not set';
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -58,7 +60,7 @@ class ReflectionListItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      item.reflectionTitle,
+                      item.reflectionTitle ?? 'No title',
                       style: theme.textTheme.bodyLarge?.copyWith(
                         fontWeight: FontWeight.w500,
                         color: colorScheme.onSurface,

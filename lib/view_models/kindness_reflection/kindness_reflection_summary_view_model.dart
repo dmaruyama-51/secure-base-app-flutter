@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../models/kindness_reflection.dart';
-import '../../models/kindness_record.dart';
 import '../../repositories/kindness_reflection_repository.dart';
 
 // Reflection Summary画面のViewModel
 class KindnessReflectionSummaryViewModel extends ChangeNotifier {
-  final ReflectionRepository _repository = ReflectionRepository();
+  final KindnessReflectionRepository _repository =
+      KindnessReflectionRepository();
 
   ReflectionSummaryData? _summaryData;
   bool _isLoading = false;
@@ -23,68 +23,23 @@ class KindnessReflectionSummaryViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // Repository から reflection データを取得
-      final reflectionItems = await _repository.getReflectionItems();
+      // Repository から特定のリフレクションデータを取得
+      final reflectionId = int.tryParse(summaryId);
+      if (reflectionId == null) {
+        _error = '無効なリフレクションIDです';
+        return;
+      }
 
-      // 指定されたIDのreflectionアイテムを探す
-      final targetReflection = reflectionItems.firstWhere(
-        (item) => item.id.toString() == summaryId,
-        orElse: () => reflectionItems.first, // フォールバック
+      final reflection = await _repository.fetchKindnessReflectionById(
+        reflectionId,
       );
+      if (reflection == null) {
+        _error = 'リフレクションが見つかりません';
+        return;
+      }
 
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      // ダミーのKindnessRecordリスト
-      final dummyRecords = [
-        KindnessRecord(
-          id: 1,
-          userId: 1,
-          giverId: 1,
-          content: '雨が降っていた中で傘を貸してくれた',
-          createdAt: DateTime.now().subtract(const Duration(hours: 24)),
-          updatedAt: DateTime.now().subtract(const Duration(hours: 24)),
-          giverName: 'お母さん',
-          giverAvatarUrl: null,
-        ),
-        KindnessRecord(
-          id: 2,
-          userId: 1,
-          giverId: 2,
-          content: '残業がんばってと応援してくれた',
-          createdAt: DateTime.now().subtract(const Duration(hours: 48)),
-          updatedAt: DateTime.now().subtract(const Duration(hours: 48)),
-          giverName: 'お父さん',
-          giverAvatarUrl: null,
-        ),
-        KindnessRecord(
-          id: 3,
-          userId: 1,
-          giverId: 1,
-          content: '合格をお祝いしてくれた',
-          createdAt: DateTime.now().subtract(const Duration(hours: 72)),
-          updatedAt: DateTime.now().subtract(const Duration(hours: 72)),
-          giverName: 'お母さん',
-          giverAvatarUrl: null,
-        ),
-        KindnessRecord(
-          id: 4,
-          userId: 1,
-          giverId: 3,
-          content: '誕生日にプレゼントをくれた',
-          createdAt: DateTime.now().subtract(const Duration(hours: 96)),
-          updatedAt: DateTime.now().subtract(const Duration(hours: 96)),
-          giverName: 'たろー',
-          giverAvatarUrl: null,
-        ),
-      ];
-
-      _summaryData = ReflectionSummaryData(
-        title: targetReflection.reflectionTitle,
-        entriesCount: 4,
-        daysCount: 2,
-        peopleCount: 3,
-        records: dummyRecords,
-      );
+      // リフレクション期間内のKindnessRecordとサマリーデータを取得
+      _summaryData = await _repository.getReflectionSummaryData(reflection);
     } catch (e) {
       _error = 'データの読み込みに失敗しました';
       debugPrint('Summary data loading error: $e');

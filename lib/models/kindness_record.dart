@@ -1,10 +1,10 @@
 class KindnessRecord {
   final int? id;
-  final int userId;
+  final String userId;
   final int giverId;
-  final String content;
+  final String? content;
   final DateTime createdAt;
-  final DateTime updatedAt;
+  final DateTime? updatedAt;
   final String giverName; // kindness_giversテーブルから取得する情報
   final String? giverAvatarUrl; // kindness_giversテーブルから取得する情報
 
@@ -12,9 +12,9 @@ class KindnessRecord {
     this.id,
     required this.userId,
     required this.giverId,
-    required this.content,
+    this.content,
     required this.createdAt,
-    required this.updatedAt,
+    this.updatedAt,
     required this.giverName,
     this.giverAvatarUrl,
   });

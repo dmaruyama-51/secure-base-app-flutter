@@ -32,7 +32,7 @@ class KindnessRecordListItem extends StatelessWidget {
                 : null,
       ),
       title: Text(
-        record.content,
+        record.content ?? '',
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(

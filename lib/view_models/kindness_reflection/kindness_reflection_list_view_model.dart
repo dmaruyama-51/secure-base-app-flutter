@@ -5,7 +5,8 @@ import '../../repositories/kindness_reflection_repository.dart';
 
 // ReflectionページのViewModel
 class KindnessReflectionListViewModel extends ChangeNotifier {
-  final ReflectionRepository _repository = ReflectionRepository();
+  final KindnessReflectionRepository _repository =
+      KindnessReflectionRepository();
 
   List<KindnessReflection> _reflectionItems = [];
   bool _isLoading = false;
@@ -25,7 +26,7 @@ class KindnessReflectionListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _reflectionItems = await _repository.getReflectionItems();
+      _reflectionItems = await _repository.fetchKindnessReflections();
     } catch (e) {
       _error = 'データの読み込みに失敗しました';
       debugPrint('Reflection items loading error: $e');
