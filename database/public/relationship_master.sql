@@ -4,3 +4,12 @@ CREATE TABLE public.relationship_master (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT relationship_master_pkey PRIMARY KEY (id)
 );
+
+-- RLSを有効化
+ALTER TABLE relationship_master ENABLE ROW LEVEL SECURITY;
+
+-- 認証済みユーザーは全ての関係性データを読み取り可能
+CREATE POLICY "Authenticated users can view all relationship_master data."
+ON relationship_master FOR SELECT
+TO authenticated
+USING (true);
