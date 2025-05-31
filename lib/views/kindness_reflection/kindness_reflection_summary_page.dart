@@ -176,7 +176,7 @@ class _ReflectionSummaryPageState extends State<ReflectionSummaryPage> {
 
     return Column(
       children:
-          _viewModel.summaryData!.records
+          _viewModel.displayedRecords
               .map((record) => _buildReflectionItemFromRecord(record))
               .toList(),
     );
@@ -259,6 +259,11 @@ class _ReflectionSummaryPageState extends State<ReflectionSummaryPage> {
 
   // Show more ボタンを構築
   Widget _buildShowMoreButton() {
+    // show moreボタンを表示する必要がない場合は何も表示しない
+    if (!_viewModel.shouldShowMoreButton) {
+      return const SizedBox.shrink();
+    }
+
     final theme = Theme.of(context);
 
     return Center(

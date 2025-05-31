@@ -11,15 +11,34 @@ class KindnessReflectionSummaryViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
 
+  // 表示制御用のプロパティ
+  static const int _defaultDisplayCount = 5;
+  int _displayCount = _defaultDisplayCount;
+
   // ゲッター
   ReflectionSummaryData? get summaryData => _summaryData;
   bool get isLoading => _isLoading;
   String? get error => _error;
 
+  // 表示用のレコードリスト（件数制限あり）
+  List<dynamic> get displayedRecords {
+    if (_summaryData?.records == null) return [];
+    final records = _summaryData!.records;
+    return records.take(_displayCount).toList();
+  }
+
+  // show moreボタンを表示するかどうか
+  bool get shouldShowMoreButton {
+    if (_summaryData?.records == null) return false;
+    return _summaryData!.records.length > _displayCount;
+  }
+
   // サマリーデータの読み込み
   Future<void> loadSummaryData(String summaryId) async {
     _isLoading = true;
     _error = null;
+    // 表示件数をリセット
+    _displayCount = _defaultDisplayCount;
     notifyListeners();
 
     try {
@@ -51,7 +70,14 @@ class KindnessReflectionSummaryViewModel extends ChangeNotifier {
 
   // Show moreボタンの処理
   void showMore() {
-    debugPrint('Show more reflection items');
-    // UI実装のため、現在は何もしない
+    if (_summaryData?.records != null) {
+      // さらに5件追加で表示
+      _displayCount = (_displayCount + 5).clamp(
+        0,
+        _summaryData!.records.length,
+      );
+      notifyListeners();
+      debugPrint('Display count increased to: $_displayCount');
+    }
   }
 }
