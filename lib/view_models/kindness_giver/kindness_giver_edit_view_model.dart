@@ -5,17 +5,20 @@ import '../../utils/constants.dart';
 import 'kindness_giver_base_view_model.dart';
 
 class KindnessGiverEditViewModel extends KindnessGiverBaseViewModel {
-  // リポジトリのインスタンス化
-  final KindnessGiverRepository _repository = KindnessGiverRepository();
-
   // 編集対象のメンバー
   final KindnessGiver originalKindnessGiver;
 
-  // テキスト入力の管理
-  final TextEditingController nameController;
-
   // コンストラクタでモデルのみを受け取る
   KindnessGiverEditViewModel({required KindnessGiver kindnessGiver})
+    : originalKindnessGiver = kindnessGiver,
+      super(
+        repository: KindnessGiverRepository(),
+        selectedGender: kindnessGiver.gender,
+        selectedRelation: kindnessGiver.relationship,
+        relationshipId: kindnessGiver.relationshipId,
+        genderId: kindnessGiver.genderId,
+        nameController: TextEditingController(text: kindnessGiver.name),
+      );
 
   // メンバー更新処理
   @override
@@ -41,7 +44,7 @@ class KindnessGiverEditViewModel extends KindnessGiverBaseViewModel {
       );
 
       // 更新処理
-      final result = await _repository.updateKindnessGiver(updatedKindnessGiver);
+      final result = await repository.updateKindnessGiver(updatedKindnessGiver);
 
       if (result) {
         successMessage = 'メンバー情報を更新しました';

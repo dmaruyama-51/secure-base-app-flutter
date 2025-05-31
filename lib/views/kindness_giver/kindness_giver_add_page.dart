@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
-import '../../repositories/kindness_giver_repository.dart';
 
 class KindnessGiverAddPage extends StatefulWidget {
   const KindnessGiverAddPage({super.key});
@@ -18,7 +17,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverAddViewModel(KindnessGiverRepository());
+    _viewModel = KindnessGiverAddViewModel();
   }
 
   @override
