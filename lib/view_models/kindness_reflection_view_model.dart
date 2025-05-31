@@ -4,14 +4,13 @@ import '../repositories/kindness_reflection_repository.dart';
 
 // ReflectionページのViewModel
 class ReflectionViewModel extends ChangeNotifier {
-  final ReflectionRepository _repository;
+  final ReflectionRepository _repository = ReflectionRepository();
 
   List<KindnessReflection> _reflectionItems = [];
   bool _isLoading = false;
   String? _error;
 
-  ReflectionViewModel({ReflectionRepository? repository})
-    : _repository = repository ?? ReflectionRepository();
+  ReflectionViewModel();
 
   // ゲッター
   List<KindnessReflection> get reflectionItems => _reflectionItems;
