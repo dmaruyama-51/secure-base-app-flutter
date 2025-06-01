@@ -38,8 +38,25 @@ class KindnessRecordRepository {
     ];
   }
 
+  Future<KindnessRecord?> fetchKindnessRecordById(int id) async {
+    // TODO: データベースから特定のIDのレコードを取得する実装に変更
+    // 現在はダミーデータから検索
+    final records = await fetchKindnessRecords();
+    try {
+      return records.firstWhere((record) => record.id == id);
+    } catch (e) {
+      return null;
+    }
+  }
+
   Future<bool> saveKindnessRecord(KindnessRecord record) async {
     // TODO: 実際のデータベースに保存する処理を実装
+    // 現在はダミー実装として成功を返す
+    return true;
+  }
+
+  Future<bool> updateKindnessRecord(KindnessRecord record) async {
+    // TODO: 実際のデータベースで更新する処理を実装
     // 現在はダミー実装として成功を返す
     return true;
   }
