@@ -6,6 +6,7 @@ import '../views/home_page.dart';
 import '../views/member_add_page.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
+import '../views/kindness_record_edit_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',
@@ -31,6 +32,18 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/kindness-records/add',
       builder: (context, state) => const KindnessRecordAddPage(),
+    ),
+    GoRoute(
+      path: '/kindness-records/edit/:id',
+      builder: (context, state) {
+        final idParam = state.pathParameters['id'];
+        final id = int.tryParse(idParam ?? '');
+        if (id == null) {
+          // IDが無効な場合は一覧ページにリダイレクト
+          return const KindnessRecordListPage();
+        }
+        return KindnessRecordEditPage(recordId: id);
+      },
     ),
   ],
 );
