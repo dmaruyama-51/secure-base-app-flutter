@@ -1,9 +1,11 @@
 import 'package:go_router/go_router.dart';
 import '../views/login_page.dart';
 import '../views/register_page.dart';
-import '../views/member_list_page.dart';
+import '../views/kindness_giver/kindness_giver_list_page.dart';
 import '../views/home_page.dart';
-import '../views/member_add_page.dart';
+import '../views/kindness_giver/kindness_giver_add_page.dart';
+import '../views/kindness_giver/kindness_giver_edit_page.dart';
+import '../models/kindness_giver.dart';
 import '../views/kindness_record_list_page.dart';
 import '../views/kindness_record_add_page.dart';
 
@@ -17,12 +19,19 @@ final GoRouter appRouter = GoRouter(
       builder: (context, state) => const RegisterPage(),
     ),
     GoRoute(
-      path: '/members',
-      builder: (context, state) => const MemberListPage(),
+      path: '/kindness-givers',
+      builder: (context, state) => const KindnessGiverListPage(),
     ),
     GoRoute(
-      path: '/member/add',
-      builder: (context, state) => const MemberAddPage(),
+      path: '/kindness-givers/add',
+      builder: (context, state) => const KindnessGiverAddPage(),
+    ),
+    GoRoute(
+      path: '/kindness-givers/edit/:id',
+      builder: (context, state) {
+        final kindnessGiver = state.extra as KindnessGiver;
+        return KindnessGiverEditPage(kindnessGiver: kindnessGiver);
+      },
     ),
     GoRoute(
       path: '/kindness-records',

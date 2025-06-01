@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import '../models/member.dart';
+import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
-import '../repositories/member_repository.dart';
+import '../repositories/kindness_giver_repository.dart';
 import '../repositories/kindness_record_repository.dart';
 import 'package:collection/collection.dart';
 
 // やさしさ記録追加ページ用のViewModel
 class KindnessRecordAddViewModel extends ChangeNotifier {
-  // メンバー取得用リポジトリ
-  final MemberRepository _memberRepository;
-  // やさしさ記録保存用リポジトリ
-  final KindnessRecordRepository _kindnessRecordRepository;
+  // リポジトリのインスタンス化
+  final KindnessGiverRepository _kindnessGiverRepository =
+      KindnessGiverRepository();
+  final KindnessRecordRepository _kindnessRecordRepository =
+      KindnessRecordRepository();
 
   // メンバー一覧
-  List<Member> members = [];
+  List<KindnessGiver> kindnessGivers = [];
   // 選択中のメンバー名
-  String? selectedMemberName;
+  String? selectedKindnessGiverName;
   // 選択中のメンバー（null許容）
-  Member? get selectedMember =>
-      members.firstWhereOrNull((m) => m.name == selectedMemberName);
+  KindnessGiver? get selectedKindnessGiver => kindnessGivers.firstWhereOrNull(
+    (m) => m.name == selectedKindnessGiverName,
+  );
   // やさしさ内容入力用コントローラ
   final TextEditingController contentController = TextEditingController();
 
@@ -31,17 +33,13 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   // 保存成功時に画面を戻すかどうか
   bool shouldNavigateBack = false;
 
-  // コンストラクタ。リポジトリのDI対応
-  KindnessRecordAddViewModel({
-    MemberRepository? memberRepository,
-    KindnessRecordRepository? kindnessRecordRepository,
-  })  : _memberRepository = memberRepository ?? MemberRepository(),
-        _kindnessRecordRepository = kindnessRecordRepository ?? KindnessRecordRepository();
+  // コンストラクタ
+  KindnessRecordAddViewModel();
 
   // メンバー一覧を取得する
   Future<void> loadMembers() async {
     try {
-      members = await _memberRepository.fetchMembers();
+      kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
       notifyListeners();
     } catch (e) {
       errorMessage = 'メンバー取得に失敗しました';
@@ -50,8 +48,8 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   }
 
   // メンバー選択時の処理
-  void selectMember(String? name) {
-    selectedMemberName = name;
+  void selectKindnessGiver(String? name) {
+    selectedKindnessGiverName = name;
     notifyListeners();
   }
 
@@ -62,7 +60,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (selectedMember == null) {
+    if (selectedKindnessGiver == null) {
       errorMessage = '人物を選択してください';
       notifyListeners();
       return false;
@@ -86,8 +84,8 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
         content: contentController.text.trim(),
         createdAt: now,
         updatedAt: now,
-        giverName: selectedMember?.name ?? '',
-        giverAvatarUrl: selectedMember?.avatarUrl,
+        giverName: selectedKindnessGiver?.name ?? '',
+        giverAvatarUrl: selectedKindnessGiver?.avatarUrl,
       );
       final result = await _kindnessRecordRepository.saveKindnessRecord(record);
       if (result) {
@@ -119,4 +117,4 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     contentController.dispose();
     super.dispose();
   }
-} 
+}

@@ -1,25 +1,24 @@
 import 'package:flutter/material.dart';
-import '../repositories/member_repository.dart';
-import '../models/member.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../models/kindness_giver.dart';
 
-class MemberAddViewModel extends ChangeNotifier {
-  // リポジトリの注入
-  final MemberRepository _repository;
+class KindnessGiverAddViewModel extends ChangeNotifier {
+  // リポジトリを内部でインスタンス化
+  final KindnessGiverRepository _repository = KindnessGiverRepository();
 
   // 状態管理
   String selectedGender = '女性';
-  String selectedRelation = 'Friend';
+  String selectedRelation = '家族';
   String? errorMessage;
   String? successMessage;
   bool isSaving = false;
   bool shouldNavigateBack = false;
 
-  // テキスト入力の管理 (Viewからコントローラを移動)
+  // テキスト入力の管理
   final TextEditingController nameController = TextEditingController();
 
-  // コンストラクタでリポジトリの注入と初期値の設定
-  MemberAddViewModel({MemberRepository? repository})
-    : _repository = repository ?? MemberRepository();
+  // コンストラクタ
+  KindnessGiverAddViewModel();
 
   // 性別選択
   void selectGender(String gender) {
@@ -41,13 +40,19 @@ class MemberAddViewModel extends ChangeNotifier {
       return false;
     }
 
+    if (selectedRelation.isEmpty) {
+      errorMessage = '関係性を選択してください';
+      notifyListeners();
+      return false;
+    }
+
     errorMessage = null;
     notifyListeners();
     return true;
   }
 
   // メンバー保存処理
-  Future<void> saveMember() async {
+  Future<void> saveKindnessGiver() async {
     if (!_validateInput()) {
       return;
     }
@@ -56,17 +61,18 @@ class MemberAddViewModel extends ChangeNotifier {
       isSaving = true;
       notifyListeners();
 
-      // Memberモデルの作成
-      final member = Member(
+      // KindnessGiverモデルの作成
+      final kindnessGiver = KindnessGiver(
         name: nameController.text.trim(),
         gender: selectedGender,
         category: selectedRelation,
       );
 
-      // リポジトリを通じて保存
-      final result = await _repository.saveMember(member);
+      // リポジトリを通じて新規作成
+      final createdGiver = await _repository.createKindnessGiver(kindnessGiver);
 
-      if (result) {
+      // IDが付与されていれば成功
+      if (createdGiver.id != null) {
         successMessage = 'メンバーを保存しました';
         shouldNavigateBack = true;
       } else {

@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                context.go('/members');
+                context.go('/kindness-givers');
               },
               child: const Text('メンバー一覧ページへ'),
             ),

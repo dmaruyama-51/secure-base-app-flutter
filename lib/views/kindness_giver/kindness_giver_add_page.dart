@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:secure_base/utils/app_colors.dart';
-import '../widgets/common/bottom_navigation.dart';
-import '../view_models/member_add_view_model.dart';
+import '../../widgets/common/bottom_navigation.dart';
+import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
 
-class MemberAddPage extends StatefulWidget {
-  const MemberAddPage({Key? key}) : super(key: key);
+class KindnessGiverAddPage extends StatefulWidget {
+  const KindnessGiverAddPage({Key? key}) : super(key: key);
 
   @override
-  State<MemberAddPage> createState() => _MemberAddPageState();
+  State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
 }
 
-class _MemberAddPageState extends State<MemberAddPage> {
+class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   // ViewModelのインスタンス
-  late MemberAddViewModel _viewModel;
+  late KindnessGiverAddViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = MemberAddViewModel();
+    _viewModel = KindnessGiverAddViewModel();
   }
 
   @override
@@ -39,7 +39,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
           icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add new member', style: theme.textTheme.titleLarge),
+        title: Text('メンバー追加', style: theme.textTheme.titleLarge),
       ),
       body: AnimatedBuilder(
         animation: _viewModel,
@@ -162,7 +162,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
                     children: [
                       _buildRelationOption('家族'),
                       const SizedBox(width: 8),
-                      _buildRelationOption('友人'),
+                      _buildRelationOption('友達'),
                       const SizedBox(width: 8),
                       _buildRelationOption('パートナー'),
                       const SizedBox(width: 8),
@@ -176,14 +176,14 @@ class _MemberAddPageState extends State<MemberAddPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _saveMember,
+                    onPressed: _viewModel.isSaving ? null : _saveKindnessGiver,
                     child:
                         _viewModel.isSaving
                             ? CircularProgressIndicator(
                               color: theme.colorScheme.onPrimary,
                             )
                             : Text(
-                              'Save',
+                              '保存',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -281,7 +281,7 @@ class _MemberAddPageState extends State<MemberAddPage> {
   }
 
   // メンバー保存処理
-  Future<void> _saveMember() async {
-    await _viewModel.saveMember();
+  Future<void> _saveKindnessGiver() async {
+    await _viewModel.saveKindnessGiver();
   }
 }

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../view_models/kindness_record_add_view_model.dart';
+import '../repositories/kindness_giver_repository.dart';
+import '../repositories/kindness_record_repository.dart';
 
 // やさしさ記録追加ページの画面Widget
 class KindnessRecordAddPage extends StatefulWidget {
@@ -49,9 +51,9 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           // エラーメッセージがあればSnackBarで表示
           if (_viewModel.errorMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(_viewModel.errorMessage!)),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
               _viewModel.clearMessages();
             });
           }
@@ -76,7 +78,9 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 // タイトル
                 Text(
                   'どんなやさしさを受け取りましたか？',
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 // 例文表示ボックス
@@ -85,7 +89,9 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -127,25 +133,31 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 const SizedBox(height: 16),
                 // メンバー選択用セレクトボックス
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.surface,
-                    border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.1)),
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                    ),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: _viewModel.selectedMemberName,
+                      value: _viewModel.selectedKindnessGiverName,
                       hint: Text('人物を選択', style: theme.textTheme.bodyMedium),
-                      items: _viewModel.members.map((member) {
-                        return DropdownMenuItem<String>(
-                          value: member.name,
-                          child: Text(member.name),
-                        );
-                      }).toList(),
+                      items:
+                          _viewModel.kindnessGivers.map((kindnessGiver) {
+                            return DropdownMenuItem<String>(
+                              value: kindnessGiver.name,
+                              child: Text(kindnessGiver.name),
+                            );
+                          }).toList(),
                       onChanged: (value) {
-                        _viewModel.selectMember(value);
+                        _viewModel.selectKindnessGiver(value);
                       },
                     ),
                   ),
@@ -162,17 +174,23 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    onPressed: _viewModel.isSaving ? null : _viewModel.saveKindnessRecord,
-                    child: _viewModel.isSaving
-                        ? CircularProgressIndicator(color: theme.colorScheme.onPrimary)
-                        : Text(
-                            'Save',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
+                    onPressed:
+                        _viewModel.isSaving
+                            ? null
+                            : _viewModel.saveKindnessRecord,
+                    child:
+                        _viewModel.isSaving
+                            ? CircularProgressIndicator(
                               color: theme.colorScheme.onPrimary,
+                            )
+                            : Text(
+                              'Save',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: theme.colorScheme.onPrimary,
+                              ),
                             ),
-                          ),
                   ),
                 ),
               ],
@@ -182,4 +200,4 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       ),
     );
   }
-} 
+}
