@@ -132,16 +132,16 @@ class _KindnessRecordEditPageState extends State<KindnessRecordEditPage> {
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<String>(
                       isExpanded: true,
-                      value: _viewModel.selectedMemberName,
+                      value: _viewModel.selectedKindnessGiverName,
                       hint: Text('人物を選択', style: theme.textTheme.bodyMedium),
-                      items: _viewModel.members.map((member) {
+                      items: _viewModel.kindnessGivers.map((kindnessGiver) {
                         return DropdownMenuItem<String>(
-                          value: member.name,
-                          child: Text(member.name),
+                          value: kindnessGiver.name,
+                          child: Text(kindnessGiver.name),
                         );
                       }).toList(),
                       onChanged: (value) {
-                        _viewModel.selectMember(value);
+                        _viewModel.selectKindnessGiver(value);
                       },
                     ),
                   ),

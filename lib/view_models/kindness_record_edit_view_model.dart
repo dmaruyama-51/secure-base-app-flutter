@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../models/member.dart';
+import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
-import '../repositories/member_repository.dart';
+import '../repositories/kindness_giver_repository.dart';
 import '../repositories/kindness_record_repository.dart';
 import 'package:collection/collection.dart';
 
 // やさしさ記録編集ページ用のViewModel
 class KindnessRecordEditViewModel extends ChangeNotifier {
-  // メンバー取得用リポジトリ
-  final MemberRepository _memberRepository;
+  // やさしさをくれる人取得用リポジトリ
+  final KindnessGiverRepository _kindnessGiverRepository;
   // やさしさ記録保存用リポジトリ
   final KindnessRecordRepository _kindnessRecordRepository;
 
@@ -17,13 +17,13 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
   // 編集対象のレコード
   KindnessRecord? kindnessRecord;
 
-  // メンバー一覧
-  List<Member> members = [];
-  // 選択中のメンバー名
-  String? selectedMemberName;
-  // 選択中のメンバー（null許容）
-  Member? get selectedMember =>
-      members.firstWhereOrNull((m) => m.name == selectedMemberName);
+  // やさしさをくれる人一覧
+  List<KindnessGiver> kindnessGivers = [];
+  // 選択中のやさしさをくれる人の名前
+  String? selectedKindnessGiverName;
+  // 選択中のやさしさをくれる人（null許容）
+  KindnessGiver? get selectedKindnessGiver =>
+      kindnessGivers.firstWhereOrNull((kg) => kg.name == selectedKindnessGiverName);
   // やさしさ内容入力用コントローラ
   final TextEditingController contentController = TextEditingController();
 
@@ -41,9 +41,9 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
   // コンストラクタ。リポジトリのDI対応
   KindnessRecordEditViewModel({
     required this.recordId,
-    MemberRepository? memberRepository,
+    KindnessGiverRepository? kindnessGiverRepository,
     KindnessRecordRepository? kindnessRecordRepository,
-  })  : _memberRepository = memberRepository ?? MemberRepository(),
+  })  : _kindnessGiverRepository = kindnessGiverRepository ?? KindnessGiverRepository(),
         _kindnessRecordRepository = kindnessRecordRepository ?? KindnessRecordRepository();
 
   // 初期データを読み込む
@@ -52,13 +52,13 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
       isLoading = true;
       notifyListeners();
 
-      // メンバー一覧とレコードデータを並行して取得
+      // やさしさをくれる人一覧とレコードデータを並行して取得
       final results = await Future.wait([
-        _memberRepository.fetchMembers(),
+        _kindnessGiverRepository.fetchKindnessGivers(),
         _kindnessRecordRepository.fetchKindnessRecordById(recordId),
       ]);
 
-      members = results[0] as List<Member>;
+      kindnessGivers = results[0] as List<KindnessGiver>;
       kindnessRecord = results[1] as KindnessRecord?;
 
       if (kindnessRecord == null) {
@@ -66,7 +66,7 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
       } else {
         // フォームに既存データを設定
         contentController.text = kindnessRecord!.content;
-        selectedMemberName = kindnessRecord!.giverName;
+        selectedKindnessGiverName = kindnessRecord!.giverName;
       }
 
       isLoading = false;
@@ -78,9 +78,9 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
     }
   }
 
-  // メンバー選択時の処理
-  void selectMember(String? name) {
-    selectedMemberName = name;
+  // やさしさをくれる人選択時の処理
+  void selectKindnessGiver(String? name) {
+    selectedKindnessGiverName = name;
     notifyListeners();
   }
 
@@ -91,7 +91,7 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
-    if (selectedMember == null) {
+    if (selectedKindnessGiver == null) {
       errorMessage = '人物を選択してください';
       notifyListeners();
       return false;
@@ -116,8 +116,8 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
         content: contentController.text.trim(),
         createdAt: kindnessRecord!.createdAt,
         updatedAt: DateTime.now(),
-        giverName: selectedMember!.name,
-        giverAvatarUrl: selectedMember!.avatarUrl,
+        giverName: selectedKindnessGiver!.name,
+        giverAvatarUrl: selectedKindnessGiver!.avatarUrl,
       );
 
       final result = await _kindnessRecordRepository.updateKindnessRecord(updatedRecord);
