@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import '../models/kindness_record.dart';
-import '../repositories/kindness_record_repository.dart';
+import '../../models/kindness_record.dart';
+import '../../repositories/kindness_record_repository.dart';
 
 // やさしさ記録一覧ページ用のViewModel
 class KindnessRecordListViewModel extends ChangeNotifier {

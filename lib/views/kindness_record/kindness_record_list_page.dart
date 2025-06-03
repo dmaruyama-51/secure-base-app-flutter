@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../view_models/kindness_record_list_view_model.dart';
-import '../widgets/kindness_record_list_item.dart';
-import '../widgets/common/bottom_navigation.dart';
+import '../../view_models/kindness_record/kindness_record_list_view_model.dart';
+import '../../widgets/kindness_record_list_item.dart';
+import '../../widgets/common/bottom_navigation.dart';
 import 'package:go_router/go_router.dart';
 
 // やさしさ記録一覧ページの画面Widget

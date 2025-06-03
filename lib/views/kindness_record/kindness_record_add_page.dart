@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../view_models/kindness_record_add_view_model.dart';
+import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 
 // やさしさ記録追加ページの画面Widget
 class KindnessRecordAddPage extends StatefulWidget {

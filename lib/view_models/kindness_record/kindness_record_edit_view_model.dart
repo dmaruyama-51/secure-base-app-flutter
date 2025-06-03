@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../models/kindness_giver.dart';
-import '../models/kindness_record.dart';
-import '../repositories/kindness_giver_repository.dart';
-import '../repositories/kindness_record_repository.dart';
+import '../../models/kindness_giver.dart';
+import '../../models/kindness_record.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../repositories/kindness_record_repository.dart';
 import 'package:collection/collection.dart';
 
 // やさしさ記録編集ページ用のViewModel

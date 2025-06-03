@@ -6,9 +6,9 @@ import '../views/home_page.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../models/kindness_giver.dart';
-import '../views/kindness_record_list_page.dart';
-import '../views/kindness_record_add_page.dart';
-import '../views/kindness_record_edit_page.dart';
+import '../views/kindness_record/kindness_record_list_page.dart';
+import '../views/kindness_record/kindness_record_add_page.dart';
+import '../views/kindness_record/kindness_record_edit_page.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/',

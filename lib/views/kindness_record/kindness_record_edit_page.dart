@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../view_models/kindness_record_edit_view_model.dart';
+import '../../view_models/kindness_record/kindness_record_edit_view_model.dart';
 
 // やさしさ記録編集ページの画面Widget
 class KindnessRecordEditPage extends StatefulWidget {
