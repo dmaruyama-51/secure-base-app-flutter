@@ -95,8 +95,16 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
         return ListView.builder(
           itemCount: _viewModel.records.length,
           itemBuilder: (context, index) {
+            final record = _viewModel.records[index];
             return KindnessRecordListItem(
-              record: _viewModel.records[index],
+              record: record,
+              onTap: () {
+                // 編集ページに遷移
+                GoRouter.of(context).push('/kindness-records/edit/${record.id}').then((_) {
+                  // 編集ページから戻ってきた際にリストを再読み込み
+                  _loadRecords();
+                });
+              },
             );
           },
         );

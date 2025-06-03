@@ -6,11 +6,14 @@ import '../models/kindness_record.dart';
 class KindnessRecordListItem extends StatelessWidget {
   /// 表示するやさしさ記録
   final KindnessRecord record;
+  /// タップ時のコールバック関数
+  final VoidCallback? onTap;
 
   // コンストラクタ
   const KindnessRecordListItem({
     Key? key,
     required this.record,
+    this.onTap,
   }) : super(key: key);
 
   // UI構築処理
@@ -20,6 +23,7 @@ class KindnessRecordListItem extends StatelessWidget {
     final dateFormat = DateFormat('yyyy/MM/dd');
 
     return ListTile(
+      onTap: onTap,
       leading: CircleAvatar(
         backgroundColor: theme.colorScheme.surface,
         backgroundImage:
