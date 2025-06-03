@@ -14,6 +14,8 @@ class KindnessRecordRepository {
         updatedAt: DateTime.now().subtract(const Duration(hours: 1)),
         giverName: 'お母さん',
         giverAvatarUrl: null,
+        giverCategory: 'family',
+        giverGender: 'female',
       ),
       KindnessRecord(
         id: 2,
@@ -24,6 +26,8 @@ class KindnessRecordRepository {
         updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
         giverName: 'お父さん',
         giverAvatarUrl: null,
+        giverCategory: 'family',
+        giverGender: 'male',
       ),
       KindnessRecord(
         id: 3,
@@ -34,6 +38,8 @@ class KindnessRecordRepository {
         updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
         giverName: 'たろー',
         giverAvatarUrl: null,
+        giverCategory: 'friend',
+        giverGender: 'male',
       ),
     ];
   }
@@ -60,4 +66,4 @@ class KindnessRecordRepository {
     // 現在はダミー実装として成功を返す
     return true;
   }
-} 
+}

@@ -1,154 +1,158 @@
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../repositories/kindness_record_repository.dart';
-import 'package:collection/collection.dart';
+import '../../states/kindness_record/kindness_record_edit_state.dart';
+import '../../providers/kindness_record/kindness_record_providers.dart';
+import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
-// やさしさ記録編集ページ用のViewModel
-class KindnessRecordEditViewModel extends ChangeNotifier {
-  // やさしさをくれる人取得用リポジトリ
+// StateNotifierベースのKindnessRecordEditViewModel
+class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState> {
   final KindnessGiverRepository _kindnessGiverRepository;
-  // やさしさ記録保存用リポジトリ
   final KindnessRecordRepository _kindnessRecordRepository;
 
-  // 編集対象のレコードID
-  final int recordId;
-  // 編集対象のレコード
-  KindnessRecord? kindnessRecord;
-
-  // やさしさをくれる人一覧
-  List<KindnessGiver> kindnessGivers = [];
-  // 選択中のやさしさをくれる人の名前
-  String? selectedKindnessGiverName;
-  // 選択中のやさしさをくれる人（null許容）
-  KindnessGiver? get selectedKindnessGiver =>
-      kindnessGivers.firstWhereOrNull((kg) => kg.name == selectedKindnessGiverName);
-  // やさしさ内容入力用コントローラ
-  final TextEditingController contentController = TextEditingController();
-
-  // エラーメッセージ
-  String? errorMessage;
-  // 成功メッセージ
-  String? successMessage;
-  // 保存中フラグ
-  bool isSaving = false;
-  // データ読み込み中フラグ
-  bool isLoading = true;
-  // 保存成功時に画面を戻すかどうか
-  bool shouldNavigateBack = false;
-
-  // コンストラクタ。リポジトリのDI対応
+  // DIパターン：コンストラクタでRepositoryを受け取る
   KindnessRecordEditViewModel({
-    required this.recordId,
-    KindnessGiverRepository? kindnessGiverRepository,
-    KindnessRecordRepository? kindnessRecordRepository,
-  })  : _kindnessGiverRepository = kindnessGiverRepository ?? KindnessGiverRepository(),
-        _kindnessRecordRepository = kindnessRecordRepository ?? KindnessRecordRepository();
+    required KindnessGiverRepository kindnessGiverRepository,
+    required KindnessRecordRepository kindnessRecordRepository,
+  })  : _kindnessGiverRepository = kindnessGiverRepository,
+        _kindnessRecordRepository = kindnessRecordRepository,
+        super(const KindnessRecordEditState());
 
-  // 初期データを読み込む
-  Future<void> loadInitialData() async {
+  // 編集対象の記録を初期化する
+  Future<void> initializeRecord(KindnessRecord record) async {
+    state = state.copyWith(
+      originalRecord: record,
+      content: record.content,
+      selectedKindnessGiver: KindnessGiver(
+        id: record.giverId,
+        name: record.giverName,
+        category: record.giverCategory,
+        gender: record.giverGender,
+        avatarUrl: record.giverAvatarUrl,
+      ),
+    );
+    await loadMembers();
+  }
+
+  // メンバー一覧を取得する
+  Future<void> loadMembers() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
+
     try {
-      isLoading = true;
-      notifyListeners();
-
-      // やさしさをくれる人一覧とレコードデータを並行して取得
-      final results = await Future.wait([
-        _kindnessGiverRepository.fetchKindnessGivers(),
-        _kindnessRecordRepository.fetchKindnessRecordById(recordId),
-      ]);
-
-      kindnessGivers = results[0] as List<KindnessGiver>;
-      kindnessRecord = results[1] as KindnessRecord?;
-
-      if (kindnessRecord == null) {
-        errorMessage = 'レコードが見つかりませんでした';
-      } else {
-        // フォームに既存データを設定
-        contentController.text = kindnessRecord!.content;
-        selectedKindnessGiverName = kindnessRecord!.giverName;
-      }
-
-      isLoading = false;
-      notifyListeners();
+      final kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
+      state = state.copyWith(
+        kindnessGivers: kindnessGivers,
+        isLoading: false,
+      );
     } catch (e) {
-      isLoading = false;
-      errorMessage = 'データの読み込みに失敗しました';
-      notifyListeners();
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'メンバー取得に失敗しました',
+      );
     }
   }
 
-  // やさしさをくれる人選択時の処理
-  void selectKindnessGiver(String? name) {
-    selectedKindnessGiverName = name;
-    notifyListeners();
+  // 内容を更新する
+  void updateContent(String content) {
+    state = state.copyWith(content: content);
+  }
+
+  // メンバー選択時の処理
+  void selectKindnessGiver(KindnessGiver? kindnessGiver) {
+    state = state.copyWith(selectedKindnessGiver: kindnessGiver);
   }
 
   // 入力バリデーション
   bool _validateInput() {
-    if (contentController.text.trim().isEmpty) {
-      errorMessage = '内容を入力してください';
-      notifyListeners();
+    if (state.content.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '内容を入力してください');
       return false;
     }
-    if (selectedKindnessGiver == null) {
-      errorMessage = '人物を選択してください';
-      notifyListeners();
+    if (state.selectedKindnessGiver == null) {
+      state = state.copyWith(errorMessage: '人物を選択してください');
       return false;
     }
-    errorMessage = null;
-    notifyListeners();
+    if (state.selectedKindnessGiver!.category.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '選択された人物のカテゴリが設定されていません');
+      return false;
+    }
+    if (state.selectedKindnessGiver!.gender.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '選択された人物の性別が設定されていません');
+      return false;
+    }
     return true;
   }
 
   // やさしさ記録を更新する
   Future<void> updateKindnessRecord() async {
-    if (!_validateInput() || kindnessRecord == null) return;
-    
-    try {
-      isSaving = true;
-      notifyListeners();
+    if (!_validateInput() || state.originalRecord == null) return;
 
+    state = state.copyWith(
+      isSaving: true,
+      errorMessage: null,
+      successMessage: null,
+    );
+
+    try {
+      final now = DateTime.now();
       final updatedRecord = KindnessRecord(
-        id: kindnessRecord!.id,
-        userId: kindnessRecord!.userId,
-        giverId: kindnessRecord!.giverId,
-        content: contentController.text.trim(),
-        createdAt: kindnessRecord!.createdAt,
-        updatedAt: DateTime.now(),
-        giverName: selectedKindnessGiver!.name,
-        giverAvatarUrl: selectedKindnessGiver!.avatarUrl,
+        id: state.originalRecord!.id,
+        userId: state.originalRecord!.userId,
+        giverId: state.selectedKindnessGiver!.id,
+        content: state.content.trim(),
+        createdAt: state.originalRecord!.createdAt,
+        updatedAt: now,
+        giverName: state.selectedKindnessGiver!.name,
+        giverAvatarUrl: state.selectedKindnessGiver!.avatarUrl,
+        giverCategory: state.selectedKindnessGiver!.category,
+        giverGender: state.selectedKindnessGiver!.gender,
       );
 
       final result = await _kindnessRecordRepository.updateKindnessRecord(updatedRecord);
       
       if (result) {
-        successMessage = '記録を更新しました';
-        shouldNavigateBack = true;
+        state = state.copyWith(
+          isSaving: false,
+          successMessage: '記録を更新しました',
+          shouldNavigateBack: true,
+        );
       } else {
-        errorMessage = '更新に失敗しました';
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: '更新に失敗しました',
+        );
       }
     } catch (e) {
-      errorMessage = 'エラーが発生しました: ${e.toString()}';
-    } finally {
-      isSaving = false;
-      notifyListeners();
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'エラーが発生しました: ${e.toString()}',
+      );
     }
   }
 
   // メッセージ類をクリアする
   void clearMessages() {
-    errorMessage = null;
-    successMessage = null;
-    shouldNavigateBack = false;
-    notifyListeners();
+    state = state.copyWith(
+      errorMessage: null,
+      successMessage: null,
+      shouldNavigateBack: false,
+    );
   }
+}
 
-  // リソース解放処理。TextEditingControllerのdisposeが必要なため必ず呼ぶこと。
-  // TextEditingControllerなどのリソースはメモリリーク防止のため明示的にdisposeする必要がある。
-  @override
-  void dispose() {
-    contentController.dispose();
-    super.dispose();
-  }
-} 
+// ViewModelのProvider（DIで依存関係を注入）
+final kindnessRecordEditViewModelProvider = 
+    StateNotifierProvider<KindnessRecordEditViewModel, KindnessRecordEditState>(
+  (ref) {
+    // Repository Providerから依存関係を取得
+    final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
+    final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
+    
+    return KindnessRecordEditViewModel(
+      kindnessGiverRepository: kindnessGiverRepository,
+      kindnessRecordRepository: kindnessRecordRepository,
+    );
+  },
+); 

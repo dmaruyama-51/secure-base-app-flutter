@@ -58,6 +58,14 @@ class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
       state = state.copyWith(errorMessage: '人物を選択してください');
       return false;
     }
+    if (state.selectedKindnessGiver!.category.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '選択された人物のカテゴリが設定されていません');
+      return false;
+    }
+    if (state.selectedKindnessGiver!.gender.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '選択された人物の性別が設定されていません');
+      return false;
+    }
     return true;
   }
 
@@ -76,12 +84,14 @@ class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
       final record = KindnessRecord(
         // TODO: 実際のユーザーIDを使用する
         userId: 'temp_user_id',
-        giverId: state.selectedKindnessGiver!.id ?? 1,
+        giverId: state.selectedKindnessGiver!.id,
         content: state.content.trim(),
         createdAt: now,
         updatedAt: now,
         giverName: state.selectedKindnessGiver!.name,
         giverAvatarUrl: state.selectedKindnessGiver!.avatarUrl,
+        giverCategory: state.selectedKindnessGiver!.category,
+        giverGender: state.selectedKindnessGiver!.gender,
       );
 
       final result = await _kindnessRecordRepository.saveKindnessRecord(record);

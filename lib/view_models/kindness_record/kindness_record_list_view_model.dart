@@ -1,41 +1,46 @@
-import 'dart:async';
-import 'package:flutter/material.dart';
-import '../../models/kindness_record.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../repositories/kindness_record_repository.dart';
+import '../../states/kindness_record/kindness_record_list_state.dart';
+import '../../providers/kindness_record/kindness_record_providers.dart';
 
-// やさしさ記録一覧ページ用のViewModel
-class KindnessRecordListViewModel extends ChangeNotifier {
-  // やさしさ記録取得用リポジトリ
-  final KindnessRecordRepository _repository = KindnessRecordRepository();
+// StateNotifierベースのKindnessRecordListViewModel
+class KindnessRecordListViewModel extends StateNotifier<KindnessRecordListState> {
+  final KindnessRecordRepository _kindnessRecordRepository;
 
-  // やさしさ記録リスト
-  List<KindnessRecord> _records = [];
-  // ローディング中フラグ
-  bool _isLoading = false;
-  // エラーメッセージ
-  String? _error;
-
-  // やさしさ記録リストのgetter
-  List<KindnessRecord> get records => _records;
-  // ローディング中フラグのgetter
-  bool get isLoading => _isLoading;
-  // エラーメッセージのgetter
-  String? get error => _error;
+  // DIパターン：コンストラクタでRepositoryを受け取る
+  KindnessRecordListViewModel({
+    required KindnessRecordRepository kindnessRecordRepository,
+  })  : _kindnessRecordRepository = kindnessRecordRepository,
+        super(const KindnessRecordListState());
 
   // やさしさ記録一覧を取得する
-  Future<void> loadRecords() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
+  Future<void> loadKindnessRecords() async {
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      _records = await _repository.fetchKindnessRecords();
-      _isLoading = false;
-      notifyListeners();
+      final records = await _kindnessRecordRepository.fetchKindnessRecords();
+      state = state.copyWith(
+        kindnessRecords: records,
+        isLoading: false,
+      );
     } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
+      state = state.copyWith(
+        isLoading: false,
+        errorMessage: 'データの取得に失敗しました',
+      );
     }
   }
-} 
+}
+
+// ViewModelのProvider（DIで依存関係を注入）
+final kindnessRecordListViewModelProvider = 
+    StateNotifierProvider<KindnessRecordListViewModel, KindnessRecordListState>(
+  (ref) {
+    // Repository Providerから依存関係を取得
+    final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
+    
+    return KindnessRecordListViewModel(
+      kindnessRecordRepository: kindnessRecordRepository,
+    );
+  },
+); 
