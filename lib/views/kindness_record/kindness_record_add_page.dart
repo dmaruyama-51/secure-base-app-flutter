@@ -1,30 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 
 // やさしさ記録追加ページの画面Widget
-class KindnessRecordAddPage extends StatefulWidget {
+class KindnessRecordAddPage extends ConsumerStatefulWidget {
   const KindnessRecordAddPage({Key? key}) : super(key: key);
 
   @override
-  State<KindnessRecordAddPage> createState() => _KindnessRecordAddPageState();
+  ConsumerState<KindnessRecordAddPage> createState() => _KindnessRecordAddPageState();
 }
 
 // やさしさ記録追加ページの状態管理クラス
-class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
-  late KindnessRecordAddViewModel _viewModel;
+class _KindnessRecordAddPageState extends ConsumerState<KindnessRecordAddPage> {
+  late TextEditingController _contentController;
 
   // 初期化処理。ViewModelの生成とメンバー一覧の取得を行う。
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessRecordAddViewModel();
-    _viewModel.loadMembers();
+    _contentController = TextEditingController();
+    // 画面表示後にメンバー一覧を取得
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(kindnessRecordAddViewModelProvider.notifier).loadMembers();
+    });
   }
 
-  // リソース解放処理。ViewModelのdisposeを呼ぶ。
+  // リソース解放処理。TextEditingControllerのdisposeを呼ぶ。
   @override
   void dispose() {
-    _viewModel.dispose();
+    _contentController.dispose();
     super.dispose();
   }
 
@@ -32,6 +36,13 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final state = ref.watch(kindnessRecordAddViewModelProvider);
+    final viewModel = ref.read(kindnessRecordAddViewModelProvider.notifier);
+
+    // TextEditingControllerの内容を状態と同期
+    if (_contentController.text != state.content) {
+      _contentController.text = state.content;
+    }
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -43,30 +54,37 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: AnimatedBuilder(
-        animation: _viewModel,
-        builder: (context, child) {
+      body: Builder(
+        builder: (context) {
           // エラーメッセージがあればSnackBarで表示
-          if (_viewModel.errorMessage != null) {
+          if (state.errorMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
-              _viewModel.clearMessages();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage!)),
+              );
+              viewModel.clearMessages();
             });
           }
           // 成功メッセージがあればSnackBarで表示し、必要なら画面を戻す
-          if (_viewModel.successMessage != null) {
+          if (state.successMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(_viewModel.successMessage!)),
+                SnackBar(content: Text(state.successMessage!)),
               );
-              if (_viewModel.shouldNavigateBack) {
+              if (state.shouldNavigateBack) {
                 Navigator.of(context).pop();
               }
-              _viewModel.clearMessages();
+              viewModel.clearMessages();
             });
           }
+
+          // ローディング中の表示
+          if (state.isLoading) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
           // メインUI部分
           return SingleChildScrollView(
             padding: const EdgeInsets.all(24),
@@ -102,9 +120,12 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 const SizedBox(height: 16),
                 // やさしさ内容入力欄
                 TextField(
-                  controller: _viewModel.contentController,
+                  controller: _contentController,
                   minLines: 4,
                   maxLines: 6,
+                  onChanged: (value) {
+                    viewModel.updateContent(value);
+                  },
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: theme.colorScheme.surface,
@@ -143,19 +164,18 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: DropdownButtonHideUnderline(
-                    child: DropdownButton<String>(
+                    child: DropdownButton(
                       isExpanded: true,
-                      value: _viewModel.selectedKindnessGiverName,
+                      value: state.selectedKindnessGiver,
                       hint: Text('人物を選択', style: theme.textTheme.bodyMedium),
-                      items:
-                          _viewModel.kindnessGivers.map((kindnessGiver) {
-                            return DropdownMenuItem<String>(
-                              value: kindnessGiver.name,
-                              child: Text(kindnessGiver.name),
-                            );
-                          }).toList(),
+                      items: state.kindnessGivers.map((kindnessGiver) {
+                        return DropdownMenuItem(
+                          value: kindnessGiver,
+                          child: Text(kindnessGiver.name),
+                        );
+                      }).toList(),
                       onChanged: (value) {
-                        _viewModel.selectKindnessGiver(value);
+                        viewModel.selectKindnessGiver(value);
                       },
                     ),
                   ),
@@ -172,23 +192,19 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                         borderRadius: BorderRadius.circular(24),
                       ),
                     ),
-                    onPressed:
-                        _viewModel.isSaving
-                            ? null
-                            : _viewModel.saveKindnessRecord,
-                    child:
-                        _viewModel.isSaving
-                            ? CircularProgressIndicator(
+                    onPressed: state.isSaving ? null : viewModel.saveKindnessRecord,
+                    child: state.isSaving
+                        ? CircularProgressIndicator(
+                            color: theme.colorScheme.onPrimary,
+                          )
+                        : Text(
+                            'Save',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                               color: theme.colorScheme.onPrimary,
-                            )
-                            : Text(
-                              'Save',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: theme.colorScheme.onPrimary,
-                              ),
                             ),
+                          ),
                   ),
                 ),
               ],

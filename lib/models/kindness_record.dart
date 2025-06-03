@@ -1,6 +1,6 @@
 class KindnessRecord {
   final int? id;
-  final int userId;
+  final String userId;
   final int giverId;
   final String content;
   final DateTime createdAt;
