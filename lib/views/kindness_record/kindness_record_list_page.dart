@@ -31,7 +31,6 @@ class _KindnessRecordListPageState extends ConsumerState<KindnessRecordListPage>
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(kindnessRecordListViewModelProvider);
     final theme = Theme.of(context);
 
     return Scaffold(

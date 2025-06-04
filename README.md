@@ -3,9 +3,44 @@
 
 アプリの設計資料は [こちら](https://www.notion.so/20_secure-base-1c31f8583e6f80cc88f1d676d9c0f7b0?pvs=4)
 
+## チーム開発ルール
+
+### 1. ブランチ戦略
+- `main`
+  - 常にデプロイ可能な安定版のみを置く
+- `develop`
+  - 次リリース向けの統合ブランチ。すべての `feature/...` や `fix/...` はまずここへマージ
+- `feature/#<issue番号>`
+  - 新機能開発用。作業完了後、`develop` へPRを作成
+- `fix/#<issue番号>`
+  - バグ修正用。作業完了後、`develop` へPRを作成
+
+### 2. Issue管理
+- 新機能・バグは必ずIssueを切る
+- 状態（Backlog -> In progress -> In review -> Done）は常に最新状態にしておく
+- 担当機能のIssue内でサブIssueを切って開発を進める
+
 ## アーキテクチャ
 
-このアプリは**MVVM + Repository パターン**と**Riverpod**を組み合わせた、初心者にも理解しやすいアーキテクチャを採用しています。
+### **アーキテクチャ概要**
+
+このアプリは **MVVM + Repository パターン** で構築されており、Riverpodによる状態管理を採用しています。
+
+**📂 責任分離の原則**
+- **View**: UIの表示のみ
+- **ViewModel**: 状態管理・ビジネスロジック
+- **State**: 状態の定義（Freezedで不変オブジェクト化）
+- **Repository**: データ取得・永続化
+- **Model**: データ構造の定義
+- **Provider**: 依存性注入（DI）による疎結合な設計
+
+**🔧 依存性注入（DI）パターン**
+- Providerを使った型安全な依存関係管理
+- テスト時のモック注入が容易
+- Repository の生成・管理を外部化
+- 設定変更に強い柔軟な構成
+
+この構成により、**テストしやすく、保守しやすく、拡張しやすい**コードが実現されています。
 
 ### 📐 アーキテクチャ全体像
 
@@ -28,10 +63,10 @@
 ```
 
 **🔗 正しい依存関係：**
-- **Provider** → **ViewModel** (Repository を DI注入)
-- **ViewModel** → **State** (状態の更新のみ)
-- **ViewModel** → **Repository** (データアクセス)  
 - **View** → **ViewModel** (状態の監視)
+- **ViewModel** → **Provider** (DI注入のため)
+- **Provider** → **Repository** (インスタンス管理)
+- **ViewModel** → **State** (状態の管理・更新)
 
 **❌ StateはDI注入を受けません** - 単純なデータクラスです
 
@@ -49,12 +84,12 @@
 ```dart
 // 例：lib/providers/kindness_record/kindness_record_providers.dart
 final kindnessRecordRepositoryProvider = Provider<KindnessRecordRepository>((ref) {
-  return KindnessRecordRepository();  // ← 機能特化した工場
+  return KindnessRecordRepository();
 });
 
 // 例：lib/providers/kindness_giver/kindness_giver_providers.dart
 final kindnessGiverRepositoryProvider = Provider<KindnessGiverRepository>((ref) {
-  return KindnessGiverRepository();   // ← 機能特化した工場
+  return KindnessGiverRepository();
 });
 ```
 
@@ -239,12 +274,103 @@ class _MyPageState extends State<MyPage> {
 }
 ```
 
+#### **❄️ Freezedによる状態クラス生成**
+
+**Freezedとは？**
+- Dartのコード生成ライブラリ
+- **不変オブジェクト**と**copyWithメソッド**を自動生成
+- 型安全で効率的な状態管理を実現
+
+**🔧 設定手順**
+
+1. **依存関係追加** (`pubspec.yaml`)
+```yaml
+dependencies:
+  freezed_annotation: ^2.4.1
+
+dev_dependencies:
+  build_runner: ^2.4.7
+  freezed: ^2.4.6
+  json_serialization: ^1.0.0
+```
+
+2. **状態クラス作成** (例：`kindness_record_add_state.dart`)
+```dart
+import 'package:freezed_annotation/freezed_annotation.dart';
+import '../../models/kindness_giver.dart';
+
+part 'kindness_record_add_state.freezed.dart';  // ← 自動生成ファイル
+
+@freezed
+class KindnessRecordAddState with _$KindnessRecordAddState {
+  const factory KindnessRecordAddState({
+    @Default([]) List<KindnessGiver> kindnessGivers,
+    @Default('') String content,
+    KindnessGiver? selectedKindnessGiver,
+    @Default(false) bool isLoading,
+    @Default(false) bool isSaving,
+    String? errorMessage,
+    String? successMessage,
+    @Default(false) bool shouldNavigateBack,
+  }) = _KindnessRecordAddState;
+}
+```
+
+3. **自動生成コマンド実行**
+```bash
+# 初回または大きな変更時
+dart run build_runner build --delete-conflicting-outputs
+
+# 開発中の継続的な生成
+dart run build_runner watch
+```
+
+**📁 生成されるファイル**
+- `kindness_record_add_state.freezed.dart` ← 自動生成（編集禁止）
+- 以下のメソッドが自動生成される：
+  - `copyWith()` - 部分更新
+  - `toString()` - デバッグ表示
+  - `==` と `hashCode` - 等価比較
+  - その他多数のヘルパーメソッド
+
+**✨ Freezedのメリット**
+
+```dart
+// ❌ 手動で書く場合（大変！）
+class MyState {
+  final String content;
+  final bool isLoading;
+  
+  MyState({required this.content, required this.isLoading});
+  
+  // copyWithを手動実装（面倒&エラーが起きやすい）
+  MyState copyWith({String? content, bool? isLoading}) {
+    return MyState(
+      content: content ?? this.content,
+      isLoading: isLoading ?? this.isLoading,
+    );
+  }
+  
+  // toString, ==, hashCodeも手動実装...
+}
+
+// ✅ Freezedで自動生成（楽！）
+@freezed
+class MyState with _$MyState {
+  const factory MyState({
+    @Default('') String content,
+    @Default(false) bool isLoading,
+  }) = _MyState;
+}
+// ↑ これだけでcopyWith等が全て自動生成！
+```
+
 #### **Riverpodでの状態管理**
 
 Riverpodを使うと、状態の変更が自動でUIに反映されます：
 
 ```dart
-// 1. 状態クラスを定義（別ファイル）
+// 1. 状態クラスを定義（別ファイル + Freezed自動生成）
 // lib/states/kindness_record/kindness_record_add_state.dart
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -259,45 +385,86 @@ class KindnessRecordAddState with _$KindnessRecordAddState {
   }) = _KindnessRecordAddState;
 }
 
-// 2. Repository Providerを定義（別ファイル）
-// lib/providers/repository_providers.dart
-final kindnessRecordRepositoryProvider = Provider<KindnessRecordRepository>((ref) {
-  return KindnessRecordRepository();  // ← オブジェクト工場
-});
-
-// 3. ViewModelで状態を管理（別ファイル + DI）
-// lib/view_models/kindness_record/kindness_record_add_view_model.dart
+// 2. ViewModelで状態を管理（別ファイル + DI）
 class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
-  final KindnessRecordRepository _repository;
-
-  KindnessRecordAddViewModel({
-    required KindnessRecordRepository repository,  // ← DI注入
-  }) : _repository = repository,
-       super(const KindnessRecordAddState());
+  KindnessRecordAddViewModel() : super(const KindnessRecordAddState());
   
   void updateContent(String content) {
-    state = state.copyWith(content: content); // ← これだけで自動更新！
+    state = state.copyWith(content: content); // ← Freezed自動生成のcopyWith！
+  }
+  
+  void setLoading(bool loading) {
+    state = state.copyWith(isLoading: loading); // ← 部分更新が簡単！
   }
 }
 
-// 4. ViewModel Providerを定義（DI実行）
+// 3. ViewModelのProvider
 final kindnessRecordAddViewModelProvider = 
     StateNotifierProvider<KindnessRecordAddViewModel, KindnessRecordAddState>(
-  (ref) {
-    final repository = ref.read(kindnessRecordRepositoryProvider);  // ← DI取得
-    return KindnessRecordAddViewModel(repository: repository);      // ← DI注入
-  },
+  (ref) => KindnessRecordAddViewModel(),
 );
 
-// 5. UIで状態を監視
+// 4. UIで状態を監視
 class MyPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final state = ref.watch(kindnessRecordAddViewModelProvider); // 状態を監視
+    final viewModel = ref.read(kindnessRecordAddViewModelProvider.notifier);
     
-    return Text(state.content); // 状態が変わると自動で画面更新
+    return Column(
+      children: [
+        Text(state.content), // 状態が変わると自動で画面更新
+        TextField(
+          onChanged: viewModel.updateContent, // 入力で状態更新
+        ),
+        if (state.isLoading) CircularProgressIndicator(), // 条件表示も簡単
+      ],
+    );
   }
 }
+```
+
+**🔧 Freezed使用時のポイント**
+
+1. **partディレクティブが重要**
+```dart
+part 'ファイル名.freezed.dart';  // ← これを忘れるとエラー
+```
+
+2. **ファイル名規則**
+```
+元ファイル: kindness_record_add_state.dart
+生成ファイル: kindness_record_add_state.freezed.dart
+```
+
+3. **build_runner実行タイミング**
+```bash
+# 新しい@freezedクラスを作った時
+dart run build_runner build
+
+# フィールドを追加・削除した時  
+dart run build_runner build --delete-conflicting-outputs
+
+# 開発中は watch で自動生成
+dart run build_runner watch
+```
+
+**⚠️ よくあるエラーと対処法**
+
+```bash
+# エラー例
+Target of URI doesn't exist: 'package:app/states/my_state.freezed.dart'
+
+# 対処法
+dart run build_runner build --delete-conflicting-outputs
+```
+
+```bash
+# 警告例  
+Classes can only mix in mixins and classes.
+
+# 原因: build_runnerをまだ実行していない
+# 対処法: 上記コマンド実行
 ```
 
 #### **状態管理の流れ**
@@ -431,40 +598,3 @@ KindnessRecordAddViewModel({
 - [Freezed 公式ドキュメント](https://pub.dev/packages/freezed) - 不変オブジェクト生成
 
 **このパターンは「集合知」から生まれた確立されたベストプラクティスです！** 🚀
-
-## チーム開発ルール
-
-### 1. ブランチ戦略
-- `main`
-  - 常にデプロイ可能な安定版のみを置く
-- `develop`
-  - 次リリース向けの統合ブランチ。すべての `feature/...` や `fix/...` はまずここへマージ
-- `feature/#<issue番号>`
-  - 新機能開発用。作業完了後、`develop` へPRを作成
-- `fix/#<issue番号>`
-  - バグ修正用。作業完了後、`develop` へPRを作成
-
-### 2. Issue管理
-- 新機能・バグは必ずIssueを切る
-- 状態（Backlog -> In progress -> In review -> Done）は常に最新状態にしておく
-- 担当機能のIssue内でサブIssueを切って開発を進める
-
-### **アーキテクチャ概要**
-
-このアプリは **MVVM + Repository パターン** で構築されており、Riverpodによる状態管理を採用しています。
-
-**📂 責任分離の原則**
-- **View**: UIの表示のみ
-- **ViewModel**: 状態管理・ビジネスロジック
-- **State**: 状態の定義（Freezedで不変オブジェクト化）
-- **Repository**: データ取得・永続化
-- **Model**: データ構造の定義
-- **Provider**: 依存性注入（DI）による疎結合な設計
-
-**🔧 依存性注入（DI）パターン**
-- Providerを使った型安全な依存関係管理
-- テスト時のモック注入が容易
-- Repository の生成・管理を外部化
-- 設定変更に強い柔軟な構成
-
-この構成により、**テストしやすく、保守しやすく、拡張しやすい**コードが実現されています。
