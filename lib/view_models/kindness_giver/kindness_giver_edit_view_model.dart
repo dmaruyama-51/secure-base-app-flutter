@@ -1,126 +1,113 @@
-import 'package:flutter/material.dart';
-import '../../repositories/kindness_giver_repository.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/kindness_giver.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../states/kindness_giver/kindness_giver_edit_state.dart';
+import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
-class KindnessGiverEditViewModel extends ChangeNotifier {
-  // リポジトリのインスタンス化
-  final KindnessGiverRepository _repository = KindnessGiverRepository();
+/// やさしさをくれる人編集のViewModel（新アーキテクチャ版）
+class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
+  final KindnessGiverRepository _repository;
 
-  // 編集対象のメンバー
-  final KindnessGiver originalKindnessGiver;
+  // DIパターン：コンストラクタでRepositoryを受け取る
+  KindnessGiverEditViewModel({
+    required KindnessGiverRepository repository,
+    required KindnessGiver originalKindnessGiver,
+  }) : _repository = repository,
+       super(
+         KindnessGiverEditState(
+           originalKindnessGiver: originalKindnessGiver,
+           name: originalKindnessGiver.name,
+           selectedGender: originalKindnessGiver.gender,
+           selectedRelation: originalKindnessGiver.category,
+         ),
+       );
 
-  // 状態管理
-  String selectedGender;
-  String selectedRelation;
-  String? errorMessage;
-  String? successMessage;
-  bool isSaving = false;
-  bool shouldNavigateBack = false;
+  /// 名前を更新
+  void updateName(String name) {
+    state = state.copyWith(name: name);
+  }
 
-  // テキスト入力の管理
-  final TextEditingController nameController;
-
-  // コンストラクタでモデルのみを受け取る
-  KindnessGiverEditViewModel({required KindnessGiver kindnessGiver})
-    : originalKindnessGiver = kindnessGiver,
-      selectedGender = kindnessGiver.gender,
-      selectedRelation = kindnessGiver.category,
-      nameController = TextEditingController(text: kindnessGiver.name);
-
-  // 性別選択
+  /// 性別を選択
   void selectGender(String gender) {
-    selectedGender = gender;
-    notifyListeners();
+    state = state.copyWith(selectedGender: gender);
   }
 
-  // 関係性選択
+  /// 関係性を選択
   void selectRelation(String relation) {
-    selectedRelation = relation;
-    notifyListeners();
+    state = state.copyWith(selectedRelation: relation);
   }
 
-  // バリデーション
+  /// バリデーション
   bool _validateInput() {
-    if (nameController.text.trim().isEmpty) {
-      errorMessage = '名前を入力してください';
-      notifyListeners();
+    if (state.name.trim().isEmpty) {
+      state = state.copyWith(errorMessage: '名前を入力してください');
       return false;
     }
 
-    if (selectedRelation.isEmpty) {
-      errorMessage = '関係性を選択してください';
-      notifyListeners();
+    if (state.selectedRelation.isEmpty) {
+      state = state.copyWith(errorMessage: '関係性を選択してください');
       return false;
     }
 
-    errorMessage = null;
-    notifyListeners();
+    state = state.copyWith(errorMessage: null);
     return true;
   }
 
-  // メンバー更新処理
+  /// メンバー更新処理
   Future<void> updateKindnessGiver() async {
-    if (!_validateInput()) {
-      return;
-    }
+    if (!_validateInput()) return;
+
+    state = state.copyWith(isSaving: true, errorMessage: null);
 
     try {
-      isSaving = true;
-      notifyListeners();
-
-      // 更新用のKindnessGiverモデルの作成
       final updatedKindnessGiver = KindnessGiver(
-        id: originalKindnessGiver.id,
-        name: nameController.text.trim(),
-        gender: selectedGender,
-        category: selectedRelation,
-        avatarUrl: originalKindnessGiver.avatarUrl,
+        id: state.originalKindnessGiver?.id,
+        name: state.name.trim(),
+        gender: state.selectedGender,
+        category: state.selectedRelation,
+        avatarUrl: state.originalKindnessGiver?.avatarUrl,
       );
 
-      // 更新処理を実行
       final result = await _repository.updateKindnessGiver(
         updatedKindnessGiver,
       );
 
       if (result) {
-        successMessage = 'メンバー情報を更新しました';
-        shouldNavigateBack = true;
+        state = state.copyWith(
+          isSaving: false,
+          successMessage: 'メンバー情報を更新しました',
+          shouldNavigateBack: true,
+        );
       } else {
-        errorMessage = '更新に失敗しました';
+        state = state.copyWith(isSaving: false, errorMessage: '更新に失敗しました');
       }
     } catch (e) {
-      errorMessage = 'エラーが発生しました: ${e.toString()}';
-    } finally {
-      isSaving = false;
-      notifyListeners();
+      state = state.copyWith(
+        isSaving: false,
+        errorMessage: 'エラーが発生しました: ${e.toString()}',
+      );
     }
   }
 
-  // エラーメッセージと成功メッセージをクリアする
+  /// メッセージをクリア
   void clearMessages() {
-    errorMessage = null;
-    successMessage = null;
-    shouldNavigateBack = false;
-    notifyListeners();
-  }
-
-  // 性別に基づいてアイコンを返す
-  IconData getGenderIcon(String gender) {
-    switch (gender) {
-      case '女性':
-        return Icons.female;
-      case '男性':
-        return Icons.male;
-      case 'ペット':
-        return Icons.pets;
-      default:
-        return Icons.person;
-    }
-  }
-
-  @override
-  void dispose() {
-    nameController.dispose();
-    super.dispose();
+    state = state.copyWith(
+      errorMessage: null,
+      successMessage: null,
+      shouldNavigateBack: false,
+    );
   }
 }
+
+// ViewModelのProvider（DIで依存関係を注入）
+final kindnessGiverEditViewModelProvider = StateNotifierProvider.family<
+  KindnessGiverEditViewModel,
+  KindnessGiverEditState,
+  KindnessGiver
+>((ref, originalKindnessGiver) {
+  final repository = ref.read(kindnessGiverRepositoryProvider);
+  return KindnessGiverEditViewModel(
+    repository: repository,
+    originalKindnessGiver: originalKindnessGiver,
+  );
+});
