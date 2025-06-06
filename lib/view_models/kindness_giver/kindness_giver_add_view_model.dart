@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../models/kindness_giver.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../states/kindness_giver/kindness_giver_add_state.dart';
 import '../../providers/kindness_giver/kindness_giver_providers.dart';
+import '../../models/kindness_giver.dart';
 
 /// やさしさをくれる人追加のViewModel（新アーキテクチャ版）
 class KindnessGiverAddViewModel extends StateNotifier<KindnessGiverAddState> {
@@ -28,33 +28,59 @@ class KindnessGiverAddViewModel extends StateNotifier<KindnessGiverAddState> {
     state = state.copyWith(selectedRelation: relation);
   }
 
-  /// バリデーション
+  /// 入力バリデーション
   bool _validateInput() {
     if (state.name.trim().isEmpty) {
       state = state.copyWith(errorMessage: '名前を入力してください');
       return false;
     }
-
+    if (state.selectedGender.isEmpty) {
+      state = state.copyWith(errorMessage: '性別を選択してください');
+      return false;
+    }
     if (state.selectedRelation.isEmpty) {
       state = state.copyWith(errorMessage: '関係性を選択してください');
       return false;
     }
-
-    state = state.copyWith(errorMessage: null);
     return true;
   }
 
-  /// メンバー保存処理
+  /// メンバーを保存
   Future<void> saveKindnessGiver() async {
     if (!_validateInput()) return;
 
     state = state.copyWith(isSaving: true, errorMessage: null);
 
     try {
-      final kindnessGiver = KindnessGiver(
-        name: state.name.trim(),
-        gender: state.selectedGender,
-        category: state.selectedRelation,
+      // マスターデータからIDを取得
+      final genderId = await _repository.getGenderIdByName(
+        state.selectedGender,
+      );
+      final relationshipId = await _repository.getRelationshipIdByName(
+        state.selectedRelation,
+      );
+
+      if (genderId == null) {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: '選択された性別が見つかりません',
+        );
+        return;
+      }
+
+      if (relationshipId == null) {
+        state = state.copyWith(
+          isSaving: false,
+          errorMessage: '選択された関係性が見つかりません',
+        );
+        return;
+      }
+
+      final kindnessGiver = KindnessGiver.create(
+        userId: '', // Repository内で現在のユーザーIDを設定
+        giverName: state.name.trim(),
+        relationshipId: relationshipId,
+        genderId: genderId,
       );
 
       final createdGiver = await _repository.createKindnessGiver(kindnessGiver);

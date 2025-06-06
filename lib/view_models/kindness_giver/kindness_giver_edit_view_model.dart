@@ -16,9 +16,9 @@ class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
        super(
          KindnessGiverEditState(
            originalKindnessGiver: originalKindnessGiver,
-           name: originalKindnessGiver.name,
-           selectedGender: originalKindnessGiver.gender,
-           selectedRelation: originalKindnessGiver.category,
+           name: originalKindnessGiver.giverName,
+           selectedGender: originalKindnessGiver.genderName ?? '女性',
+           selectedRelation: originalKindnessGiver.relationshipName ?? '家族',
          ),
        );
 
@@ -27,14 +27,19 @@ class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
     state = state.copyWith(name: name);
   }
 
-  /// 性別を選択
-  void selectGender(String gender) {
-    state = state.copyWith(selectedGender: gender);
+  /// 性別選択時の処理
+  Future<void> selectGender(String gender) async {
+    final genderId = await _repository.getGenderIdByName(gender);
+    state = state.copyWith(selectedGender: gender, selectedGenderId: genderId);
   }
 
-  /// 関係性を選択
-  void selectRelation(String relation) {
-    state = state.copyWith(selectedRelation: relation);
+  /// 関係性選択時の処理
+  Future<void> selectRelation(String relation) async {
+    final relationshipId = await _repository.getRelationshipIdByName(relation);
+    state = state.copyWith(
+      selectedRelation: relation,
+      selectedRelationshipId: relationshipId,
+    );
   }
 
   /// バリデーション
@@ -57,35 +62,48 @@ class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
   Future<void> updateKindnessGiver() async {
     if (!_validateInput()) return;
 
+    // IDが取得できていない場合は再取得
+    if (state.selectedGenderId == null ||
+        state.selectedRelationshipId == null) {
+      await _ensureIdsAreLoaded();
+    }
+
     state = state.copyWith(isSaving: true, errorMessage: null);
 
     try {
-      final updatedKindnessGiver = KindnessGiver(
-        id: state.originalKindnessGiver?.id,
-        name: state.name.trim(),
-        gender: state.selectedGender,
-        category: state.selectedRelation,
-        avatarUrl: state.originalKindnessGiver?.avatarUrl,
+      final updatedKindnessGiver = state.originalKindnessGiver!.copyWith(
+        giverName: state.name.trim(),
+        genderId: state.selectedGenderId!,
+        relationshipId: state.selectedRelationshipId!,
       );
 
-      final result = await _repository.updateKindnessGiver(
-        updatedKindnessGiver,
+      await _repository.updateKindnessGiver(updatedKindnessGiver);
+      state = state.copyWith(
+        isSaving: false,
+        successMessage: 'メンバーが更新されました',
+        shouldNavigateBack: true,
       );
-
-      if (result) {
-        state = state.copyWith(
-          isSaving: false,
-          successMessage: 'メンバー情報を更新しました',
-          shouldNavigateBack: true,
-        );
-      } else {
-        state = state.copyWith(isSaving: false, errorMessage: '更新に失敗しました');
-      }
     } catch (e) {
       state = state.copyWith(
         isSaving: false,
-        errorMessage: 'エラーが発生しました: ${e.toString()}',
+        errorMessage: 'メンバーの更新に失敗しました: $e',
       );
+    }
+  }
+
+  /// IDが読み込まれていることを確認
+  Future<void> _ensureIdsAreLoaded() async {
+    if (state.selectedGenderId == null) {
+      final genderId = await _repository.getGenderIdByName(
+        state.selectedGender,
+      );
+      state = state.copyWith(selectedGenderId: genderId);
+    }
+    if (state.selectedRelationshipId == null) {
+      final relationshipId = await _repository.getRelationshipIdByName(
+        state.selectedRelation,
+      );
+      state = state.copyWith(selectedRelationshipId: relationshipId);
     }
   }
 
@@ -95,6 +113,17 @@ class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
       errorMessage: null,
       successMessage: null,
       shouldNavigateBack: false,
+    );
+  }
+
+  Future<void> initializeWithKindnessGiver(
+    KindnessGiver originalKindnessGiver,
+  ) async {
+    state = state.copyWith(
+      originalKindnessGiver: originalKindnessGiver,
+      name: originalKindnessGiver.giverName,
+      selectedGender: originalKindnessGiver.genderName ?? '女性',
+      selectedRelation: originalKindnessGiver.relationshipName ?? '家族',
     );
   }
 }

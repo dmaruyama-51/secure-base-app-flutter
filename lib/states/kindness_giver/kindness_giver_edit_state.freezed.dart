@@ -22,6 +22,8 @@ mixin _$KindnessGiverEditState {
   String get name => throw _privateConstructorUsedError;
   String get selectedGender => throw _privateConstructorUsedError;
   String get selectedRelation => throw _privateConstructorUsedError;
+  int? get selectedGenderId => throw _privateConstructorUsedError;
+  int? get selectedRelationshipId => throw _privateConstructorUsedError;
   bool get isSaving => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
   String? get successMessage => throw _privateConstructorUsedError;
@@ -46,6 +48,8 @@ abstract class $KindnessGiverEditStateCopyWith<$Res> {
     String name,
     String selectedGender,
     String selectedRelation,
+    int? selectedGenderId,
+    int? selectedRelationshipId,
     bool isSaving,
     String? errorMessage,
     String? successMessage,
@@ -75,6 +79,8 @@ class _$KindnessGiverEditStateCopyWithImpl<
     Object? name = null,
     Object? selectedGender = null,
     Object? selectedRelation = null,
+    Object? selectedGenderId = freezed,
+    Object? selectedRelationshipId = freezed,
     Object? isSaving = null,
     Object? errorMessage = freezed,
     Object? successMessage = freezed,
@@ -102,6 +108,16 @@ class _$KindnessGiverEditStateCopyWithImpl<
                     ? _value.selectedRelation
                     : selectedRelation // ignore: cast_nullable_to_non_nullable
                         as String,
+            selectedGenderId:
+                freezed == selectedGenderId
+                    ? _value.selectedGenderId
+                    : selectedGenderId // ignore: cast_nullable_to_non_nullable
+                        as int?,
+            selectedRelationshipId:
+                freezed == selectedRelationshipId
+                    ? _value.selectedRelationshipId
+                    : selectedRelationshipId // ignore: cast_nullable_to_non_nullable
+                        as int?,
             isSaving:
                 null == isSaving
                     ? _value.isSaving
@@ -142,6 +158,8 @@ abstract class _$$KindnessGiverEditStateImplCopyWith<$Res>
     String name,
     String selectedGender,
     String selectedRelation,
+    int? selectedGenderId,
+    int? selectedRelationshipId,
     bool isSaving,
     String? errorMessage,
     String? successMessage,
@@ -168,6 +186,8 @@ class __$$KindnessGiverEditStateImplCopyWithImpl<$Res>
     Object? name = null,
     Object? selectedGender = null,
     Object? selectedRelation = null,
+    Object? selectedGenderId = freezed,
+    Object? selectedRelationshipId = freezed,
     Object? isSaving = null,
     Object? errorMessage = freezed,
     Object? successMessage = freezed,
@@ -195,6 +215,16 @@ class __$$KindnessGiverEditStateImplCopyWithImpl<$Res>
                 ? _value.selectedRelation
                 : selectedRelation // ignore: cast_nullable_to_non_nullable
                     as String,
+        selectedGenderId:
+            freezed == selectedGenderId
+                ? _value.selectedGenderId
+                : selectedGenderId // ignore: cast_nullable_to_non_nullable
+                    as int?,
+        selectedRelationshipId:
+            freezed == selectedRelationshipId
+                ? _value.selectedRelationshipId
+                : selectedRelationshipId // ignore: cast_nullable_to_non_nullable
+                    as int?,
         isSaving:
             null == isSaving
                 ? _value.isSaving
@@ -228,6 +258,8 @@ class _$KindnessGiverEditStateImpl implements _KindnessGiverEditState {
     this.name = '',
     this.selectedGender = '女性',
     this.selectedRelation = '家族',
+    this.selectedGenderId,
+    this.selectedRelationshipId,
     this.isSaving = false,
     this.errorMessage,
     this.successMessage,
@@ -246,6 +278,10 @@ class _$KindnessGiverEditStateImpl implements _KindnessGiverEditState {
   @JsonKey()
   final String selectedRelation;
   @override
+  final int? selectedGenderId;
+  @override
+  final int? selectedRelationshipId;
+  @override
   @JsonKey()
   final bool isSaving;
   @override
@@ -258,7 +294,7 @@ class _$KindnessGiverEditStateImpl implements _KindnessGiverEditState {
 
   @override
   String toString() {
-    return 'KindnessGiverEditState(originalKindnessGiver: $originalKindnessGiver, name: $name, selectedGender: $selectedGender, selectedRelation: $selectedRelation, isSaving: $isSaving, errorMessage: $errorMessage, successMessage: $successMessage, shouldNavigateBack: $shouldNavigateBack)';
+    return 'KindnessGiverEditState(originalKindnessGiver: $originalKindnessGiver, name: $name, selectedGender: $selectedGender, selectedRelation: $selectedRelation, selectedGenderId: $selectedGenderId, selectedRelationshipId: $selectedRelationshipId, isSaving: $isSaving, errorMessage: $errorMessage, successMessage: $successMessage, shouldNavigateBack: $shouldNavigateBack)';
   }
 
   @override
@@ -273,6 +309,10 @@ class _$KindnessGiverEditStateImpl implements _KindnessGiverEditState {
                 other.selectedGender == selectedGender) &&
             (identical(other.selectedRelation, selectedRelation) ||
                 other.selectedRelation == selectedRelation) &&
+            (identical(other.selectedGenderId, selectedGenderId) ||
+                other.selectedGenderId == selectedGenderId) &&
+            (identical(other.selectedRelationshipId, selectedRelationshipId) ||
+                other.selectedRelationshipId == selectedRelationshipId) &&
             (identical(other.isSaving, isSaving) ||
                 other.isSaving == isSaving) &&
             (identical(other.errorMessage, errorMessage) ||
@@ -290,6 +330,8 @@ class _$KindnessGiverEditStateImpl implements _KindnessGiverEditState {
     name,
     selectedGender,
     selectedRelation,
+    selectedGenderId,
+    selectedRelationshipId,
     isSaving,
     errorMessage,
     successMessage,
@@ -315,6 +357,8 @@ abstract class _KindnessGiverEditState implements KindnessGiverEditState {
     final String name,
     final String selectedGender,
     final String selectedRelation,
+    final int? selectedGenderId,
+    final int? selectedRelationshipId,
     final bool isSaving,
     final String? errorMessage,
     final String? successMessage,
@@ -329,6 +373,10 @@ abstract class _KindnessGiverEditState implements KindnessGiverEditState {
   String get selectedGender;
   @override
   String get selectedRelation;
+  @override
+  int? get selectedGenderId;
+  @override
+  int? get selectedRelationshipId;
   @override
   bool get isSaving;
   @override

@@ -9,11 +9,15 @@ import '../../models/kindness_giver.dart';
 /// メンバー一覧のViewModel
 class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
   final KindnessGiverRepository _repository;
+  final Ref _ref;
 
   // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessGiverListViewModel({required KindnessGiverRepository repository})
-    : _repository = repository,
-      super(const KindnessGiverListState());
+  KindnessGiverListViewModel({
+    required KindnessGiverRepository repository,
+    required Ref ref,
+  }) : _repository = repository,
+       _ref = ref,
+       super(const KindnessGiverListState());
 
   /// メンバー一覧を読み込む
   Future<void> loadKindnessGivers() async {
@@ -23,18 +27,18 @@ class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
       final kindnessGivers = await _repository.fetchKindnessGivers();
       state = state.copyWith(kindnessGivers: kindnessGivers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'データの読み込みに失敗しました: ${e.toString()}',
-      );
+      String errorMessage = 'メンバー一覧の取得に失敗しました';
+
+      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
     }
   }
 
   /// メンバー編集画面へのナビゲーション
   void navigateToEdit(BuildContext context, KindnessGiver kindnessGiver) {
-    GoRouter.of(
-      context,
-    ).push('/kindness-givers/edit/${kindnessGiver.name}', extra: kindnessGiver);
+    GoRouter.of(context).push(
+      '/kindness-givers/edit/${kindnessGiver.giverName}',
+      extra: kindnessGiver,
+    );
   }
 
   /// メンバー追加画面へのナビゲーション
@@ -51,5 +55,5 @@ final kindnessGiverListViewModelProvider =
       // Repository Providerから依存関係を取得
       final repository = ref.read(kindnessGiverRepositoryProvider);
 
-      return KindnessGiverListViewModel(repository: repository);
+      return KindnessGiverListViewModel(repository: repository, ref: ref);
     });

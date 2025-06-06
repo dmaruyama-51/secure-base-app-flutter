@@ -11,6 +11,8 @@ class KindnessGiverEditState with _$KindnessGiverEditState {
     @Default('') String name,
     @Default('女性') String selectedGender,
     @Default('家族') String selectedRelation,
+    int? selectedGenderId,
+    int? selectedRelationshipId,
     @Default(false) bool isSaving,
     String? errorMessage,
     String? successMessage,

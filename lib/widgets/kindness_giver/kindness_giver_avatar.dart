@@ -21,7 +21,7 @@ class KindnessGiverAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final genderValue = kindnessGiver?.gender ?? gender ?? '';
+    final genderValue = kindnessGiver?.genderName ?? gender ?? '';
     final avatarUrl = kindnessGiver?.avatarUrl;
 
     return Container(

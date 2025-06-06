@@ -25,7 +25,9 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.kindnessGiver.name);
+    _nameController = TextEditingController(
+      text: widget.kindnessGiver.giverName,
+    );
   }
 
   @override
@@ -161,9 +163,9 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
           ),
           const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.only(left: 28), // アイコン分のインデント
+            padding: const EdgeInsets.only(left: 28),
             child: Text(
-              '${widget.kindnessGiver.name}さんの情報を更新できます',
+              '${widget.kindnessGiver.giverName}さんの情報を更新できます',
               style: theme.textTheme.bodyMedium?.copyWith(
                 color: AppColors.textLight,
                 fontSize: 13,

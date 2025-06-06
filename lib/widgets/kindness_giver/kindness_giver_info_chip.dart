@@ -11,35 +11,34 @@ class KindnessGiverInfoChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Icon(
-          _getRelationIcon(kindnessGiver.category),
+          _getRelationIcon(kindnessGiver.relationshipName ?? ''),
           size: 16,
-          color: AppColors.textLight,
+          color: theme.colorScheme.primary,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 6),
         Text(
-          kindnessGiver.category,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.textLight,
-            fontWeight: FontWeight.w500,
+          kindnessGiver.relationshipName ?? '',
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 12,
           ),
         ),
         const SizedBox(width: 12),
         Icon(
-          _getGenderIcon(kindnessGiver.gender),
+          _getGenderIcon(kindnessGiver.genderName ?? ''),
           size: 16,
-          color: AppColors.textLight,
+          color: theme.colorScheme.onSurface.withOpacity(0.7),
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: 6),
         Text(
-          kindnessGiver.gender,
-          style: TextStyle(
-            fontSize: 14,
-            color: AppColors.textLight,
-            fontWeight: FontWeight.w500,
+          kindnessGiver.genderName ?? '',
+          style: theme.textTheme.bodySmall?.copyWith(
+            fontSize: 12,
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
           ),
         ),
       ],

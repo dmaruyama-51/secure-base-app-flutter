@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:secure_base/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
-
-  static Route<void> route() {
-    return MaterialPageRoute(builder: (context) => const LoginPage());
-  }
 
   @override
   LoginPageState createState() => LoginPageState();
@@ -27,13 +24,20 @@ class LoginPageState extends State<LoginPage> {
         email: _emailController.text,
         password: _passwordController.text,
       );
-      // TODO: ログイン後遷移先ページを追加
-      // Navigator.of(context)
-      //     .pushAndRemoveUntil(NextPage.route(), (route) => false);
+
+      if (mounted) {
+        // リダイレクトパラメータがあれば元のページへ、なければホームへ
+        final redirectPath =
+            GoRouter.of(
+              context,
+            ).routeInformationProvider.value.uri.queryParameters['redirect'];
+        final destination = redirectPath ?? '/';
+        context.go(destination);
+      }
     } on AuthException catch (error) {
-      context.showErrorSnackBar(message: error.message);
+      if (mounted) context.showErrorSnackBar(message: error.message);
     } catch (_) {
-      context.showErrorSnackBar(message: unexpectedErrorMessage);
+      if (mounted) context.showErrorSnackBar(message: unexpectedErrorMessage);
     }
     if (mounted) {
       setState(() {
@@ -56,6 +60,36 @@ class LoginPageState extends State<LoginPage> {
       body: ListView(
         padding: formPadding,
         children: [
+          // ログインが必要である旨のメッセージ
+          Container(
+            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.only(bottom: 24),
+            decoration: BoxDecoration(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.info_outline,
+                  color: Theme.of(context).colorScheme.primary,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'メンバー管理機能をご利用いただくには、ログインが必要です。',
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.primary,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           TextFormField(
             controller: _emailController,
             decoration: const InputDecoration(labelText: 'メールアドレス'),
@@ -70,7 +104,19 @@ class LoginPageState extends State<LoginPage> {
           formSpacer,
           ElevatedButton(
             onPressed: _isLoading ? null : _signIn,
-            child: const Text('ログイン'),
+            child:
+                _isLoading
+                    ? const SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                    : const Text('ログイン'),
+          ),
+          formSpacer,
+          TextButton(
+            onPressed: () => context.go('/register'),
+            child: const Text('アカウント作成はこちら'),
           ),
         ],
       ),
