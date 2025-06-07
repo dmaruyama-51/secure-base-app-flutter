@@ -7,15 +7,11 @@ import '../../models/kindness_giver.dart';
 /// メンバー一覧のViewModel
 class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
   final KindnessGiverRepository _repository;
-  final Ref _ref;
 
   // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessGiverListViewModel({
-    required KindnessGiverRepository repository,
-    required Ref ref,
-  }) : _repository = repository,
-       _ref = ref,
-       super(const KindnessGiverListState());
+  KindnessGiverListViewModel({required KindnessGiverRepository repository})
+    : _repository = repository,
+      super(const KindnessGiverListState());
 
   /// メンバー一覧を読み込む
   Future<void> loadKindnessGivers() async {
@@ -84,8 +80,6 @@ final kindnessGiverListViewModelProvider =
     StateNotifierProvider<KindnessGiverListViewModel, KindnessGiverListState>((
       ref,
     ) {
-      // Repository Providerから依存関係を取得
       final repository = ref.read(kindnessGiverRepositoryProvider);
-
-      return KindnessGiverListViewModel(repository: repository, ref: ref);
+      return KindnessGiverListViewModel(repository: repository);
     });
