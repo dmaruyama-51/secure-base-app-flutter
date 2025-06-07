@@ -2,24 +2,30 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../states/tutorial/tutorial_state.dart';
 import '../../repositories/tutorial_repository.dart';
 import '../../repositories/kindness_giver_repository.dart';
+import '../../repositories/kindness_record_repository.dart';
 import '../../models/kindness_giver.dart';
+import '../../models/kindness_record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../providers/kindness_giver/kindness_giver_providers.dart';
+import '../../providers/kindness_record/kindness_record_providers.dart';
 import '../../providers/tutorial_providers.dart';
 
 class TutorialViewModel extends StateNotifier<TutorialState> {
   final KindnessGiverRepository _kindnessGiverRepository;
   final TutorialRepository _tutorialRepository;
+  final KindnessRecordRepository _kindnessRecordRepository;
 
   TutorialViewModel({
     required KindnessGiverRepository kindnessGiverRepository,
     required TutorialRepository tutorialRepository,
+    required KindnessRecordRepository kindnessRecordRepository,
   }) : _kindnessGiverRepository = kindnessGiverRepository,
        _tutorialRepository = tutorialRepository,
+       _kindnessRecordRepository = kindnessRecordRepository,
        super(const TutorialState());
 
   void nextPage() {
-    if (state.currentPage < 1) {
+    if (state.currentPage < 2) {
       state = state.copyWith(currentPage: state.currentPage + 1);
     }
   }
@@ -42,6 +48,56 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
     state = state.copyWith(selectedRelation: relation);
   }
 
+  void updateKindnessContent(String content) {
+    state = state.copyWith(kindnessContent: content);
+  }
+
+  Future<bool> recordKindness() async {
+    if (state.kindnessContent.trim().isEmpty) {
+      return true;
+    }
+
+    state = state.copyWith(isRecordingKindness: true, errorMessage: null);
+
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      final kindnessGivers =
+          await _kindnessGiverRepository.fetchKindnessGivers();
+      if (kindnessGivers.isEmpty) {
+        throw Exception('メンバーが見つかりません');
+      }
+
+      final kindnessGiver = kindnessGivers.first;
+
+      final kindnessRecord = KindnessRecord(
+        userId: user.id,
+        giverId: kindnessGiver.id,
+        content: state.kindnessContent,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        giverName: kindnessGiver.giverName,
+        giverAvatarUrl: kindnessGiver.avatarUrl,
+        giverCategory: kindnessGiver.relationshipName ?? state.selectedRelation,
+        giverGender: kindnessGiver.genderName ?? state.selectedGender,
+      );
+
+      await _kindnessRecordRepository.saveKindnessRecord(kindnessRecord);
+
+      state = state.copyWith(isRecordingKindness: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isRecordingKindness: false,
+        errorMessage: '優しさの記録に失敗しました: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
   Future<bool> completeTutorial() async {
     if (state.kindnessGiverName.trim().isEmpty) {
       state = state.copyWith(errorMessage: '名前を入力してください');
@@ -56,7 +112,6 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
         throw Exception('ユーザーが認証されていません');
       }
 
-      // kindness_giverを登録
       final kindnessGiver = KindnessGiver.create(
         userId: user.id,
         giverName: state.kindnessGiverName,
@@ -66,7 +121,6 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
       await _kindnessGiverRepository.createKindnessGiver(kindnessGiver);
 
-      // チュートリアル完了をマーク
       await _tutorialRepository.markTutorialCompleted();
 
       state = state.copyWith(isCompleting: false);
@@ -119,8 +173,12 @@ final tutorialViewModelProvider =
     StateNotifierProvider<TutorialViewModel, TutorialState>((ref) {
       final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
       final tutorialRepository = ref.read(tutorialRepositoryProvider);
+      final kindnessRecordRepository = ref.read(
+        kindnessRecordRepositoryProvider,
+      );
       return TutorialViewModel(
         kindnessGiverRepository: kindnessGiverRepository,
         tutorialRepository: tutorialRepository,
+        kindnessRecordRepository: kindnessRecordRepository,
       );
     });

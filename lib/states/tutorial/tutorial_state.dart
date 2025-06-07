@@ -9,7 +9,9 @@ class TutorialState with _$TutorialState {
     @Default('') String kindnessGiverName,
     @Default('女性') String selectedGender,
     @Default('家族') String selectedRelation,
+    @Default('') String kindnessContent,
     @Default(false) bool isCompleting,
+    @Default(false) bool isRecordingKindness,
     String? errorMessage,
   }) = _TutorialState;
 }
