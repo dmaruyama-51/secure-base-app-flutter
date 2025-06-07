@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/kindness_giver.dart';
 import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
+import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
@@ -53,6 +54,9 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
     ) {
       if (next.shouldNavigateBack) {
         viewModel.clearMessages();
+        ref
+            .read(kindnessGiverListViewModelProvider.notifier)
+            .loadKindnessGivers();
         GoRouter.of(context).pop();
       }
 

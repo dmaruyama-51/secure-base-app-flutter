@@ -3,7 +3,7 @@ import '../models/kindness_giver.dart';
 import '../models/gender_master.dart';
 import '../models/relationship_master.dart';
 
-/// 優しさをくれる人のデータのリポジトリクラス
+/// メンバーデータのリポジトリクラス
 class KindnessGiverRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
 
@@ -89,7 +89,6 @@ class KindnessGiverRepository {
                 'giver_name': kindnessGiver.giverName,
                 'relationship_id': kindnessGiver.relationshipId,
                 'gender_id': kindnessGiver.genderId,
-                'avatar_url': kindnessGiver.avatarUrl,
               })
               .select('''
             id,
@@ -98,7 +97,6 @@ class KindnessGiverRepository {
             relationship_id,
             gender_id,
             created_at,
-            avatar_url,
             relationship_master!inner(name),
             gender_master!inner(name)
           ''')
@@ -133,7 +131,6 @@ class KindnessGiverRepository {
             'giver_name': kindnessGiver.giverName,
             'relationship_id': kindnessGiver.relationshipId,
             'gender_id': kindnessGiver.genderId,
-            'avatar_url': kindnessGiver.avatarUrl,
           })
           .eq('id', kindnessGiver.id!)
           .eq('user_id', currentUser.id);

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
+import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
@@ -62,6 +63,9 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                 context,
               ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
               if (state.shouldNavigateBack) {
+                ref
+                    .read(kindnessGiverListViewModelProvider.notifier)
+                    .loadKindnessGivers();
                 GoRouter.of(context).pop();
               }
               viewModel.clearMessages();

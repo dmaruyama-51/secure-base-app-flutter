@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../models/kindness_giver.dart';
-import '../../utils/app_colors.dart';
 
 /// KindnessGiverの情報表示チップ（関係性・性別）
 class KindnessGiverInfoChip extends StatelessWidget {
@@ -23,7 +22,7 @@ class KindnessGiverInfoChip extends StatelessWidget {
         Text(
           kindnessGiver.relationshipName ?? '',
           style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
+            fontWeight: FontWeight.normal,
             fontSize: 12,
           ),
         ),
@@ -37,6 +36,7 @@ class KindnessGiverInfoChip extends StatelessWidget {
         Text(
           kindnessGiver.genderName ?? '',
           style: theme.textTheme.bodySmall?.copyWith(
+            fontWeight: FontWeight.normal,
             fontSize: 12,
             color: theme.colorScheme.onSurface.withOpacity(0.7),
           ),

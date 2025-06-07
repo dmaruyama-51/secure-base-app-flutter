@@ -20,6 +20,10 @@ mixin _$KindnessGiverListState {
   List<KindnessGiver> get kindnessGivers => throw _privateConstructorUsedError;
   bool get isLoading => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
+  String? get successMessage => throw _privateConstructorUsedError;
+  bool get showDeleteConfirmation => throw _privateConstructorUsedError;
+  KindnessGiver? get kindnessGiverToDelete =>
+      throw _privateConstructorUsedError;
 
   /// Create a copy of KindnessGiverListState
   /// with the given fields replaced by the non-null parameter values.
@@ -39,6 +43,9 @@ abstract class $KindnessGiverListStateCopyWith<$Res> {
     List<KindnessGiver> kindnessGivers,
     bool isLoading,
     String? errorMessage,
+    String? successMessage,
+    bool showDeleteConfirmation,
+    KindnessGiver? kindnessGiverToDelete,
   });
 }
 
@@ -63,6 +70,9 @@ class _$KindnessGiverListStateCopyWithImpl<
     Object? kindnessGivers = null,
     Object? isLoading = null,
     Object? errorMessage = freezed,
+    Object? successMessage = freezed,
+    Object? showDeleteConfirmation = null,
+    Object? kindnessGiverToDelete = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -81,6 +91,21 @@ class _$KindnessGiverListStateCopyWithImpl<
                     ? _value.errorMessage
                     : errorMessage // ignore: cast_nullable_to_non_nullable
                         as String?,
+            successMessage:
+                freezed == successMessage
+                    ? _value.successMessage
+                    : successMessage // ignore: cast_nullable_to_non_nullable
+                        as String?,
+            showDeleteConfirmation:
+                null == showDeleteConfirmation
+                    ? _value.showDeleteConfirmation
+                    : showDeleteConfirmation // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            kindnessGiverToDelete:
+                freezed == kindnessGiverToDelete
+                    ? _value.kindnessGiverToDelete
+                    : kindnessGiverToDelete // ignore: cast_nullable_to_non_nullable
+                        as KindnessGiver?,
           )
           as $Val,
     );
@@ -100,6 +125,9 @@ abstract class _$$KindnessGiverListStateImplCopyWith<$Res>
     List<KindnessGiver> kindnessGivers,
     bool isLoading,
     String? errorMessage,
+    String? successMessage,
+    bool showDeleteConfirmation,
+    KindnessGiver? kindnessGiverToDelete,
   });
 }
 
@@ -121,6 +149,9 @@ class __$$KindnessGiverListStateImplCopyWithImpl<$Res>
     Object? kindnessGivers = null,
     Object? isLoading = null,
     Object? errorMessage = freezed,
+    Object? successMessage = freezed,
+    Object? showDeleteConfirmation = null,
+    Object? kindnessGiverToDelete = freezed,
   }) {
     return _then(
       _$KindnessGiverListStateImpl(
@@ -139,6 +170,21 @@ class __$$KindnessGiverListStateImplCopyWithImpl<$Res>
                 ? _value.errorMessage
                 : errorMessage // ignore: cast_nullable_to_non_nullable
                     as String?,
+        successMessage:
+            freezed == successMessage
+                ? _value.successMessage
+                : successMessage // ignore: cast_nullable_to_non_nullable
+                    as String?,
+        showDeleteConfirmation:
+            null == showDeleteConfirmation
+                ? _value.showDeleteConfirmation
+                : showDeleteConfirmation // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        kindnessGiverToDelete:
+            freezed == kindnessGiverToDelete
+                ? _value.kindnessGiverToDelete
+                : kindnessGiverToDelete // ignore: cast_nullable_to_non_nullable
+                    as KindnessGiver?,
       ),
     );
   }
@@ -151,6 +197,9 @@ class _$KindnessGiverListStateImpl implements _KindnessGiverListState {
     final List<KindnessGiver> kindnessGivers = const [],
     this.isLoading = false,
     this.errorMessage,
+    this.successMessage,
+    this.showDeleteConfirmation = false,
+    this.kindnessGiverToDelete,
   }) : _kindnessGivers = kindnessGivers;
 
   final List<KindnessGiver> _kindnessGivers;
@@ -167,10 +216,17 @@ class _$KindnessGiverListStateImpl implements _KindnessGiverListState {
   final bool isLoading;
   @override
   final String? errorMessage;
+  @override
+  final String? successMessage;
+  @override
+  @JsonKey()
+  final bool showDeleteConfirmation;
+  @override
+  final KindnessGiver? kindnessGiverToDelete;
 
   @override
   String toString() {
-    return 'KindnessGiverListState(kindnessGivers: $kindnessGivers, isLoading: $isLoading, errorMessage: $errorMessage)';
+    return 'KindnessGiverListState(kindnessGivers: $kindnessGivers, isLoading: $isLoading, errorMessage: $errorMessage, successMessage: $successMessage, showDeleteConfirmation: $showDeleteConfirmation, kindnessGiverToDelete: $kindnessGiverToDelete)';
   }
 
   @override
@@ -185,7 +241,13 @@ class _$KindnessGiverListStateImpl implements _KindnessGiverListState {
             (identical(other.isLoading, isLoading) ||
                 other.isLoading == isLoading) &&
             (identical(other.errorMessage, errorMessage) ||
-                other.errorMessage == errorMessage));
+                other.errorMessage == errorMessage) &&
+            (identical(other.successMessage, successMessage) ||
+                other.successMessage == successMessage) &&
+            (identical(other.showDeleteConfirmation, showDeleteConfirmation) ||
+                other.showDeleteConfirmation == showDeleteConfirmation) &&
+            (identical(other.kindnessGiverToDelete, kindnessGiverToDelete) ||
+                other.kindnessGiverToDelete == kindnessGiverToDelete));
   }
 
   @override
@@ -194,6 +256,9 @@ class _$KindnessGiverListStateImpl implements _KindnessGiverListState {
     const DeepCollectionEquality().hash(_kindnessGivers),
     isLoading,
     errorMessage,
+    successMessage,
+    showDeleteConfirmation,
+    kindnessGiverToDelete,
   );
 
   /// Create a copy of KindnessGiverListState
@@ -214,6 +279,9 @@ abstract class _KindnessGiverListState implements KindnessGiverListState {
     final List<KindnessGiver> kindnessGivers,
     final bool isLoading,
     final String? errorMessage,
+    final String? successMessage,
+    final bool showDeleteConfirmation,
+    final KindnessGiver? kindnessGiverToDelete,
   }) = _$KindnessGiverListStateImpl;
 
   @override
@@ -222,6 +290,12 @@ abstract class _KindnessGiverListState implements KindnessGiverListState {
   bool get isLoading;
   @override
   String? get errorMessage;
+  @override
+  String? get successMessage;
+  @override
+  bool get showDeleteConfirmation;
+  @override
+  KindnessGiver? get kindnessGiverToDelete;
 
   /// Create a copy of KindnessGiverListState
   /// with the given fields replaced by the non-null parameter values.

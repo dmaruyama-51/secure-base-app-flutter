@@ -1,6 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:flutter/material.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../states/kindness_giver/kindness_giver_list_state.dart';
 import '../../providers/kindness_giver/kindness_giver_providers.dart';
@@ -33,17 +31,51 @@ class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
     }
   }
 
-  /// メンバー編集画面へのナビゲーション
-  void navigateToEdit(BuildContext context, KindnessGiver kindnessGiver) {
-    GoRouter.of(context).push(
-      '/kindness-givers/edit/${kindnessGiver.giverName}',
-      extra: kindnessGiver,
+  /// 削除確認の要求
+  void requestDeleteConfirmation(KindnessGiver kindnessGiver) {
+    state = state.copyWith(
+      kindnessGiverToDelete: kindnessGiver,
+      showDeleteConfirmation: true,
     );
   }
 
-  /// メンバー追加画面へのナビゲーション
-  void navigateToAdd(BuildContext context) {
-    GoRouter.of(context).push('/kindness-givers/add');
+  /// 削除確認のキャンセル
+  void cancelDeleteConfirmation() {
+    state = state.copyWith(
+      kindnessGiverToDelete: null,
+      showDeleteConfirmation: false,
+    );
+  }
+
+  /// 削除の実行
+  Future<void> confirmDelete() async {
+    final kindnessGiver = state.kindnessGiverToDelete;
+    if (kindnessGiver?.id == null) return;
+
+    // 確認状態をクリア
+    state = state.copyWith(
+      kindnessGiverToDelete: null,
+      showDeleteConfirmation: false,
+    );
+
+    try {
+      final success = await _repository.deleteKindnessGiver(kindnessGiver!.id!);
+
+      if (success) {
+        final updatedList =
+            state.kindnessGivers
+                .where((giver) => giver.id != kindnessGiver.id)
+                .toList();
+        state = state.copyWith(
+          kindnessGivers: updatedList,
+          successMessage: '${kindnessGiver.name}さんを削除しました',
+        );
+      } else {
+        state = state.copyWith(errorMessage: '削除に失敗しました');
+      }
+    } catch (e) {
+      state = state.copyWith(errorMessage: '削除中にエラーが発生しました: $e');
+    }
   }
 }
 

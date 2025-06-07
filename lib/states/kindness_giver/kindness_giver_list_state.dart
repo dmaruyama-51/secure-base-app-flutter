@@ -10,5 +10,8 @@ class KindnessGiverListState with _$KindnessGiverListState {
     @Default([]) List<KindnessGiver> kindnessGivers,
     @Default(false) bool isLoading,
     String? errorMessage,
+    String? successMessage,
+    @Default(false) bool showDeleteConfirmation,
+    KindnessGiver? kindnessGiverToDelete,
   }) = _KindnessGiverListState;
 }

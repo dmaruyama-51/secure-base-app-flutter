@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
-import '../../widgets/kindness_giver/kindness_giver_info_chip.dart';
 import '../../utils/app_colors.dart';
+import '../../widgets/kindness_giver/kindness_giver_card.dart';
+import '../../widgets/common/delete_confirm_dialog.dart';
+import '../../models/kindness_giver.dart';
+import 'package:go_router/go_router.dart';
 
 class KindnessGiverListPage extends ConsumerStatefulWidget {
-  const KindnessGiverListPage({Key? key}) : super(key: key);
+  const KindnessGiverListPage({super.key});
 
   @override
   ConsumerState<KindnessGiverListPage> createState() =>
@@ -32,6 +33,17 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
     final state = ref.watch(kindnessGiverListViewModelProvider);
     final viewModel = ref.read(kindnessGiverListViewModelProvider.notifier);
     final theme = Theme.of(context);
+
+    // 削除確認ダイアログの表示監視
+    ref.listen(kindnessGiverListViewModelProvider, (previous, next) {
+      if (next.showDeleteConfirmation && next.kindnessGiverToDelete != null) {
+        _showDeleteConfirmDialog(
+          context,
+          next.kindnessGiverToDelete!,
+          viewModel,
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -143,9 +155,9 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
         Row(
           children: [
             Icon(
-              Icons.group_outlined,
-              size: 20,
+              Icons.people_outline,
               color: theme.colorScheme.primary,
+              size: 20,
             ),
             const SizedBox(width: 8),
             Text(
@@ -177,81 +189,15 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
         ...state.kindnessGivers.map(
           (kindnessGiver) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
-            child: _buildMemberCard(kindnessGiver, theme),
+            child: KindnessGiverCard(
+              kindnessGiver: kindnessGiver,
+              onEdit: () => _navigateToEdit(kindnessGiver),
+              onDeleteRequest:
+                  () => viewModel.requestDeleteConfirmation(kindnessGiver),
+            ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildMemberCard(kindnessGiver, ThemeData theme) {
-    final viewModel = ref.read(kindnessGiverListViewModelProvider.notifier);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 1),
-          ),
-        ],
-        border: Border.all(
-          color: theme.colorScheme.secondary.withOpacity(0.8),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        children: [
-          // アバター（共通ウィジェット使用）
-          KindnessGiverAvatar(kindnessGiver: kindnessGiver),
-          const SizedBox(width: 16),
-
-          // メンバー情報
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  kindnessGiver.name,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 16,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                // 情報チップ（共通ウィジェット使用）
-                KindnessGiverInfoChip(kindnessGiver: kindnessGiver),
-              ],
-            ),
-          ),
-
-          // 編集ボタン
-          Material(
-            color: Colors.transparent,
-            child: InkWell(
-              onTap: () => viewModel.navigateToEdit(context, kindnessGiver),
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.secondary.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(
-                  Icons.edit_outlined,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -338,8 +284,6 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   }
 
   Widget _buildEmptyCard(ThemeData theme) {
-    final viewModel = ref.read(kindnessGiverListViewModelProvider.notifier);
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(32),
@@ -388,7 +332,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           ),
           const SizedBox(height: 20),
           ElevatedButton.icon(
-            onPressed: () => viewModel.navigateToAdd(context),
+            onPressed: _navigateToAdd,
             icon: const Icon(Icons.add, size: 18),
             label: const Text('メンバーを追加'),
             style: ElevatedButton.styleFrom(
@@ -415,9 +359,40 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
       ),
       child: FloatingActionButton(
         backgroundColor: theme.colorScheme.primary,
-        onPressed: () => viewModel.navigateToAdd(context),
+        onPressed: _navigateToAdd,
         child: Icon(Icons.add, color: theme.colorScheme.onPrimary, size: 28),
       ),
     );
+  }
+
+  /// 削除確認ダイアログを表示（Viewの責務）
+  void _showDeleteConfirmDialog(
+    BuildContext context,
+    KindnessGiver kindnessGiver,
+    KindnessGiverListViewModel viewModel,
+  ) {
+    showDialog(
+      context: context,
+      barrierDismissible: false, // 意図しない閉じを防ぐ
+      builder:
+          (context) => DeleteConfirmDialog(
+            title: '削除の確認',
+            message: '${kindnessGiver.name}さんを削除しますか？\n\nこの操作は取り消せません。',
+            onConfirm: viewModel.confirmDelete,
+          ),
+    );
+  }
+
+  /// 編集ページへの遷移
+  void _navigateToEdit(KindnessGiver kindnessGiver) {
+    GoRouter.of(context).push(
+      '/kindness-givers/edit/${kindnessGiver.giverName}',
+      extra: kindnessGiver,
+    );
+  }
+
+  /// 追加ページへの遷移
+  void _navigateToAdd() {
+    GoRouter.of(context).push('/kindness-givers/add');
   }
 }
