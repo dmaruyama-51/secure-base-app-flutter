@@ -92,10 +92,6 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
             _buildHeader(theme),
             const SizedBox(height: 20),
             _buildNameSection(state, viewModel, theme),
-            const SizedBox(height: 16),
-            _buildGenderSection(state, viewModel, theme),
-            const SizedBox(height: 16),
-            _buildRelationSection(state, viewModel, theme),
             const SizedBox(height: 28),
             _buildUpdateButton(state, viewModel, theme),
           ],
@@ -212,28 +208,6 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildGenderSection(state, viewModel, ThemeData theme) {
-    return _buildCard(
-      theme,
-      child: GenderSelection(
-        selectedGender: state.selectedGender,
-        onGenderSelected: viewModel.selectGender,
-        theme: theme,
-      ),
-    );
-  }
-
-  Widget _buildRelationSection(state, viewModel, ThemeData theme) {
-    return _buildCard(
-      theme,
-      child: RelationSelection(
-        selectedRelation: state.selectedRelation,
-        onRelationSelected: viewModel.selectRelation,
-        theme: theme,
       ),
     );
   }
