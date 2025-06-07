@@ -14,27 +14,27 @@ import '../views/kindness_record/kindness_record_list_page.dart';
 import '../views/kindness_record/kindness_record_add_page.dart';
 import '../views/kindness_record/kindness_record_edit_page.dart';
 
-/// 認証が必要なページへのリダイレクト処理
+/// 認証とチュートリアルのガード処理
 Future<String?> _authAndTutorialGuard(String location) async {
   final isLoggedIn = Supabase.instance.client.auth.currentUser != null;
 
-  // kindness-giver系のページは認証が必要
-  final requiresAuth =
-      location.startsWith('/kindness-givers') ||
-      location.startsWith('/kindness-records');
-
-  if (requiresAuth && !isLoggedIn) {
-    return '/login?redirect=${Uri.encodeComponent(location)}';
+  // ログインページと登録ページは認証不要
+  if (location == '/login' || location == '/register') {
+    return null;
   }
 
-  // 認証されたユーザーがkindness-giver系にアクセスする際、チュートリアル未完了なら誘導
-  if (isLoggedIn && location.startsWith('/kindness-givers')) {
-    final tutorialRepository = TutorialRepository();
-    final hasCompletedTutorial =
-        await tutorialRepository.hasCompletedTutorial();
-    if (!hasCompletedTutorial && location != '/tutorial') {
-      return '/tutorial';
-    }
+  // 未認証の場合はログインページにリダイレクト
+  if (!isLoggedIn) {
+    return '/login';
+  }
+
+  // 認証済みの場合、チュートリアル完了状況をチェック
+  final tutorialRepository = TutorialRepository();
+  final hasCompletedTutorial = await tutorialRepository.hasCompletedTutorial();
+
+  // チュートリアル未完了かつチュートリアルページでない場合、チュートリアルにリダイレクト
+  if (!hasCompletedTutorial && location != '/tutorial') {
+    return '/tutorial';
   }
 
   return null; // 問題なし
@@ -44,7 +44,8 @@ final GoRouter appRouter = GoRouter(
   initialLocation: '/',
   redirect: (context, state) => _authAndTutorialGuard(state.uri.toString()),
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const HomePage()),
+    // ルートパスは認証後kindness-recordsにリダイレクト
+    GoRoute(path: '/', redirect: (context, state) => '/kindness-records'),
     GoRoute(path: '/login', builder: (context, state) => const LoginPage()),
     GoRoute(
       path: '/register',
@@ -55,7 +56,7 @@ final GoRouter appRouter = GoRouter(
       path: '/tutorial',
       builder: (context, state) => const TutorialPage(),
     ),
-    // 認証が必要なkindness-giver系のルート
+    // kindness-giver系のルート（認証必須）
     GoRoute(
       path: '/kindness-givers',
       builder: (context, state) => const KindnessGiverListPage(),
@@ -71,7 +72,7 @@ final GoRouter appRouter = GoRouter(
         return KindnessGiverEditPage(kindnessGiver: kindnessGiver);
       },
     ),
-    // kindness-record系は認証チェックなし（別担当のため）
+    // kindness-record系のルート（認証必須）
     GoRoute(
       path: '/kindness-records',
       builder: (context, state) => const KindnessRecordListPage(),

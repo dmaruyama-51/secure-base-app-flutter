@@ -404,10 +404,10 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                             curve: Curves.easeInOut,
                           );
                         } else {
-                          // チュートリアル完了
+                          // チュートリアル完了後はkindness-recordsに遷移
                           final success = await viewModel.completeTutorial();
                           if (success && mounted) {
-                            context.go('/kindness-givers');
+                            context.go('/kindness-records');
                           }
                         }
                       },
