@@ -6,7 +6,6 @@ import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
 import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
-import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
 import '../../widgets/kindness_giver/relation_selection.dart';
 

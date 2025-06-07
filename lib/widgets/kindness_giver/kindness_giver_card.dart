@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../models/kindness_giver.dart';
 import 'kindness_giver_avatar.dart';
 import 'kindness_giver_info_chip.dart';
-import '../../widgets/common/delete_confirm_dialog.dart';
 
 /// メンバーカード表示ウィジェット
 class KindnessGiverCard extends StatelessWidget {

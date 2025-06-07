@@ -3,7 +3,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../views/login_page.dart';
 import '../views/register_page.dart';
 import '../views/kindness_giver/kindness_giver_list_page.dart';
-import '../views/home_page.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../views/tutorial/tutorial_page.dart';
