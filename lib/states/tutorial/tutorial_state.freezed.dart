@@ -22,8 +22,10 @@ mixin _$TutorialState {
   String get selectedGender => throw _privateConstructorUsedError;
   String get selectedRelation => throw _privateConstructorUsedError;
   String get kindnessContent => throw _privateConstructorUsedError;
+  String get selectedReflectionFrequency => throw _privateConstructorUsedError;
   bool get isCompleting => throw _privateConstructorUsedError;
   bool get isRecordingKindness => throw _privateConstructorUsedError;
+  bool get isSettingReflection => throw _privateConstructorUsedError;
   String? get errorMessage => throw _privateConstructorUsedError;
 
   /// Create a copy of TutorialState
@@ -46,8 +48,10 @@ abstract class $TutorialStateCopyWith<$Res> {
     String selectedGender,
     String selectedRelation,
     String kindnessContent,
+    String selectedReflectionFrequency,
     bool isCompleting,
     bool isRecordingKindness,
+    bool isSettingReflection,
     String? errorMessage,
   });
 }
@@ -72,8 +76,10 @@ class _$TutorialStateCopyWithImpl<$Res, $Val extends TutorialState>
     Object? selectedGender = null,
     Object? selectedRelation = null,
     Object? kindnessContent = null,
+    Object? selectedReflectionFrequency = null,
     Object? isCompleting = null,
     Object? isRecordingKindness = null,
+    Object? isSettingReflection = null,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -103,6 +109,11 @@ class _$TutorialStateCopyWithImpl<$Res, $Val extends TutorialState>
                     ? _value.kindnessContent
                     : kindnessContent // ignore: cast_nullable_to_non_nullable
                         as String,
+            selectedReflectionFrequency:
+                null == selectedReflectionFrequency
+                    ? _value.selectedReflectionFrequency
+                    : selectedReflectionFrequency // ignore: cast_nullable_to_non_nullable
+                        as String,
             isCompleting:
                 null == isCompleting
                     ? _value.isCompleting
@@ -112,6 +123,11 @@ class _$TutorialStateCopyWithImpl<$Res, $Val extends TutorialState>
                 null == isRecordingKindness
                     ? _value.isRecordingKindness
                     : isRecordingKindness // ignore: cast_nullable_to_non_nullable
+                        as bool,
+            isSettingReflection:
+                null == isSettingReflection
+                    ? _value.isSettingReflection
+                    : isSettingReflection // ignore: cast_nullable_to_non_nullable
                         as bool,
             errorMessage:
                 freezed == errorMessage
@@ -139,8 +155,10 @@ abstract class _$$TutorialStateImplCopyWith<$Res>
     String selectedGender,
     String selectedRelation,
     String kindnessContent,
+    String selectedReflectionFrequency,
     bool isCompleting,
     bool isRecordingKindness,
+    bool isSettingReflection,
     String? errorMessage,
   });
 }
@@ -164,8 +182,10 @@ class __$$TutorialStateImplCopyWithImpl<$Res>
     Object? selectedGender = null,
     Object? selectedRelation = null,
     Object? kindnessContent = null,
+    Object? selectedReflectionFrequency = null,
     Object? isCompleting = null,
     Object? isRecordingKindness = null,
+    Object? isSettingReflection = null,
     Object? errorMessage = freezed,
   }) {
     return _then(
@@ -195,6 +215,11 @@ class __$$TutorialStateImplCopyWithImpl<$Res>
                 ? _value.kindnessContent
                 : kindnessContent // ignore: cast_nullable_to_non_nullable
                     as String,
+        selectedReflectionFrequency:
+            null == selectedReflectionFrequency
+                ? _value.selectedReflectionFrequency
+                : selectedReflectionFrequency // ignore: cast_nullable_to_non_nullable
+                    as String,
         isCompleting:
             null == isCompleting
                 ? _value.isCompleting
@@ -204,6 +229,11 @@ class __$$TutorialStateImplCopyWithImpl<$Res>
             null == isRecordingKindness
                 ? _value.isRecordingKindness
                 : isRecordingKindness // ignore: cast_nullable_to_non_nullable
+                    as bool,
+        isSettingReflection:
+            null == isSettingReflection
+                ? _value.isSettingReflection
+                : isSettingReflection // ignore: cast_nullable_to_non_nullable
                     as bool,
         errorMessage:
             freezed == errorMessage
@@ -224,8 +254,10 @@ class _$TutorialStateImpl implements _TutorialState {
     this.selectedGender = '女性',
     this.selectedRelation = '家族',
     this.kindnessContent = '',
+    this.selectedReflectionFrequency = '2週に1回',
     this.isCompleting = false,
     this.isRecordingKindness = false,
+    this.isSettingReflection = false,
     this.errorMessage,
   });
 
@@ -246,16 +278,22 @@ class _$TutorialStateImpl implements _TutorialState {
   final String kindnessContent;
   @override
   @JsonKey()
+  final String selectedReflectionFrequency;
+  @override
+  @JsonKey()
   final bool isCompleting;
   @override
   @JsonKey()
   final bool isRecordingKindness;
   @override
+  @JsonKey()
+  final bool isSettingReflection;
+  @override
   final String? errorMessage;
 
   @override
   String toString() {
-    return 'TutorialState(currentPage: $currentPage, kindnessGiverName: $kindnessGiverName, selectedGender: $selectedGender, selectedRelation: $selectedRelation, kindnessContent: $kindnessContent, isCompleting: $isCompleting, isRecordingKindness: $isRecordingKindness, errorMessage: $errorMessage)';
+    return 'TutorialState(currentPage: $currentPage, kindnessGiverName: $kindnessGiverName, selectedGender: $selectedGender, selectedRelation: $selectedRelation, kindnessContent: $kindnessContent, selectedReflectionFrequency: $selectedReflectionFrequency, isCompleting: $isCompleting, isRecordingKindness: $isRecordingKindness, isSettingReflection: $isSettingReflection, errorMessage: $errorMessage)';
   }
 
   @override
@@ -273,10 +311,18 @@ class _$TutorialStateImpl implements _TutorialState {
                 other.selectedRelation == selectedRelation) &&
             (identical(other.kindnessContent, kindnessContent) ||
                 other.kindnessContent == kindnessContent) &&
+            (identical(
+                  other.selectedReflectionFrequency,
+                  selectedReflectionFrequency,
+                ) ||
+                other.selectedReflectionFrequency ==
+                    selectedReflectionFrequency) &&
             (identical(other.isCompleting, isCompleting) ||
                 other.isCompleting == isCompleting) &&
             (identical(other.isRecordingKindness, isRecordingKindness) ||
                 other.isRecordingKindness == isRecordingKindness) &&
+            (identical(other.isSettingReflection, isSettingReflection) ||
+                other.isSettingReflection == isSettingReflection) &&
             (identical(other.errorMessage, errorMessage) ||
                 other.errorMessage == errorMessage));
   }
@@ -289,8 +335,10 @@ class _$TutorialStateImpl implements _TutorialState {
     selectedGender,
     selectedRelation,
     kindnessContent,
+    selectedReflectionFrequency,
     isCompleting,
     isRecordingKindness,
+    isSettingReflection,
     errorMessage,
   );
 
@@ -310,8 +358,10 @@ abstract class _TutorialState implements TutorialState {
     final String selectedGender,
     final String selectedRelation,
     final String kindnessContent,
+    final String selectedReflectionFrequency,
     final bool isCompleting,
     final bool isRecordingKindness,
+    final bool isSettingReflection,
     final String? errorMessage,
   }) = _$TutorialStateImpl;
 
@@ -326,9 +376,13 @@ abstract class _TutorialState implements TutorialState {
   @override
   String get kindnessContent;
   @override
+  String get selectedReflectionFrequency;
+  @override
   bool get isCompleting;
   @override
   bool get isRecordingKindness;
+  @override
+  bool get isSettingReflection;
   @override
   String? get errorMessage;
 

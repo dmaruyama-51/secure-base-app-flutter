@@ -70,6 +70,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                   _buildWelcomePage(theme),
                   _buildKindnessGiverRegistrationPage(state, viewModel, theme),
                   _buildKindnessRecordPage(state, viewModel, theme),
+                  _buildReflectionSettingPage(state, viewModel, theme),
                 ],
               ),
             ),
@@ -88,7 +89,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
         children: [
           Expanded(
             child: LinearProgressIndicator(
-              value: (currentPage + 1) / 3,
+              value: (currentPage + 1) / 4,
               backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation<Color>(
                 theme.colorScheme.primary,
@@ -97,7 +98,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(width: 12),
           Text(
-            '${currentPage + 1}/3',
+            '${currentPage + 1}/4',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -556,6 +557,281 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
+  Widget _buildReflectionSettingPage(
+    TutorialState state,
+    TutorialViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ヘッダー
+          _buildReflectionHeader(theme),
+          const SizedBox(height: 32),
+          // アイコン表示 → 画像表示に変更
+          Center(
+            child: Container(
+              width: 140,
+              height: 140,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: RadialGradient(
+                  colors: [
+                    AppColors.primaryLight.withOpacity(0.4),
+                    AppColors.secondary.withOpacity(0.2),
+                  ],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Image.asset(
+                  'assets/images/img_mindfulness.png',
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          // 機能説明
+          _buildReflectionDescription(theme),
+          const SizedBox(height: 32),
+          // 頻度選択
+          _buildFrequencySelection(state, viewModel, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReflectionHeader(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primary.withOpacity(0.05),
+            theme.colorScheme.primary.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.auto_awesome,
+                size: 20,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'リフレクション',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '設定した頻度で、受け取った優しさを振り返る機会をお届けします。\nあなたの心の安全基地を実感できる大切な時間です。',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 13,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildReflectionDescription(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'リフレクションでできること',
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              color: theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(height: 16),
+          _buildFeatureItem(
+            theme,
+            Icons.summarize,
+            '受け取ったやさしさのサマリ',
+            '期間中に記録した優しさをまとめて表示',
+          ),
+          const SizedBox(height: 12),
+          _buildFeatureItem(
+            theme,
+            Icons.schedule,
+            '定期的な振り返り',
+            '忙しい日常でも大切なことを思い出せる',
+          ),
+          const SizedBox(height: 12), // 追加
+          _buildFeatureItem(
+            // 追加
+            theme,
+            Icons.volunteer_activism,
+            'あたたかい気持ちを育てる',
+            '自然と大切な相手にやさしくなれる',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFeatureItem(
+    ThemeData theme,
+    IconData icon,
+    String title,
+    String description,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            color: theme.colorScheme.primary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(icon, size: 18, color: theme.colorScheme.primary),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textLight,
+                  height: 1.4,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildFrequencySelection(
+    TutorialState state,
+    TutorialViewModel viewModel,
+    ThemeData theme,
+  ) {
+    final frequencies = ['週に1回', '2週に1回', '月に1回'];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'リフレクションの頻度',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 12),
+        ...frequencies
+            .map(
+              (frequency) => Container(
+                margin: const EdgeInsets.only(bottom: 8),
+                child: RadioListTile<String>(
+                  value: frequency,
+                  groupValue: state.selectedReflectionFrequency,
+                  onChanged: (value) {
+                    if (value != null) {
+                      viewModel.updateReflectionFrequency(value);
+                    }
+                  },
+                  title: Text(
+                    frequency,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  subtitle: Text(
+                    _getFrequencyDescription(frequency),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textLight,
+                    ),
+                  ),
+                  activeColor: theme.colorScheme.primary,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(
+                      color:
+                          state.selectedReflectionFrequency == frequency
+                              ? theme.colorScheme.primary
+                              : theme.colorScheme.primary.withOpacity(0.2),
+                    ),
+                  ),
+                  tileColor:
+                      state.selectedReflectionFrequency == frequency
+                          ? theme.colorScheme.primary.withOpacity(0.05)
+                          : theme.colorScheme.surface,
+                ),
+              ),
+            )
+            .toList(),
+      ],
+    );
+  }
+
+  String _getFrequencyDescription(String frequency) {
+    switch (frequency) {
+      case '週に1回':
+        return 'こまめに振り返りたい方におすすめ';
+      case '2週に1回':
+        return 'バランスよく振り返れる推奨設定';
+      case '月に1回':
+        return '記録する頻度が少ない方におすすめ';
+      default:
+        return '';
+    }
+  }
+
   Widget _buildNavigationButtons(
     TutorialState state,
     TutorialViewModel viewModel,
@@ -565,8 +841,8 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // 戻るボタン
-          if (state.currentPage > 0)
+          // 戻るボタン（3ページ目では表示しない）
+          if (state.currentPage > 0 && state.currentPage != 2)
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
@@ -589,17 +865,20 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
             ),
-          if (state.currentPage > 0) const SizedBox(width: 16),
+          if (state.currentPage > 0 && state.currentPage != 2)
+            const SizedBox(width: 16),
 
           // スキップボタン（3ページ目のみ）
           if (state.currentPage == 2)
             Expanded(
               child: OutlinedButton(
-                onPressed: () async {
-                  // スキップしてメイン画面へ遷移
-                  if (mounted) {
-                    context.go('/kindness-records');
-                  }
+                onPressed: () {
+                  // 3ページ目をスキップして4ページ目へ
+                  viewModel.nextPage();
+                  _pageController.nextPage(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                  );
                 },
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -621,7 +900,9 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
             flex: state.currentPage == 0 ? 1 : 2,
             child: FilledButton(
               onPressed:
-                  (state.isCompleting || state.isRecordingKindness)
+                  (state.isCompleting ||
+                          state.isRecordingKindness ||
+                          state.isSettingReflection)
                       ? null
                       : () async {
                         if (state.currentPage == 0) {
@@ -641,9 +922,20 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                               curve: Curves.easeInOut,
                             );
                           }
-                        } else {
-                          // 3ページ目：優しさ記録後、メイン画面へ
+                        } else if (state.currentPage == 2) {
+                          // 3ページ目：優しさ記録後、4ページ目へ
                           final success = await viewModel.recordKindness();
+                          if (success) {
+                            viewModel.nextPage();
+                            _pageController.nextPage(
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          }
+                        } else {
+                          // 4ページ目：リフレクション設定後、メイン画面へ
+                          final success =
+                              await viewModel.saveReflectionSettings();
                           if (success && mounted) {
                             context.go('/kindness-records');
                           }
@@ -657,7 +949,9 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
               child:
-                  (state.isCompleting || state.isRecordingKindness)
+                  (state.isCompleting ||
+                          state.isRecordingKindness ||
+                          state.isSettingReflection)
                       ? SizedBox(
                         height: 20,
                         width: 20,
@@ -673,7 +967,9 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                             ? '次へ'
                             : state.currentPage == 1
                             ? '次へ'
-                            : '記録して始める',
+                            : state.currentPage == 2
+                            ? '記録して次へ'
+                            : '設定して始める',
                         style: TextStyle(
                           color: theme.colorScheme.onPrimary,
                           fontWeight: FontWeight.w600,

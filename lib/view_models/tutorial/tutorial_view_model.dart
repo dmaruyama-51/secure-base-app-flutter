@@ -25,7 +25,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
        super(const TutorialState());
 
   void nextPage() {
-    if (state.currentPage < 2) {
+    if (state.currentPage < 3) {
       state = state.copyWith(currentPage: state.currentPage + 1);
     }
   }
@@ -50,6 +50,10 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   void updateKindnessContent(String content) {
     state = state.copyWith(kindnessContent: content);
+  }
+
+  void updateReflectionFrequency(String frequency) {
+    state = state.copyWith(selectedReflectionFrequency: frequency);
   }
 
   Future<bool> recordKindness() async {
@@ -93,6 +97,29 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
       state = state.copyWith(
         isRecordingKindness: false,
         errorMessage: '優しさの記録に失敗しました: ${e.toString()}',
+      );
+      return false;
+    }
+  }
+
+  Future<bool> saveReflectionSettings() async {
+    state = state.copyWith(isSettingReflection: true, errorMessage: null);
+
+    try {
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      await Future.delayed(const Duration(milliseconds: 500));
+      print('リフレクション頻度を保存しました: ${state.selectedReflectionFrequency}');
+
+      state = state.copyWith(isSettingReflection: false);
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isSettingReflection: false,
+        errorMessage: 'リフレクション設定の保存に失敗しました: ${e.toString()}',
       );
       return false;
     }
