@@ -84,8 +84,6 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
               children: [
                 _buildHeader(theme),
                 const SizedBox(height: 32),
-                _buildProfileSection(state, viewModel, theme),
-                const SizedBox(height: 24),
                 _buildNameSection(state, viewModel, theme),
                 const SizedBox(height: 24),
                 _buildGenderSection(state, viewModel, theme),
@@ -130,6 +128,8 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
   }
 
   Widget _buildHeader(ThemeData theme) {
+    final state = ref.watch(kindnessGiverAddViewModelProvider);
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -149,8 +149,8 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
         ),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // テキスト情報
           Row(
             children: [
               Icon(
@@ -171,7 +171,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
           ),
           const SizedBox(height: 8),
           Padding(
-            padding: const EdgeInsets.only(left: 28), // アイコン分のインデント
+            padding: const EdgeInsets.only(left: 28),
             child: Text(
               'あなたの心の安全基地になる人を登録しましょう',
               style: theme.textTheme.bodyMedium?.copyWith(
@@ -179,65 +179,6 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileSection(state, viewModel, ThemeData theme) {
-    return _buildCard(
-      theme,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('プロフィール', Icons.account_circle_outlined, theme),
-          const SizedBox(height: 20),
-
-          // アバター画像エリア（共通ウィジェット使用）
-          Center(
-            child: Column(
-              children: [
-                KindnessGiverAvatar(
-                  gender: state.selectedGender,
-                  size: 100,
-                  iconSize: 40,
-                  showCameraButton: true,
-                ),
-                const SizedBox(height: 12),
-
-                // 将来の機能を示唆するテキスト
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        size: 14,
-                        color: AppColors.textLight,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'プロフィール画像（今後追加予定）',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textLight,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
         ],

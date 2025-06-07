@@ -16,7 +16,7 @@ class KindnessGiverInfoChip extends StatelessWidget {
         Icon(
           _getRelationIcon(kindnessGiver.relationshipName ?? ''),
           size: 16,
-          color: theme.colorScheme.primary,
+          color: theme.colorScheme.onSurface.withOpacity(0.7),
         ),
         const SizedBox(width: 6),
         Text(

@@ -86,8 +86,6 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
           children: [
             _buildHeader(theme),
             const SizedBox(height: 32),
-            _buildProfileSection(state, viewModel, theme),
-            const SizedBox(height: 24),
             _buildNameSection(state, viewModel, theme),
             const SizedBox(height: 24),
             _buildGenderSection(state, viewModel, theme),
@@ -175,99 +173,6 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildProfileSection(state, viewModel, ThemeData theme) {
-    return _buildCard(
-      theme,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildSectionTitle('プロフィール', Icons.account_circle_outlined, theme),
-          const SizedBox(height: 20),
-
-          // アバター画像エリア（共通ウィジェット使用）
-          Center(
-            child: Column(
-              children: [
-                KindnessGiverAvatar(
-                  gender: state.selectedGender,
-                  size: 100,
-                  iconSize: 40,
-                ),
-                const SizedBox(height: 12),
-
-                // 将来の機能を示唆するテキスト
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
-                  ),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        Icons.image_outlined,
-                        size: 14,
-                        color: AppColors.textLight,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        'プロフィール画像（今後追加予定）',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textLight,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 20),
-
-          // 現在の性別による表示説明
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.1),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  size: 16,
-                  color: theme.colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    '現在は性別に応じたアイコンを表示しています',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
