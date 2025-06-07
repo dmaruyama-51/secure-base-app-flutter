@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/kindness_giver.dart';
 
-/// KindnessGiverの情報表示チップ（関係性・性別）
+/// KindnessGiverの情報表示チップ（関係性のみ）
 class KindnessGiverInfoChip extends StatelessWidget {
   final KindnessGiver kindnessGiver;
 
@@ -26,36 +26,8 @@ class KindnessGiverInfoChip extends StatelessWidget {
             fontSize: 12,
           ),
         ),
-        const SizedBox(width: 12),
-        Icon(
-          _getGenderIcon(kindnessGiver.genderName ?? ''),
-          size: 16,
-          color: theme.colorScheme.onSurface.withOpacity(0.7),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          kindnessGiver.genderName ?? '',
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 12,
-            color: theme.colorScheme.onSurface.withOpacity(0.7),
-          ),
-        ),
       ],
     );
-  }
-
-  IconData _getGenderIcon(String gender) {
-    switch (gender) {
-      case '女性':
-        return Icons.female;
-      case '男性':
-        return Icons.male;
-      case 'ペット':
-        return Icons.pets;
-      default:
-        return Icons.person;
-    }
   }
 
   IconData _getRelationIcon(String relation) {

@@ -52,7 +52,6 @@ class GenderSelection extends StatelessWidget {
   static List<Map<String, dynamic>> get genderOptions => [
     {'label': '女性', 'icon': Icons.female, 'value': '女性'},
     {'label': '男性', 'icon': Icons.male, 'value': '男性'},
-    {'label': 'ペット', 'icon': Icons.pets, 'value': 'ペット'},
   ];
 }
 
