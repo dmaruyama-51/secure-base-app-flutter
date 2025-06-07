@@ -22,7 +22,7 @@ class GenderSelection extends StatelessWidget {
           children: [
             Icon(
               Icons.person_outline,
-              size: 20,
+              size: 18,
               color: theme.colorScheme.primary,
             ),
             const SizedBox(width: 8),
@@ -30,12 +30,12 @@ class GenderSelection extends StatelessWidget {
               '性別',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         ...genderOptions.map(
           (gender) => _GenderOptionTile(
             label: gender['label'] as String,
@@ -74,14 +74,14 @@ class _GenderOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               color:
                   isSelected
@@ -100,13 +100,13 @@ class _GenderOptionTile extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  size: 20,
+                  size: 18,
                   color:
                       isSelected
                           ? theme.colorScheme.primary
                           : Colors.grey.shade600,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Text(
                   label,
                   style: TextStyle(
@@ -116,14 +116,14 @@ class _GenderOptionTile extends StatelessWidget {
                             : theme.colorScheme.onSurface,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
                 const Spacer(),
                 if (isSelected)
                   Icon(
                     Icons.check_circle,
-                    size: 20,
+                    size: 18,
                     color: theme.colorScheme.primary,
                   ),
               ],

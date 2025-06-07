@@ -22,7 +22,7 @@ class RelationSelection extends StatelessWidget {
           children: [
             Icon(
               Icons.group_outlined,
-              size: 20,
+              size: 18,
               color: theme.colorScheme.primary,
             ),
             const SizedBox(width: 8),
@@ -30,12 +30,12 @@ class RelationSelection extends StatelessWidget {
               '関係性',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 10),
         ...relationOptions.map(
           (relation) => _RelationOptionTile(
             label: relation['label'] as String,

@@ -83,13 +83,13 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(theme),
-                const SizedBox(height: 32),
+                const SizedBox(height: 24),
                 _buildNameSection(state, viewModel, theme),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 _buildGenderSection(state, viewModel, theme),
-                const SizedBox(height: 24),
+                const SizedBox(height: 20),
                 _buildRelationSection(state, viewModel, theme),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
                 _buildSaveButton(state, viewModel, theme),
               ],
             ),
@@ -130,7 +130,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
   Widget _buildHeader(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -153,7 +153,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
             children: [
               Icon(
                 Icons.info_outline,
-                size: 20,
+                size: 18,
                 color: theme.colorScheme.primary,
               ),
               const SizedBox(width: 8),
@@ -162,17 +162,17 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             'あなたの心の安全基地になる人を登録しましょう',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
-              fontSize: 13,
+              fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
           ),
@@ -193,7 +193,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildSectionTitle('名前', Icons.edit_outlined, theme),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary.withOpacity(0.3),
@@ -203,15 +203,15 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
             child: TextField(
               controller: _nameController,
               onChanged: viewModel.updateName,
-              style: theme.textTheme.bodyLarge,
+              style: theme.textTheme.bodyMedium,
               decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                  horizontal: 14,
+                  vertical: 10,
                 ),
                 hintText: '名前またはニックネームを入力',
-                hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
+                hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
               ),
             ),
           ),
@@ -245,7 +245,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
   Widget _buildCard(ThemeData theme, {required Widget child}) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -268,13 +268,13 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
   Widget _buildSectionTitle(String title, IconData icon, ThemeData theme) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: theme.colorScheme.primary),
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
         Text(
           title,
           style: theme.textTheme.titleMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            fontSize: 16,
+            fontSize: 14,
           ),
         ),
       ],
@@ -289,15 +289,15 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(vertical: 16),
+          padding: const EdgeInsets.symmetric(vertical: 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child:
             state.isSaving
                 ? SizedBox(
-                  height: 20,
-                  width: 20,
+                  height: 18,
+                  width: 18,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
                     color: theme.colorScheme.onPrimary,
@@ -308,7 +308,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                   children: [
                     Icon(
                       Icons.save_outlined,
-                      size: 20,
+                      size: 18,
                       color: theme.colorScheme.onPrimary,
                     ),
                     const SizedBox(width: 8),
@@ -316,7 +316,7 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                       'メンバーを保存',
                       style: TextStyle(
                         color: theme.colorScheme.onPrimary,
-                        fontSize: 16,
+                        fontSize: 15,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

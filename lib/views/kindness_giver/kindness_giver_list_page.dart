@@ -50,16 +50,16 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
       appBar: _buildAppBar(theme),
       body: SingleChildScrollView(
         padding: const EdgeInsets.only(
-          left: 24.0,
-          right: 24.0,
+          left: 20.0,
+          right: 20.0,
           top: 8.0,
-          bottom: 24.0,
+          bottom: 20.0,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHeader(theme),
-            const SizedBox(height: 32),
+            const SizedBox(height: 24),
             _buildMembersSection(state, viewModel, theme),
           ],
         ),
@@ -82,7 +82,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   Widget _buildHeader(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
@@ -105,7 +105,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
             children: [
               Icon(
                 Icons.info_outline,
-                size: 20,
+                size: 18,
                 color: theme.colorScheme.primary,
               ),
               const SizedBox(width: 8),
@@ -114,21 +114,18 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
-                  fontSize: 16,
+                  fontSize: 14,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 28), // アイコン分のインデント
-            child: Text(
-              '心の支えとなるメンバーを管理できます',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textLight,
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-              ),
+          const SizedBox(height: 4),
+          Text(
+            '心の支えとなるメンバーを管理できます',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],
@@ -157,19 +154,19 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
             Icon(
               Icons.people_outline,
               color: theme.colorScheme.primary,
-              size: 20,
+              size: 18,
             ),
             const SizedBox(width: 8),
             Text(
               'メンバー',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
-                fontSize: 16,
+                fontSize: 14,
               ),
             ),
             const Spacer(),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
@@ -177,7 +174,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
               child: Text(
                 '${state.kindnessGivers.length}人',
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: 11,
                   color: theme.colorScheme.primary,
                   fontWeight: FontWeight.w600,
                 ),
@@ -185,10 +182,10 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
             ),
           ],
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 12),
         ...state.kindnessGivers.map(
           (kindnessGiver) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
+            padding: const EdgeInsets.only(bottom: 10),
             child: KindnessGiverCard(
               kindnessGiver: kindnessGiver,
               onEdit: () => _navigateToEdit(kindnessGiver),
@@ -204,7 +201,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   Widget _buildLoadingCard(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -223,10 +220,10 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
       child: Column(
         children: [
           CircularProgressIndicator(color: theme.colorScheme.primary),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           Text(
             'メンバーを読み込み中...',
-            style: TextStyle(color: AppColors.textLight, fontSize: 14),
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
           ),
         ],
       ),
@@ -236,7 +233,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   Widget _buildErrorCard(state, viewModel, ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -254,28 +251,31 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
       ),
       child: Column(
         children: [
-          Icon(Icons.error_outline, size: 48, color: theme.colorScheme.error),
-          const SizedBox(height: 16),
+          Icon(Icons.error_outline, size: 40, color: theme.colorScheme.error),
+          const SizedBox(height: 12),
           Text(
             'エラーが発生しました',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             state.errorMessage!,
-            style: TextStyle(color: AppColors.textLight),
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 12),
           ElevatedButton.icon(
             onPressed: () => viewModel.loadKindnessGivers(),
-            icon: const Icon(Icons.refresh, size: 18),
+            icon: const Icon(Icons.refresh, size: 16),
             label: const Text('再試行'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              textStyle: TextStyle(fontSize: 14),
             ),
           ),
         ],
@@ -286,7 +286,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   Widget _buildEmptyCard(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -305,39 +305,42 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
       child: Column(
         children: [
           Container(
-            width: 80,
-            height: 80,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(40),
+              borderRadius: BorderRadius.circular(32),
             ),
             child: Icon(
               Icons.people_outline,
-              size: 40,
+              size: 32,
               color: theme.colorScheme.primary.withOpacity(0.6),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             'まだメンバーがいません',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             '右下のボタンから\n最初のメンバーを追加しましょう',
-            style: TextStyle(color: AppColors.textLight, fontSize: 14),
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           ElevatedButton.icon(
             onPressed: _navigateToAdd,
-            icon: const Icon(Icons.add, size: 18),
+            icon: const Icon(Icons.add, size: 16),
             label: const Text('メンバーを追加'),
             style: ElevatedButton.styleFrom(
               backgroundColor: theme.colorScheme.primary,
               foregroundColor: theme.colorScheme.onPrimary,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              textStyle: TextStyle(fontSize: 14),
             ),
           ),
         ],
