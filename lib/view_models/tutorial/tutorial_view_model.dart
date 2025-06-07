@@ -139,11 +139,26 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
         throw Exception('ユーザーが認証されていません');
       }
 
+      // データベースのマスターテーブルから正しいIDを取得
+      final genderId = await _kindnessGiverRepository.getGenderIdByName(
+        state.selectedGender,
+      );
+      final relationshipId = await _kindnessGiverRepository
+          .getRelationshipIdByName(state.selectedRelation);
+
+      if (genderId == null) {
+        throw Exception('選択された性別が見つかりません: ${state.selectedGender}');
+      }
+
+      if (relationshipId == null) {
+        throw Exception('選択された関係性が見つかりません: ${state.selectedRelation}');
+      }
+
       final kindnessGiver = KindnessGiver.create(
         userId: user.id,
         giverName: state.kindnessGiverName,
-        relationshipId: _getRelationshipId(state.selectedRelation),
-        genderId: _getGenderId(state.selectedGender),
+        relationshipId: relationshipId,
+        genderId: genderId,
       );
 
       await _kindnessGiverRepository.createKindnessGiver(kindnessGiver);
@@ -251,36 +266,6 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   void executeSkipAction() {
     if (state.currentPage == 2) {
       nextPage();
-    }
-  }
-
-  int _getGenderId(String gender) {
-    switch (gender) {
-      case '男性':
-        return 1;
-      case '女性':
-        return 2;
-      case 'その他':
-        return 3;
-      default:
-        return 2; // デフォルトは女性
-    }
-  }
-
-  int _getRelationshipId(String relation) {
-    switch (relation) {
-      case '家族':
-        return 1;
-      case '友達':
-        return 2;
-      case 'パートナー':
-        return 3;
-      case 'ペット':
-        return 4;
-      case '会社の人':
-        return 5;
-      default:
-        return 1; // デフォルトは家族
     }
   }
 }

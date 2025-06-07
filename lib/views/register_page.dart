@@ -37,9 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
       final email = _emailController.text;
       final password = _passwordController.text;
       await supabase.auth.signUp(email: email, password: password);
-      // TODO: 遷移先ページを追加
-      // Navigator.of(context)
-      //     .pushAndRemoveUntil(NextPage.route(), (route) => false);
+      context.go('/tutorial');
     } on AuthException catch (error) {
       if (mounted) context.showErrorSnackBar(message: error.message);
     } catch (error) {
@@ -142,7 +140,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         // サブタイトル（デフォルトフォント使用）
         const Text(
-          '新しいアカウントを作成して\nあなたの心の安全基地を育てましょう',
+          'Kindlyの利用をはじめましょう',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
