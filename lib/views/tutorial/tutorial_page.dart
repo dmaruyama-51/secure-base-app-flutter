@@ -115,7 +115,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // アイコン → ログイン・新規登録ページと統一したデザインに変更
           Container(
             width: 160,
             height: 160,
@@ -146,7 +145,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           const SizedBox(height: 32),
           // タイトル
           Text(
-            'ようこそ, xxxへ!',
+            'ようこそ, Kindlyへ!',
             style: theme.textTheme.headlineMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.colorScheme.primary,
@@ -176,7 +175,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
             child: Column(
               children: [
                 Text(
-                  '日々受け取っている小さな優しさに目を向けて、あなたが大切で価値ある存在であることを見える化するためのアプリです。',
+                  'Kindly は日々受け取っている小さな優しさに目を向けて、心がほっとする場所を作っていくアプリです。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.text,
@@ -218,7 +217,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
             child: KindnessGiverAvatar(
               gender: state.selectedGender,
               relationship: state.selectedRelation,
-              size: 80,
+              size: 120,
             ),
           ),
           const SizedBox(height: 24),
@@ -276,7 +275,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'あなたの心の安全基地になる大切な人を登録しましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更できます。',
+            'あなたにやさしさを向けてくれる大切な人を登録しましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更や追加もできます。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -308,8 +307,8 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           controller: _nameController,
           onChanged: viewModel.updateName,
           decoration: InputDecoration(
-            hintText: '名前/ニックネームを入力してください',
-            hintStyle: TextStyle(color: AppColors.textLight),
+            hintText: '名前かニックネームを入力してください',
+            hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
@@ -487,7 +486,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           maxLines: 4,
           decoration: InputDecoration(
             hintText: '例：疲れているときに「お疲れ様」と声をかけてくれた',
-            hintStyle: TextStyle(color: AppColors.textLight),
+            hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
@@ -652,7 +651,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '設定した頻度で、受け取った優しさを振り返る機会をお届けします。\nあなたの心の安全基地を実感できる大切な時間です。',
+            '設定した頻度で、受け取った優しさを振り返る機会をお届けします。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -792,7 +791,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                     ),
                   ),
                   subtitle: Text(
-                    _getFrequencyDescription(frequency),
+                    viewModel.getFrequencyDescription(frequency),
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.textLight,
                     ),
@@ -819,19 +818,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  String _getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return 'こまめに振り返りたい方におすすめ';
-      case '2週に1回':
-        return 'バランスよく振り返れる推奨設定';
-      case '月に1回':
-        return '記録する頻度が少ない方におすすめ';
-      default:
-        return '';
-    }
-  }
-
   Widget _buildNavigationButtons(
     TutorialState state,
     TutorialViewModel viewModel,
@@ -841,8 +827,8 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
       padding: const EdgeInsets.all(20),
       child: Row(
         children: [
-          // 戻るボタン（3ページ目では表示しない）
-          if (state.currentPage > 0 && state.currentPage != 2)
+          // 戻るボタン
+          if (viewModel.shouldShowBackButton())
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
@@ -865,16 +851,14 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
             ),
-          if (state.currentPage > 0 && state.currentPage != 2)
-            const SizedBox(width: 16),
+          if (viewModel.shouldShowBackButton()) const SizedBox(width: 16),
 
-          // スキップボタン（3ページ目のみ）
-          if (state.currentPage == 2)
+          // スキップボタン
+          if (viewModel.shouldShowSkipButton())
             Expanded(
               child: OutlinedButton(
                 onPressed: () {
-                  // 3ページ目をスキップして4ページ目へ
-                  viewModel.nextPage();
+                  viewModel.executeSkipAction();
                   _pageController.nextPage(
                     duration: const Duration(milliseconds: 300),
                     curve: Curves.easeInOut,
@@ -893,52 +877,24 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
             ),
-          if (state.currentPage == 2) const SizedBox(width: 16),
+          if (viewModel.shouldShowSkipButton()) const SizedBox(width: 16),
 
           // 次へ/完了ボタン
           Expanded(
             flex: state.currentPage == 0 ? 1 : 2,
             child: FilledButton(
               onPressed:
-                  (state.isCompleting ||
-                          state.isRecordingKindness ||
-                          state.isSettingReflection)
+                  viewModel.isNextButtonDisabled()
                       ? null
                       : () async {
-                        if (state.currentPage == 0) {
-                          // 1ページ目：次のページへ
-                          viewModel.nextPage();
+                        final result = await viewModel.executeNextAction();
+                        if (result == 'next_page') {
                           _pageController.nextPage(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
                           );
-                        } else if (state.currentPage == 1) {
-                          // 2ページ目：メンバー登録完了後、3ページ目へ
-                          final success = await viewModel.completeTutorial();
-                          if (success) {
-                            viewModel.nextPage();
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        } else if (state.currentPage == 2) {
-                          // 3ページ目：優しさ記録後、4ページ目へ
-                          final success = await viewModel.recordKindness();
-                          if (success) {
-                            viewModel.nextPage();
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          }
-                        } else {
-                          // 4ページ目：リフレクション設定後、メイン画面へ
-                          final success =
-                              await viewModel.saveReflectionSettings();
-                          if (success && mounted) {
-                            context.go('/kindness-records');
-                          }
+                        } else if (result == 'navigate_to_main' && mounted) {
+                          context.go('/kindness-records');
                         }
                       },
               style: FilledButton.styleFrom(
@@ -949,9 +905,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
               child:
-                  (state.isCompleting ||
-                          state.isRecordingKindness ||
-                          state.isSettingReflection)
+                  viewModel.isNextButtonDisabled()
                       ? SizedBox(
                         height: 20,
                         width: 20,
@@ -963,13 +917,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                         ),
                       )
                       : Text(
-                        state.currentPage == 0
-                            ? '次へ'
-                            : state.currentPage == 1
-                            ? '次へ'
-                            : state.currentPage == 2
-                            ? '記録して次へ'
-                            : '設定して始める',
+                        viewModel.getNextButtonText(),
                         style: TextStyle(
                           color: theme.colorScheme.onPrimary,
                           fontWeight: FontWeight.w600,

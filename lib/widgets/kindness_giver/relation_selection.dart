@@ -54,6 +54,7 @@ class RelationSelection extends StatelessWidget {
     {'label': '友達', 'icon': Icons.people_outline, 'value': '友達'},
     {'label': 'パートナー', 'icon': Icons.favorite_outline, 'value': 'パートナー'},
     {'label': 'ペット', 'icon': Icons.pets_outlined, 'value': 'ペット'},
+    {'label': '会社の人', 'icon': Icons.business_outlined, 'value': '会社の人'},
   ];
 }
 

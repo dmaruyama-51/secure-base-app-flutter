@@ -165,6 +165,95 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
     state = state.copyWith(errorMessage: null);
   }
 
+  /// 現在のページに応じたボタンテキストを取得
+  String getNextButtonText() {
+    switch (state.currentPage) {
+      case 0:
+        return '次へ';
+      case 1:
+        return '次へ';
+      case 2:
+        return '記録して次へ';
+      case 3:
+        return '設定して始める';
+      default:
+        return '次へ';
+    }
+  }
+
+  /// 戻るボタンを表示するかどうか
+  bool shouldShowBackButton() {
+    return state.currentPage > 0 && state.currentPage != 2;
+  }
+
+  /// スキップボタンを表示するかどうか
+  bool shouldShowSkipButton() {
+    return state.currentPage == 2;
+  }
+
+  /// 次へボタンが無効かどうか
+  bool isNextButtonDisabled() {
+    return state.isCompleting ||
+        state.isRecordingKindness ||
+        state.isSettingReflection;
+  }
+
+  /// リフレクション頻度の説明テキストを取得
+  String getFrequencyDescription(String frequency) {
+    switch (frequency) {
+      case '週に1回':
+        return 'こまめに振り返りたい方におすすめ';
+      case '2週に1回':
+        return 'バランスよく振り返れる推奨設定';
+      case '月に1回':
+        return '記録する頻度が少ない方におすすめ';
+      default:
+        return '';
+    }
+  }
+
+  /// 次へボタンのアクション実行
+  Future<String?> executeNextAction() async {
+    switch (state.currentPage) {
+      case 0:
+        // 1ページ目：次のページへ
+        nextPage();
+        return 'next_page';
+      case 1:
+        // 2ページ目：メンバー登録完了後、3ページ目へ
+        final success = await completeTutorial();
+        if (success) {
+          nextPage();
+          return 'next_page';
+        }
+        return null;
+      case 2:
+        // 3ページ目：優しさ記録後、4ページ目へ
+        final success = await recordKindness();
+        if (success) {
+          nextPage();
+          return 'next_page';
+        }
+        return null;
+      case 3:
+        // 4ページ目：リフレクション設定後、メイン画面へ
+        final success = await saveReflectionSettings();
+        if (success) {
+          return 'navigate_to_main';
+        }
+        return null;
+      default:
+        return null;
+    }
+  }
+
+  /// スキップアクション実行
+  void executeSkipAction() {
+    if (state.currentPage == 2) {
+      nextPage();
+    }
+  }
+
   int _getGenderId(String gender) {
     switch (gender) {
       case '男性':
@@ -182,13 +271,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
     switch (relation) {
       case '家族':
         return 1;
-      case '友人':
+      case '友達':
         return 2;
-      case '恋人':
+      case 'パートナー':
         return 3;
-      case '同僚':
+      case 'ペット':
         return 4;
-      case 'その他':
+      case '会社の人':
         return 5;
       default:
         return 1; // デフォルトは家族

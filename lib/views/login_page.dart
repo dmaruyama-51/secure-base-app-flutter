@@ -123,7 +123,7 @@ class LoginPageState extends State<LoginPage> {
 
         // タイトル（デフォルトフォント使用）
         const Text(
-          'ようこそ',
+          'Kindly',
           style: TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.w700,
@@ -135,7 +135,7 @@ class LoginPageState extends State<LoginPage> {
 
         // サブタイトル（デフォルトフォント使用）
         const Text(
-          'あなたの心の安全基地を育てていきましょう',
+          '心の安全基地を育むアプリ',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
