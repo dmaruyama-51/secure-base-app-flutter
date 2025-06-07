@@ -148,7 +148,7 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
           Row(
             children: [
               Icon(
-                Icons.edit_outlined,
+                Icons.info_outline,
                 size: 20,
                 color: theme.colorScheme.primary,
               ),

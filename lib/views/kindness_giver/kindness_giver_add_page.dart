@@ -128,8 +128,6 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
   }
 
   Widget _buildHeader(ThemeData theme) {
-    final state = ref.watch(kindnessGiverAddViewModelProvider);
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -149,8 +147,8 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
         ),
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // テキスト情報
           Row(
             children: [
               Icon(
@@ -170,15 +168,12 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
             ],
           ),
           const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.only(left: 28),
-            child: Text(
-              'あなたの心の安全基地になる人を登録しましょう',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textLight,
-                fontSize: 13,
-                fontWeight: FontWeight.w400,
-              ),
+          Text(
+            'あなたの心の安全基地になる人を登録しましょう',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 13,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ],

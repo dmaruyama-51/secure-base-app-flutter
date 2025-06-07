@@ -104,7 +104,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           Row(
             children: [
               Icon(
-                Icons.people_outline,
+                Icons.info_outline,
                 size: 20,
                 color: theme.colorScheme.primary,
               ),
