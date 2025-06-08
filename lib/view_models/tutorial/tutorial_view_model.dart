@@ -15,6 +15,17 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   final TutorialRepository _tutorialRepository;
   final KindnessRecordRepository _kindnessRecordRepository;
 
+  // チュートリアルページ関連の定数
+  static const int _firstPageIndex = 0;
+  static const int _lastPageIndex = 3;
+  static const int _introductionPageIndex = 0;
+  static const int _memberRegistrationPageIndex = 1;
+  static const int _kindnessRecordPageIndex = 2;
+  static const int _reflectionSettingPageIndex = 3;
+
+  // 遅延時間の定数
+  static const int _reflectionSaveDelayMs = 500;
+
   TutorialViewModel({
     required KindnessGiverRepository kindnessGiverRepository,
     required TutorialRepository tutorialRepository,
@@ -25,13 +36,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
        super(const TutorialState());
 
   void nextPage() {
-    if (state.currentPage < 3) {
+    if (state.currentPage < _lastPageIndex) {
       state = state.copyWith(currentPage: state.currentPage + 1);
     }
   }
 
   void previousPage() {
-    if (state.currentPage > 0) {
+    if (state.currentPage > _firstPageIndex) {
       state = state.copyWith(currentPage: state.currentPage - 1);
     }
   }
@@ -111,7 +122,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
         throw Exception('ユーザーが認証されていません');
       }
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
       print('リフレクション頻度を保存しました: ${state.selectedReflectionFrequency}');
 
       state = state.copyWith(isSettingReflection: false);
@@ -183,13 +194,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   /// 現在のページに応じたボタンテキストを取得
   String getNextButtonText() {
     switch (state.currentPage) {
-      case 0:
+      case _introductionPageIndex:
         return '次へ';
-      case 1:
+      case _memberRegistrationPageIndex:
         return '次へ';
-      case 2:
+      case _kindnessRecordPageIndex:
         return '記録して次へ';
-      case 3:
+      case _reflectionSettingPageIndex:
         return '設定して始める';
       default:
         return '次へ';
@@ -198,12 +209,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
-    return state.currentPage > 0 && state.currentPage != 2;
+    return state.currentPage > _firstPageIndex &&
+        state.currentPage != _kindnessRecordPageIndex;
   }
 
   /// スキップボタンを表示するかどうか
   bool shouldShowSkipButton() {
-    return state.currentPage == 2;
+    return state.currentPage == _kindnessRecordPageIndex;
   }
 
   /// 次へボタンが無効かどうか
@@ -230,11 +242,11 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   /// 次へボタンのアクション実行
   Future<String?> executeNextAction() async {
     switch (state.currentPage) {
-      case 0:
+      case _introductionPageIndex:
         // 1ページ目：次のページへ
         nextPage();
         return 'next_page';
-      case 1:
+      case _memberRegistrationPageIndex:
         // 2ページ目：メンバー登録完了後、3ページ目へ
         final success = await completeTutorial();
         if (success) {
@@ -242,7 +254,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
           return 'next_page';
         }
         return null;
-      case 2:
+      case _kindnessRecordPageIndex:
         // 3ページ目：優しさ記録後、4ページ目へ
         final success = await recordKindness();
         if (success) {
@@ -250,7 +262,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
           return 'next_page';
         }
         return null;
-      case 3:
+      case _reflectionSettingPageIndex:
         // 4ページ目：リフレクション設定後、メイン画面へ
         final success = await saveReflectionSettings();
         if (success) {
@@ -264,7 +276,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   /// スキップアクション実行
   void executeSkipAction() {
-    if (state.currentPage == 2) {
+    if (state.currentPage == _kindnessRecordPageIndex) {
       nextPage();
     }
   }
