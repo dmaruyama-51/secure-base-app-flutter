@@ -1,293 +1,297 @@
 import 'package:flutter/material.dart';
-import 'package:secure_base/utils/app_colors.dart';
-import '../../widgets/common/bottom_navigation.dart';
-import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../models/kindness_giver.dart';
+import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
+import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
+import '../../widgets/common/bottom_navigation.dart';
+import '../../utils/app_colors.dart';
+import '../../widgets/kindness_giver/gender_selection.dart';
+import '../../widgets/kindness_giver/relation_selection.dart';
 
-class KindnessGiverEditPage extends StatefulWidget {
+class KindnessGiverEditPage extends ConsumerStatefulWidget {
   final KindnessGiver kindnessGiver;
 
   const KindnessGiverEditPage({super.key, required this.kindnessGiver});
 
   @override
-  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
+  ConsumerState<KindnessGiverEditPage> createState() =>
+      _KindnessGiverEditPageState();
 }
 
-class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
-  // ViewModelのインスタンス
-  late KindnessGiverEditViewModel _viewModel;
+class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
+  late TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverEditViewModel(
-      kindnessGiver: widget.kindnessGiver,
+    _nameController = TextEditingController(
+      text: widget.kindnessGiver.giverName,
     );
   }
 
   @override
   void dispose() {
-    _viewModel.dispose(); // ViewModelのリソース解放
+    _nameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // テーマを取得
+    final state = ref.watch(
+      kindnessGiverEditViewModelProvider(widget.kindnessGiver),
+    );
+    final viewModel = ref.read(
+      kindnessGiverEditViewModelProvider(widget.kindnessGiver).notifier,
+    );
+    final theme = Theme.of(context);
+
+    // 成功メッセージと画面遷移の処理
+    ref.listen(kindnessGiverEditViewModelProvider(widget.kindnessGiver), (
+      previous,
+      next,
+    ) {
+      if (next.shouldNavigateBack) {
+        viewModel.clearMessages();
+        ref
+            .read(kindnessGiverListViewModelProvider.notifier)
+            .loadKindnessGivers();
+        GoRouter.of(context).pop();
+      }
+
+      if (next.successMessage != null) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(next.successMessage!)));
+      }
+
+      if (next.errorMessage != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(next.errorMessage!),
+            backgroundColor: theme.colorScheme.error,
+          ),
+        );
+      }
+    });
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
-          onPressed: () => Navigator.of(context).pop(),
+      appBar: _buildAppBar(theme),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.only(
+          left: 20.0,
+          right: 20.0,
+          top: 8.0,
+          bottom: 20.0,
         ),
-        title: Text('メンバー編集', style: theme.textTheme.titleLarge),
-      ),
-      body: AnimatedBuilder(
-        animation: _viewModel,
-        builder: (context, child) {
-          // エラーメッセージの表示
-          if (_viewModel.errorMessage != null) {
-            // エラーメッセージがあればSnackBarで表示
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
-              _viewModel.clearMessages();
-            });
-          }
-
-          // 成功メッセージと画面遷移
-          if (_viewModel.successMessage != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(_viewModel.successMessage!)),
-              );
-
-              if (_viewModel.shouldNavigateBack) {
-                Navigator.of(context).pop();
-              }
-
-              _viewModel.clearMessages();
-            });
-          }
-
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // プロフィール画像（中央に表示）
-                Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.primaryLight,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        _viewModel.getGenderIcon(_viewModel.selectedGender),
-                        size: 80,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // 性別選択
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildGenderOption('女性'),
-                      const SizedBox(width: 8),
-                      _buildGenderOption('男性'),
-                      const SizedBox(width: 8),
-                      _buildGenderOption('ペット'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // 名前/ニックネーム入力
-                Text(
-                  '名前 / ニックネーム',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withAlpha(153),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _viewModel.nameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: theme.colorScheme.secondary,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.secondary,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorText: _viewModel.errorMessage,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // 関係性選択
-                Text(
-                  '関係性',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withAlpha(153),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildRelationOption('家族'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('友達'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('パートナー'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('ペット'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // 更新ボタン
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed:
-                        _viewModel.isSaving ? null : _updateKindnessGiver,
-                    child:
-                        _viewModel.isSaving
-                            ? CircularProgressIndicator(
-                              color: theme.colorScheme.onPrimary,
-                            )
-                            : Text(
-                              '更新',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                  ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memnberタブを選択
-      ),
-    );
-  }
-
-  // 性別選択オプションを構築
-  Widget _buildGenderOption(String gender) {
-    final theme = Theme.of(context);
-    final isSelected = _viewModel.selectedGender == gender;
-
-    return GestureDetector(
-      onTap: () {
-        _viewModel.selectGender(gender);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Row(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(
-              _viewModel.getGenderIcon(gender),
-              size: 16,
-              color:
-                  isSelected
-                      ? theme.colorScheme.onPrimary
-                      : theme.colorScheme.onSecondary,
-            ),
-            const SizedBox(width: 4),
-            Text(
-              gender,
-              style: TextStyle(
-                color:
-                    isSelected
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 14,
-              ),
-            ),
+            _buildHeader(theme),
+            const SizedBox(height: 20),
+            _buildNameSection(state, viewModel, theme),
+            const SizedBox(height: 28),
+            _buildUpdateButton(state, viewModel, theme),
           ],
         ),
       ),
+      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
-  // 関係性選択オプションを構築
-  Widget _buildRelationOption(String relation) {
-    final theme = Theme.of(context);
-    final isSelected = _viewModel.selectedRelation == relation;
-
-    return GestureDetector(
-      onTap: () {
-        _viewModel.selectRelation(relation);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          relation,
-          style: TextStyle(
-            color:
-                isSelected
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+  PreferredSizeWidget _buildAppBar(ThemeData theme) {
+    return AppBar(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      elevation: 0,
+      centerTitle: false,
+      leading: IconButton(
+        icon: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.secondary.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            Icons.arrow_back,
+            color: theme.colorScheme.onSurface,
+            size: 20,
           ),
         ),
+        onPressed: () => GoRouter.of(context).pop(),
       ),
     );
   }
 
-  // メンバー更新処理
-  Future<void> _updateKindnessGiver() async {
-    await _viewModel.updateKindnessGiver();
+  Widget _buildHeader(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primary.withOpacity(0.05),
+            theme.colorScheme.primary.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                'メンバー情報を編集',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '${widget.kindnessGiver.giverName}さんの情報を更新できます',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameSection(state, viewModel, ThemeData theme) {
+    return _buildCard(
+      theme,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('名前', Icons.edit_outlined, theme),
+          const SizedBox(height: 10),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.colorScheme.secondary, width: 1),
+            ),
+            child: TextField(
+              controller: _nameController,
+              onChanged: viewModel.updateName,
+              style: theme.textTheme.bodyMedium,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 8,
+                ),
+                hintText: '名前またはニックネームを入力',
+                hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCard(ThemeData theme, {required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 1),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.secondary.withOpacity(0.8),
+          width: 1,
+        ),
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon, ThemeData theme) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUpdateButton(state, viewModel, ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: state.isSaving ? null : viewModel.updateKindnessGiver,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+        ),
+        child:
+            state.isSaving
+                ? SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.update_outlined,
+                      size: 18,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'メンバー情報を更新',
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
   }
 }

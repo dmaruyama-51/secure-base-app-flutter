@@ -8,7 +8,8 @@ import '../../providers/kindness_record/kindness_record_providers.dart';
 import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
 // StateNotifierベースのKindnessRecordEditViewModel
-class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState> {
+class KindnessRecordEditViewModel
+    extends StateNotifier<KindnessRecordEditState> {
   final KindnessGiverRepository _kindnessGiverRepository;
   final KindnessRecordRepository _kindnessRecordRepository;
 
@@ -16,9 +17,9 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
   KindnessRecordEditViewModel({
     required KindnessGiverRepository kindnessGiverRepository,
     required KindnessRecordRepository kindnessRecordRepository,
-  })  : _kindnessGiverRepository = kindnessGiverRepository,
-        _kindnessRecordRepository = kindnessRecordRepository,
-        super(const KindnessRecordEditState());
+  }) : _kindnessGiverRepository = kindnessGiverRepository,
+       _kindnessRecordRepository = kindnessRecordRepository,
+       super(const KindnessRecordEditState());
 
   // 編集対象の記録を初期化する
   Future<void> initializeRecord(KindnessRecord record) async {
@@ -27,10 +28,11 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
       content: record.content,
       selectedKindnessGiver: KindnessGiver(
         id: record.giverId,
-        name: record.giverName,
-        category: record.giverCategory,
-        gender: record.giverGender,
-        avatarUrl: record.giverAvatarUrl,
+        userId: record.userId,
+        giverName: record.giverName,
+        genderId: 1,
+        relationshipId: 1,
+        createdAt: DateTime.now(),
       ),
     );
     await loadMembers();
@@ -41,16 +43,11 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
-      state = state.copyWith(
-        kindnessGivers: kindnessGivers,
-        isLoading: false,
-      );
+      final kindnessGivers =
+          await _kindnessGiverRepository.fetchKindnessGivers();
+      state = state.copyWith(kindnessGivers: kindnessGivers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'メンバー取得に失敗しました',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: 'メンバー取得に失敗しました');
     }
   }
 
@@ -110,8 +107,10 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
         giverGender: state.selectedKindnessGiver!.gender,
       );
 
-      final result = await _kindnessRecordRepository.updateKindnessRecord(updatedRecord);
-      
+      final result = await _kindnessRecordRepository.updateKindnessRecord(
+        updatedRecord,
+      );
+
       if (result) {
         state = state.copyWith(
           isSaving: false,
@@ -119,10 +118,7 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
           shouldNavigateBack: true,
         );
       } else {
-        state = state.copyWith(
-          isSaving: false,
-          errorMessage: '更新に失敗しました',
-        );
+        state = state.copyWith(isSaving: false, errorMessage: '更新に失敗しました');
       }
     } catch (e) {
       state = state.copyWith(
@@ -143,16 +139,16 @@ class KindnessRecordEditViewModel extends StateNotifier<KindnessRecordEditState>
 }
 
 // ViewModelのProvider（DIで依存関係を注入）
-final kindnessRecordEditViewModelProvider = 
-    StateNotifierProvider<KindnessRecordEditViewModel, KindnessRecordEditState>(
-  (ref) {
-    // Repository Providerから依存関係を取得
-    final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-    final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
-    
-    return KindnessRecordEditViewModel(
-      kindnessGiverRepository: kindnessGiverRepository,
-      kindnessRecordRepository: kindnessRecordRepository,
-    );
-  },
-); 
+final kindnessRecordEditViewModelProvider = StateNotifierProvider<
+  KindnessRecordEditViewModel,
+  KindnessRecordEditState
+>((ref) {
+  // Repository Providerから依存関係を取得
+  final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
+  final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
+
+  return KindnessRecordEditViewModel(
+    kindnessGiverRepository: kindnessGiverRepository,
+    kindnessRecordRepository: kindnessRecordRepository,
+  );
+});

@@ -1,287 +1,327 @@
 import 'package:flutter/material.dart';
-import 'package:secure_base/utils/app_colors.dart';
-import '../../widgets/common/bottom_navigation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
+import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
+import '../../widgets/common/bottom_navigation.dart';
+import '../../utils/app_colors.dart';
+import '../../widgets/kindness_giver/gender_selection.dart';
+import '../../widgets/kindness_giver/relation_selection.dart';
 
-class KindnessGiverAddPage extends StatefulWidget {
+class KindnessGiverAddPage extends ConsumerStatefulWidget {
   const KindnessGiverAddPage({Key? key}) : super(key: key);
 
   @override
-  State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
+  ConsumerState<KindnessGiverAddPage> createState() =>
+      _KindnessGiverAddPageState();
 }
 
-class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
-  // ViewModelのインスタンス
-  late KindnessGiverAddViewModel _viewModel;
+class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
+  late TextEditingController _nameController;
 
   @override
   void initState() {
     super.initState();
-    _viewModel = KindnessGiverAddViewModel();
+    _nameController = TextEditingController();
   }
 
   @override
   void dispose() {
-    _viewModel.dispose(); // ViewModelのリソース解放
+    _nameController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context); // テーマを取得
+    final state = ref.watch(kindnessGiverAddViewModelProvider);
+    final viewModel = ref.read(kindnessGiverAddViewModelProvider.notifier);
+    final theme = Theme.of(context);
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: Text('メンバー追加', style: theme.textTheme.titleLarge),
-      ),
-      body: AnimatedBuilder(
-        animation: _viewModel,
-        builder: (context, child) {
-          // エラーメッセージの表示
-          if (_viewModel.errorMessage != null) {
-            // エラーメッセージがあればSnackBarで表示
+      appBar: _buildAppBar(theme),
+      body: Builder(
+        builder: (context) {
+          // エラーメッセージがあればSnackBarで表示
+          if (state.errorMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(_viewModel.errorMessage!)));
-              _viewModel.clearMessages();
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+              viewModel.clearMessages();
             });
           }
 
-          // 成功メッセージと画面遷移
-          if (_viewModel.successMessage != null) {
+          // 成功メッセージがあればSnackBarで表示し、必要なら画面を戻す
+          if (state.successMessage != null) {
             WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(_viewModel.successMessage!)),
-              );
-
-              if (_viewModel.shouldNavigateBack) {
-                Navigator.of(context).pop();
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+              if (state.shouldNavigateBack) {
+                ref
+                    .read(kindnessGiverListViewModelProvider.notifier)
+                    .loadKindnessGivers();
+                GoRouter.of(context).pop();
               }
-
-              _viewModel.clearMessages();
+              viewModel.clearMessages();
             });
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(
+              left: 24.0,
+              right: 24.0,
+              top: 8.0,
+              bottom: 24.0,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // プロフィール画像（中央に表示）
-                Center(
-                  child: Container(
-                    width: 120,
-                    height: 120,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: AppColors.primaryLight,
-                    ),
-                    child: Center(
-                      child: Icon(
-                        _viewModel.getGenderIcon(_viewModel.selectedGender),
-                        size: 80,
-                        color: theme.colorScheme.primary,
-                      ),
-                    ),
-                  ),
-                ),
+                _buildHeader(theme),
                 const SizedBox(height: 24),
-
-                // 性別選択
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildGenderOption('女性'),
-                      const SizedBox(width: 8),
-                      _buildGenderOption('男性'),
-                      const SizedBox(width: 8),
-                      _buildGenderOption('ペット'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // 名前/ニックネーム入力
-                Text(
-                  '名前 / ニックネーム',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withAlpha(153),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                TextField(
-                  controller: _viewModel.nameController,
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor: theme.colorScheme.secondary,
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.secondary,
-                        width: 1,
-                      ),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                      borderSide: BorderSide(
-                        color: theme.colorScheme.primary,
-                        width: 1.5,
-                      ),
-                    ),
-                    errorText: _viewModel.errorMessage,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 12,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-
-                // 関係性選択
-                Text(
-                  '関係性',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: theme.colorScheme.onSurface.withAlpha(153),
-                  ),
-                ),
-                const SizedBox(height: 8),
-                SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: Row(
-                    children: [
-                      _buildRelationOption('家族'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('友達'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('パートナー'),
-                      const SizedBox(width: 8),
-                      _buildRelationOption('ペット'),
-                    ],
-                  ),
-                ),
+                _buildNameSection(state, viewModel, theme),
+                const SizedBox(height: 20),
+                _buildGenderSection(state, viewModel, theme),
+                const SizedBox(height: 20),
+                _buildRelationSection(state, viewModel, theme),
                 const SizedBox(height: 32),
-
-                // 保存ボタン
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _viewModel.isSaving ? null : _saveKindnessGiver,
-                    child:
-                        _viewModel.isSaving
-                            ? CircularProgressIndicator(
-                              color: theme.colorScheme.onPrimary,
-                            )
-                            : Text(
-                              '保存',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                  ),
-                ),
+                _buildSaveButton(state, viewModel, theme),
               ],
             ),
           );
         },
       ),
-      bottomNavigationBar: const BottomNavigation(
-        currentIndex: 1, // memberタブを選択
+      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(ThemeData theme) {
+    return AppBar(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      elevation: 0,
+      centerTitle: false,
+      toolbarHeight: 48.0, // 戻るボタンがあるので少し高めに設定
+      leading: Padding(
+        padding: const EdgeInsets.only(left: 16.0, top: 4.0), // 位置調整
+        child: IconButton(
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary.withOpacity(0.5),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(
+              Icons.arrow_back,
+              color: theme.colorScheme.onSurface,
+              size: 20,
+            ),
+          ),
+          onPressed: () => GoRouter.of(context).pop(),
+        ),
       ),
     );
   }
 
-  // 性別選択オプションを構築
-  Widget _buildGenderOption(String gender) {
-    final theme = Theme.of(context);
-    final isSelected = _viewModel.selectedGender == gender;
-
-    return GestureDetector(
-      onTap: () {
-        _viewModel.selectGender(gender);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(20),
+  Widget _buildHeader(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primary.withOpacity(0.05),
+            theme.colorScheme.primary.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        child: Row(
-          children: [
-            Icon(
-              _viewModel.getGenderIcon(gender),
-              size: 16,
-              color:
-                  isSelected
-                      ? theme.colorScheme.onPrimary
-                      : theme.colorScheme.onSecondary,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.info_outline,
+                size: 18,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '新しいメンバーを追加',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'あなたの心の安全基地になる人を登録しましょう',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
             ),
-            const SizedBox(width: 4),
-            Text(
-              gender,
-              style: TextStyle(
-                color:
-                    isSelected
-                        ? theme.colorScheme.onPrimary
-                        : theme.colorScheme.onSecondary,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                fontSize: 14,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNameSection(state, viewModel, ThemeData theme) {
+    // TextEditingControllerの内容を状態と同期
+    if (_nameController.text != state.name) {
+      _nameController.text = state.name;
+    }
+
+    return _buildCard(
+      theme,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('名前', Icons.edit_outlined, theme),
+          const SizedBox(height: 12),
+          Container(
+            decoration: BoxDecoration(
+              color: theme.colorScheme.secondary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: theme.colorScheme.secondary, width: 1),
+            ),
+            child: TextField(
+              controller: _nameController,
+              onChanged: viewModel.updateName,
+              style: theme.textTheme.bodyMedium,
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                hintText: '名前またはニックネームを入力',
+                hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
-  // 関係性選択オプションを構築
-  Widget _buildRelationOption(String relation) {
-    final theme = Theme.of(context);
-    final isSelected = _viewModel.selectedRelation == relation;
+  Widget _buildGenderSection(state, viewModel, ThemeData theme) {
+    return _buildCard(
+      theme,
+      child: GenderSelection(
+        selectedGender: state.selectedGender,
+        onGenderSelected: viewModel.selectGender,
+        theme: theme,
+      ),
+    );
+  }
 
-    return GestureDetector(
-      onTap: () {
-        _viewModel.selectRelation(relation);
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color:
-              isSelected
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.secondary,
-          borderRadius: BorderRadius.circular(20),
+  Widget _buildRelationSection(state, viewModel, ThemeData theme) {
+    return _buildCard(
+      theme,
+      child: RelationSelection(
+        selectedRelation: state.selectedRelation,
+        onRelationSelected: viewModel.selectRelation,
+        theme: theme,
+      ),
+    );
+  }
+
+  Widget _buildCard(ThemeData theme, {required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 1),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.secondary.withOpacity(0.8),
+          width: 1,
         ),
-        child: Text(
-          relation,
-          style: TextStyle(
-            color:
-                isSelected
-                    ? theme.colorScheme.onPrimary
-                    : theme.colorScheme.onSecondary,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon, ThemeData theme) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
           ),
         ),
-      ),
+      ],
     );
   }
 
-  // メンバー保存処理
-  Future<void> _saveKindnessGiver() async {
-    await _viewModel.saveKindnessGiver();
+  Widget _buildSaveButton(state, viewModel, ThemeData theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: ElevatedButton(
+        onPressed: state.isSaving ? null : viewModel.saveKindnessGiver,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: theme.colorScheme.onPrimary,
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          elevation: 0,
+        ),
+        child:
+            state.isSaving
+                ? SizedBox(
+                  height: 18,
+                  width: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: theme.colorScheme.onPrimary,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.save_outlined,
+                      size: 18,
+                      color: theme.colorScheme.onPrimary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      'メンバーを保存',
+                      style: TextStyle(
+                        color: theme.colorScheme.onPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
   }
 }
