@@ -27,7 +27,7 @@ class BottomNavigation extends StatelessWidget {
             context.go('/'); // Reflectionページ用（未実装）
             break;
           case 3:
-            context.go('/'); // Settingページ用（未実装）
+            context.go('/settings'); // 設定画面に遷移
             break;
         }
       },

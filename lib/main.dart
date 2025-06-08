@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'routes/app_router.dart';
 import 'utils/app_colors.dart';
 
@@ -25,6 +26,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       title: 'secure-base',
       theme: ThemeData(
+        textTheme: GoogleFonts.mPlusRounded1cTextTheme(
+          Theme.of(context).textTheme,
+        ).apply(bodyColor: AppColors.text, displayColor: AppColors.text),
         colorScheme: ColorScheme(
           brightness: Brightness.light,
           primary: AppColors.primary,
@@ -37,15 +41,6 @@ class MyApp extends StatelessWidget {
           onSurface: AppColors.text,
         ),
         scaffoldBackgroundColor: AppColors.background,
-        textTheme: TextTheme(
-          bodyLarge: TextStyle(color: AppColors.text),
-          bodyMedium: TextStyle(color: AppColors.text),
-          titleLarge: TextStyle(
-            color: AppColors.text,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        // ボタンデザイン
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: AppColors.primary,
@@ -54,15 +49,32 @@ class MyApp extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
+            textStyle: GoogleFonts.mPlusRounded1c(fontWeight: FontWeight.w500),
           ),
         ),
-        // 塗りつぶしボタンデザイン
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24),
             ),
+            textStyle: GoogleFonts.mPlusRounded1c(fontWeight: FontWeight.w500),
           ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            textStyle: GoogleFonts.mPlusRounded1c(fontWeight: FontWeight.w500),
+          ),
+        ),
+        appBarTheme: AppBarTheme(
+          titleTextStyle: GoogleFonts.mPlusRounded1c(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: AppColors.text,
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          labelStyle: GoogleFonts.mPlusRounded1c(color: AppColors.textLight),
+          hintStyle: GoogleFonts.mPlusRounded1c(color: AppColors.textLight),
         ),
       ),
       routerConfig: appRouter,

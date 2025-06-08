@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:secure_base/utils/constants.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../utils/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -26,7 +27,6 @@ class LoginPageState extends State<LoginPage> {
       );
 
       if (mounted) {
-        // リダイレクトパラメータがあれば元のページへ、なければホームへ
         final redirectPath =
             GoRouter.of(
               context,
@@ -56,70 +56,257 @@ class LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('ログイン')),
-      body: ListView(
-        padding: formPadding,
-        children: [
-          // ログインが必要である旨のメッセージ
-          Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 24),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+      backgroundColor: AppColors.background,
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 400),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 32),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ロゴとタイトル
+                  _buildHeader(),
+
+                  const SizedBox(height: 48),
+
+                  // ログインフォーム
+                  _buildLoginForm(),
+
+                  const SizedBox(height: 32),
+
+                  // 区切り線とアカウント作成リンク
+                  _buildRegisterSection(),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Icon(
-                  Icons.info_outline,
-                  color: Theme.of(context).colorScheme.primary,
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'メンバー管理機能をご利用いただくには、ログインが必要です。',
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.primary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Column(
+      children: [
+        // より大きな円形デザイン
+        Container(
+          width: 160,
+          height: 160,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: RadialGradient(
+              colors: [
+                AppColors.primaryLight.withOpacity(0.4),
+                AppColors.secondary.withOpacity(0.2),
               ],
             ),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(0.15),
+                blurRadius: 20,
+                offset: const Offset(0, 8),
+              ),
+            ],
           ),
-          TextFormField(
-            controller: _emailController,
-            decoration: const InputDecoration(labelText: 'メールアドレス'),
-            keyboardType: TextInputType.emailAddress,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Image.asset(
+              'assets/images/img_relax.png',
+              fit: BoxFit.contain,
+            ),
           ),
-          formSpacer,
-          TextFormField(
-            controller: _passwordController,
-            decoration: const InputDecoration(labelText: 'パスワード'),
-            obscureText: true,
+        ),
+        const SizedBox(height: 32),
+
+        // タイトル（デフォルトフォント使用）
+        const Text(
+          'Kindly',
+          style: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.w700,
+            color: AppColors.text,
+            letterSpacing: -0.5,
           ),
-          formSpacer,
-          ElevatedButton(
+        ),
+        const SizedBox(height: 8),
+
+        // サブタイトル（デフォルトフォント使用）
+        const Text(
+          '心の安全基地を育むアプリ',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 16,
+            color: AppColors.textLight,
+            height: 1.5,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLoginForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // メールアドレス
+        _buildTextField(
+          controller: _emailController,
+          label: 'メールアドレス',
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 16),
+
+        // パスワード
+        _buildTextField(
+          controller: _passwordController,
+          label: 'パスワード',
+          obscureText: true,
+        ),
+        const SizedBox(height: 24),
+
+        // ログインボタン
+        SizedBox(
+          height: 44,
+          child: ElevatedButton(
             onPressed: _isLoading ? null : _signIn,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
             child:
                 _isLoading
                     ? const SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2),
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.textOnPrimary,
+                        ),
+                      ),
                     )
-                    : const Text('ログイン'),
+                    : const Text(
+                      'ログイン',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
           ),
-          formSpacer,
-          TextButton(
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    TextInputType? keyboardType,
+    bool obscureText = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // ラベル（デフォルトフォント使用）
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppColors.text,
+          ),
+        ),
+        const SizedBox(height: 6),
+        TextField(
+          controller: controller,
+          keyboardType: keyboardType,
+          obscureText: obscureText,
+          style: const TextStyle(
+            fontSize: 16,
+            color: AppColors.text,
+            fontWeight: FontWeight.w400,
+          ),
+          decoration: InputDecoration(
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(
+                color: AppColors.textLight.withOpacity(0.3),
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: BorderSide(
+                color: AppColors.textLight.withOpacity(0.3),
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(6),
+              borderSide: const BorderSide(color: AppColors.primary, width: 2),
+            ),
+            fillColor: Colors.white,
+            filled: true,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 12,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRegisterSection() {
+    return Column(
+      children: [
+        // 区切り線
+        Row(
+          children: [
+            Expanded(
+              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
+            ),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              child: Text(
+                'または',
+                style: TextStyle(fontSize: 14, color: AppColors.textLight),
+              ),
+            ),
+            Expanded(
+              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+
+        // アカウント作成ボタン
+        SizedBox(
+          height: 44,
+          child: OutlinedButton(
             onPressed: () => context.go('/register'),
-            child: const Text('アカウント作成はこちら'),
+            style: OutlinedButton.styleFrom(
+              side: BorderSide(color: AppColors.textLight.withOpacity(0.4)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
+              ),
+            ),
+            child: const Text(
+              'アカウントを作成',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: AppColors.text,
+              ),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

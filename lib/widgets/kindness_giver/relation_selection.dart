@@ -54,6 +54,7 @@ class RelationSelection extends StatelessWidget {
     {'label': '友達', 'icon': Icons.people_outline, 'value': '友達'},
     {'label': 'パートナー', 'icon': Icons.favorite_outline, 'value': 'パートナー'},
     {'label': 'ペット', 'icon': Icons.pets_outlined, 'value': 'ペット'},
+    {'label': '会社の人', 'icon': Icons.business_outlined, 'value': '会社の人'},
   ];
 }
 
@@ -75,14 +76,14 @@ class _RelationOptionTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: const EdgeInsets.only(bottom: 6),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(8),
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
             decoration: BoxDecoration(
               color:
                   isSelected
@@ -101,13 +102,13 @@ class _RelationOptionTile extends StatelessWidget {
               children: [
                 Icon(
                   icon,
-                  size: 20,
+                  size: 18,
                   color:
                       isSelected
                           ? theme.colorScheme.primary
                           : Colors.grey.shade600,
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: 10),
                 Text(
                   label,
                   style: TextStyle(
@@ -117,14 +118,14 @@ class _RelationOptionTile extends StatelessWidget {
                             : theme.colorScheme.onSurface,
                     fontWeight:
                         isSelected ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 15,
+                    fontSize: 14,
                   ),
                 ),
                 const Spacer(),
                 if (isSelected)
                   Icon(
                     Icons.check_circle,
-                    size: 20,
+                    size: 18,
                     color: theme.colorScheme.primary,
                   ),
               ],
