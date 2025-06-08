@@ -14,10 +14,4 @@ class TutorialRepository {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(_hasCompletedTutorialKey, true);
   }
-
-  /// チュートリアル状態をリセット（デバッグ用）
-  Future<void> resetTutorial() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_hasCompletedTutorialKey);
-  }
 }
