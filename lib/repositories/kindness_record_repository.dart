@@ -7,33 +7,39 @@ class KindnessRecordRepository {
     return [
       KindnessRecord(
         id: 1,
-        userId: 1,
+        userId: 'uuidv4',
         giverId: 1,
         content: '朝食を作ってくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 1)),
         updatedAt: DateTime.now().subtract(const Duration(hours: 1)),
         giverName: 'お母さん',
         giverAvatarUrl: null,
+        giverCategory: 'family',
+        giverGender: 'female',
       ),
       KindnessRecord(
         id: 2,
-        userId: 1,
+        userId: 'uuidv4',
         giverId: 2,
         content: '仕事の相談に乗ってくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 2)),
         updatedAt: DateTime.now().subtract(const Duration(hours: 2)),
         giverName: 'お父さん',
         giverAvatarUrl: null,
+        giverCategory: 'family',
+        giverGender: 'male',
       ),
       KindnessRecord(
         id: 3,
-        userId: 1,
+        userId: 'uuidv4',
         giverId: 3,
         content: '誕生日にプレゼントをくれました',
         createdAt: DateTime.now().subtract(const Duration(hours: 3)),
         updatedAt: DateTime.now().subtract(const Duration(hours: 3)),
         giverName: 'たろー',
         giverAvatarUrl: null,
+        giverCategory: 'friend',
+        giverGender: 'male',
       ),
     ];
   }
@@ -60,4 +66,4 @@ class KindnessRecordRepository {
     // 現在はダミー実装として成功を返す
     return true;
   }
-} 
+}

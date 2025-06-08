@@ -1,5 +1,5 @@
 class KindnessGiver {
-  final String? id;
+  final int? id;
   final String name;
   final String category;
   final String gender;
