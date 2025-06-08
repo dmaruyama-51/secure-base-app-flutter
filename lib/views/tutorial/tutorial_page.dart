@@ -89,7 +89,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
         children: [
           Expanded(
             child: LinearProgressIndicator(
-              value: (currentPage + 1) / 4,
+              value: (currentPage + 1) / TutorialViewModel.totalPages,
               backgroundColor: theme.colorScheme.primary.withOpacity(0.2),
               valueColor: AlwaysStoppedAnimation<Color>(
                 theme.colorScheme.primary,
@@ -98,7 +98,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(width: 12),
           Text(
-            '${currentPage + 1}/4',
+            '${currentPage + 1}/${TutorialViewModel.totalPages}',
             style: theme.textTheme.bodySmall?.copyWith(
               color: theme.colorScheme.primary,
               fontWeight: FontWeight.w600,
@@ -834,7 +834,9 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 onPressed: () {
                   viewModel.previousPage();
                   _pageController.previousPage(
-                    duration: const Duration(milliseconds: 300),
+                    duration: Duration(
+                      milliseconds: TutorialViewModel.pageAnimationDurationMs,
+                    ),
                     curve: Curves.easeInOut,
                   );
                 },
@@ -860,7 +862,9 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 onPressed: () {
                   viewModel.executeSkipAction();
                   _pageController.nextPage(
-                    duration: const Duration(milliseconds: 300),
+                    duration: Duration(
+                      milliseconds: TutorialViewModel.pageAnimationDurationMs,
+                    ),
                     curve: Curves.easeInOut,
                   );
                 },
@@ -881,7 +885,10 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
 
           // 次へ/完了ボタン
           Expanded(
-            flex: state.currentPage == 0 ? 1 : 2,
+            flex:
+                state.currentPage == TutorialViewModel.introductionPageIndex
+                    ? 1
+                    : 2,
             child: FilledButton(
               onPressed:
                   viewModel.isNextButtonDisabled()
@@ -890,7 +897,10 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                         final result = await viewModel.executeNextAction();
                         if (result == 'next_page') {
                           _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
+                            duration: Duration(
+                              milliseconds:
+                                  TutorialViewModel.pageAnimationDurationMs,
+                            ),
                             curve: Curves.easeInOut,
                           );
                         } else if (result == 'navigate_to_main' && mounted) {

@@ -16,15 +16,19 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   final KindnessRecordRepository _kindnessRecordRepository;
 
   // チュートリアルページ関連の定数
-  static const int _firstPageIndex = 0;
-  static const int _lastPageIndex = 3;
-  static const int _introductionPageIndex = 0;
-  static const int _memberRegistrationPageIndex = 1;
-  static const int _kindnessRecordPageIndex = 2;
-  static const int _reflectionSettingPageIndex = 3;
+  static const int totalPages = 4;
+  static const int firstPageIndex = 0;
+  static const int lastPageIndex = 3;
+  static const int introductionPageIndex = 0;
+  static const int memberRegistrationPageIndex = 1;
+  static const int kindnessRecordPageIndex = 2;
+  static const int reflectionSettingPageIndex = 3;
 
   // 遅延時間の定数
   static const int _reflectionSaveDelayMs = 500;
+
+  // アニメーション関連の定数
+  static const int pageAnimationDurationMs = 300;
 
   TutorialViewModel({
     required KindnessGiverRepository kindnessGiverRepository,
@@ -36,13 +40,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
        super(const TutorialState());
 
   void nextPage() {
-    if (state.currentPage < _lastPageIndex) {
+    if (state.currentPage < lastPageIndex) {
       state = state.copyWith(currentPage: state.currentPage + 1);
     }
   }
 
   void previousPage() {
-    if (state.currentPage > _firstPageIndex) {
+    if (state.currentPage > firstPageIndex) {
       state = state.copyWith(currentPage: state.currentPage - 1);
     }
   }
@@ -194,13 +198,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   /// 現在のページに応じたボタンテキストを取得
   String getNextButtonText() {
     switch (state.currentPage) {
-      case _introductionPageIndex:
+      case introductionPageIndex:
         return '次へ';
-      case _memberRegistrationPageIndex:
+      case memberRegistrationPageIndex:
         return '次へ';
-      case _kindnessRecordPageIndex:
+      case kindnessRecordPageIndex:
         return '記録して次へ';
-      case _reflectionSettingPageIndex:
+      case reflectionSettingPageIndex:
         return '設定して始める';
       default:
         return '次へ';
@@ -209,13 +213,13 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
-    return state.currentPage > _firstPageIndex &&
-        state.currentPage != _kindnessRecordPageIndex;
+    return state.currentPage > firstPageIndex &&
+        state.currentPage != kindnessRecordPageIndex;
   }
 
   /// スキップボタンを表示するかどうか
   bool shouldShowSkipButton() {
-    return state.currentPage == _kindnessRecordPageIndex;
+    return state.currentPage == kindnessRecordPageIndex;
   }
 
   /// 次へボタンが無効かどうか
@@ -242,11 +246,11 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   /// 次へボタンのアクション実行
   Future<String?> executeNextAction() async {
     switch (state.currentPage) {
-      case _introductionPageIndex:
+      case introductionPageIndex:
         // 1ページ目：次のページへ
         nextPage();
         return 'next_page';
-      case _memberRegistrationPageIndex:
+      case memberRegistrationPageIndex:
         // 2ページ目：メンバー登録完了後、3ページ目へ
         final success = await completeTutorial();
         if (success) {
@@ -254,7 +258,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
           return 'next_page';
         }
         return null;
-      case _kindnessRecordPageIndex:
+      case kindnessRecordPageIndex:
         // 3ページ目：優しさ記録後、4ページ目へ
         final success = await recordKindness();
         if (success) {
@@ -262,7 +266,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
           return 'next_page';
         }
         return null;
-      case _reflectionSettingPageIndex:
+      case reflectionSettingPageIndex:
         // 4ページ目：リフレクション設定後、メイン画面へ
         final success = await saveReflectionSettings();
         if (success) {
@@ -276,7 +280,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   /// スキップアクション実行
   void executeSkipAction() {
-    if (state.currentPage == _kindnessRecordPageIndex) {
+    if (state.currentPage == kindnessRecordPageIndex) {
       nextPage();
     }
   }
