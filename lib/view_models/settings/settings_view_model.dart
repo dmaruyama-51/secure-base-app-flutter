@@ -1,11 +1,13 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
-// Package imports:
-import 'package:supabase_flutter/supabase_flutter.dart';
+// Repository imports:
+import '../../repositories/auth_repository.dart';
 
 /// 設定のViewModel
 class SettingsViewModel extends ChangeNotifier {
+  final AuthRepository _authRepository = AuthRepository();
+
   // 状態プロパティ
   bool _isLoading = false;
   String? _errorMessage;
@@ -42,7 +44,7 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Supabase.instance.client.auth.signOut();
+      await _authRepository.signOut();
       _isLoading = false;
       _successMessage = 'ログアウトしました';
       notifyListeners();
