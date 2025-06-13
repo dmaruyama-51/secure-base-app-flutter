@@ -60,6 +60,24 @@ class _TutorialPageState extends State<TutorialPage> {
             }
           });
 
+          // ナビゲーション処理
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.shouldNavigateNext) {
+              _pageController.nextPage(
+                duration: Duration(
+                  milliseconds: TutorialViewModel.pageAnimationDurationMs,
+                ),
+                curve: Curves.easeInOut,
+              );
+              viewModel.clearNavigationState();
+            }
+
+            if (viewModel.shouldNavigateToMain && mounted) {
+              context.go('/kindness-records');
+              viewModel.clearNavigationState();
+            }
+          });
+
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             body: SafeArea(
@@ -849,15 +867,7 @@ class _TutorialPageState extends State<TutorialPage> {
           if (viewModel.shouldShowSkipButton())
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
-                  viewModel.executeSkipAction();
-                  _pageController.nextPage(
-                    duration: Duration(
-                      milliseconds: TutorialViewModel.pageAnimationDurationMs,
-                    ),
-                    curve: Curves.easeInOut,
-                  );
-                },
+                onPressed: () => viewModel.executeSkipAction(),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: AppColors.textLight),
@@ -883,20 +893,7 @@ class _TutorialPageState extends State<TutorialPage> {
               onPressed:
                   viewModel.isNextButtonDisabled()
                       ? null
-                      : () async {
-                        final result = await viewModel.executeNextAction();
-                        if (result == 'next_page') {
-                          _pageController.nextPage(
-                            duration: Duration(
-                              milliseconds:
-                                  TutorialViewModel.pageAnimationDurationMs,
-                            ),
-                            curve: Curves.easeInOut,
-                          );
-                        } else if (result == 'navigate_to_main' && mounted) {
-                          context.go('/kindness-records');
-                        }
-                      },
+                      : () => viewModel.executeNextAction(),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),

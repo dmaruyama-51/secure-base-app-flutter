@@ -73,12 +73,6 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
 
   /// やさしさ記録を更新
   Future<void> updateKindnessRecord() async {
-    if (_selectedKindnessGiver == null) {
-      _errorMessage = 'メンバーを選択してください';
-      notifyListeners();
-      return;
-    }
-
     if (_originalRecord == null) {
       _errorMessage = '編集対象のレコードが見つかりません';
       notifyListeners();
@@ -93,7 +87,7 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
       await KindnessRecord.updateKindnessRecord(
         originalRecord: _originalRecord!,
         content: _content,
-        selectedKindnessGiver: _selectedKindnessGiver!,
+        selectedKindnessGiver: _selectedKindnessGiver,
       );
 
       _isSaving = false;

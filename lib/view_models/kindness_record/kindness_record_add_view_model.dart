@@ -61,12 +61,6 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
 
   /// やさしさ記録を保存
   Future<void> saveKindnessRecord() async {
-    if (_selectedKindnessGiver == null) {
-      _errorMessage = 'メンバーを選択してください';
-      notifyListeners();
-      return;
-    }
-
     _isSaving = true;
     _errorMessage = null;
     notifyListeners();
@@ -74,7 +68,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     try {
       await KindnessRecord.createKindnessRecord(
         content: _content,
-        selectedKindnessGiver: _selectedKindnessGiver!,
+        selectedKindnessGiver: _selectedKindnessGiver,
       );
 
       _isSaving = false;

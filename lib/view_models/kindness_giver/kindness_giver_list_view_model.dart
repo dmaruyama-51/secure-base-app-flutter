@@ -12,11 +12,24 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
 
+  // コールバック管理
+  VoidCallback? _onRefreshCallback;
+
   // ゲッター
   List<KindnessGiver> get kindnessGivers => _kindnessGivers;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
+
+  /// リフレッシュコールバックを設定
+  void setRefreshCallback(VoidCallback? callback) {
+    _onRefreshCallback = callback;
+  }
+
+  /// コールバック経由でリフレッシュを実行
+  void triggerRefresh() {
+    _onRefreshCallback?.call();
+  }
 
   /// メンバー一覧を読み込む
   Future<void> loadKindnessGivers() async {

@@ -158,9 +158,12 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   }
 
   Widget _buildNameSection(viewModel, ThemeData theme) {
-    // TextEditingControllerの内容を状態と同期
-    if (_nameController.text != viewModel.name) {
-      _nameController.text = viewModel.name;
+    // ViewModelからの同期でない場合のみTextEditingControllerを更新
+    if (!viewModel.isTextControllerSyncing &&
+        _nameController.text != viewModel.name) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _nameController.text = viewModel.name;
+      });
     }
 
     return _buildCard(

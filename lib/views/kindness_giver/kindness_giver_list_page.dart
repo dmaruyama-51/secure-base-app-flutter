@@ -20,12 +20,15 @@ class KindnessGiverListPage extends StatefulWidget {
 }
 
 class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
+  KindnessGiverListViewModel? _viewModel;
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => KindnessGiverListViewModel()..loadKindnessGivers(),
       child: Consumer<KindnessGiverListViewModel>(
         builder: (context, viewModel, child) {
+          _viewModel = viewModel; // ViewModelインスタンスを保存
           final theme = Theme.of(context);
 
           // メッセージ表示処理
@@ -482,11 +485,9 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   void _navigateToAdd() {
     context.push('/kindness-givers/add').then((_) {
       // 追加ページから戻ってきた際にリストを再読み込み
-      final viewModel = Provider.of<KindnessGiverListViewModel>(
-        context,
-        listen: false,
-      );
-      viewModel.refreshKindnessGivers();
+      if (_viewModel != null) {
+        _viewModel!.refreshKindnessGivers();
+      }
     });
   }
 
@@ -495,11 +496,9 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
         .push('/kindness-givers/edit/${kindnessGiver.id}', extra: kindnessGiver)
         .then((_) {
           // 編集ページから戻ってきた際にリストを再読み込み
-          final viewModel = Provider.of<KindnessGiverListViewModel>(
-            context,
-            listen: false,
-          );
-          viewModel.refreshKindnessGivers();
+          if (_viewModel != null) {
+            _viewModel!.refreshKindnessGivers();
+          }
         });
   }
 }

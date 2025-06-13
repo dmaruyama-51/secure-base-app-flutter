@@ -95,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // アカウント設定セクション
-            _buildAccountSettingsSection(theme),
+            _buildAccountSettingsSection(viewModel, theme),
             const SizedBox(height: 24),
 
             // アプリ設定セクション
@@ -115,7 +115,10 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildAccountSettingsSection(ThemeData theme) {
+  Widget _buildAccountSettingsSection(
+    SettingsViewModel viewModel,
+    ThemeData theme,
+  ) {
     return _buildSection(
       title: 'アカウント設定',
       icon: Icons.person_outline,
@@ -125,9 +128,7 @@ class _SettingsPageState extends State<SettingsPage> {
           icon: Icons.email_outlined,
           title: 'メールアドレス変更',
           subtitle: 'ログイン用のメールアドレスを変更',
-          onTap: () {
-            _showChangeEmailDialog();
-          },
+          onTap: () => viewModel.showEmailChangeDialog(),
           theme: theme,
         ),
         _buildDivider(theme),
@@ -135,9 +136,7 @@ class _SettingsPageState extends State<SettingsPage> {
           icon: Icons.lock_outline,
           title: 'パスワード変更',
           subtitle: 'ログイン用のパスワードを変更',
-          onTap: () {
-            _showChangePasswordDialog();
-          },
+          onTap: () => viewModel.showPasswordChangeDialog(),
           theme: theme,
         ),
       ],

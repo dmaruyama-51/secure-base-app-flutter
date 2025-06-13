@@ -6,7 +6,34 @@ import '../../models/tutorial_model.dart';
 
 /// チュートリアルのViewModel
 class TutorialViewModel extends ChangeNotifier {
+  // =============================================================================
+  // 定数定義
+  // =============================================================================
+
+  // チュートリアルページ関連
+  static const int totalPages = 4;
+  static const int firstPageIndex = 0;
+  static const int lastPageIndex = 3;
+  static const int introductionPageIndex = 0;
+  static const int memberRegistrationPageIndex = 1;
+  static const int kindnessRecordPageIndex = 2;
+  static const int reflectionSettingPageIndex = 3;
+
+  // アニメーション関連
+  static const int pageAnimationDurationMs = 300;
+
+  // ボタンテキスト定義
+  static const Map<int, String> _nextButtonTexts = {
+    introductionPageIndex: '次へ',
+    memberRegistrationPageIndex: '次へ',
+    kindnessRecordPageIndex: '記録して次へ',
+    reflectionSettingPageIndex: 'チュートリアル完了',
+  };
+
+  // =============================================================================
   // 状態プロパティ
+  // =============================================================================
+
   int _currentPage = 0;
   String _kindnessGiverName = '';
   String _selectedGender = '女性';
@@ -18,17 +45,9 @@ class TutorialViewModel extends ChangeNotifier {
   bool _isSettingReflection = false;
   String? _errorMessage;
 
-  // チュートリアルページ関連の定数
-  static const int totalPages = 4;
-  static const int firstPageIndex = 0;
-  static const int lastPageIndex = 3;
-  static const int introductionPageIndex = 0;
-  static const int memberRegistrationPageIndex = 1;
-  static const int kindnessRecordPageIndex = 2;
-  static const int reflectionSettingPageIndex = 3;
-
-  // アニメーション関連の定数
-  static const int pageAnimationDurationMs = 300;
+  // ナビゲーション状態
+  bool _shouldNavigateNext = false;
+  bool _shouldNavigateToMain = false;
 
   TutorialViewModel() {
     // Initialize any necessary fields
@@ -45,6 +64,8 @@ class TutorialViewModel extends ChangeNotifier {
   bool get isRecordingKindness => _isRecordingKindness;
   bool get isSettingReflection => _isSettingReflection;
   String? get errorMessage => _errorMessage;
+  bool get shouldNavigateNext => _shouldNavigateNext;
+  bool get shouldNavigateToMain => _shouldNavigateToMain;
 
   void nextPage() {
     if (_currentPage < lastPageIndex) {
@@ -157,20 +178,20 @@ class TutorialViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// ナビゲーション状態をクリア
+  void clearNavigationState() {
+    _shouldNavigateNext = false;
+    _shouldNavigateToMain = false;
+    notifyListeners();
+  }
+
+  // =============================================================================
+  // UI制御メソッド
+  // =============================================================================
+
   /// 現在のページに応じたボタンテキストを取得
   String getNextButtonText() {
-    switch (_currentPage) {
-      case introductionPageIndex:
-        return '次へ';
-      case memberRegistrationPageIndex:
-        return '次へ';
-      case kindnessRecordPageIndex:
-        return '記録して次へ';
-      case reflectionSettingPageIndex:
-        return 'チュートリアル完了';
-      default:
-        return '次へ';
-    }
+    return _nextButtonTexts[_currentPage] ?? '次へ';
   }
 
   /// 戻るボタンを表示するかどうか
@@ -190,68 +211,87 @@ class TutorialViewModel extends ChangeNotifier {
 
   /// 次へボタンがローディング状態かどうか
   bool isNextButtonLoading() {
-    switch (_currentPage) {
-      case memberRegistrationPageIndex:
-        return _isCompleting;
-      case kindnessRecordPageIndex:
-        return _isRecordingKindness;
-      case reflectionSettingPageIndex:
-        return _isSettingReflection || _isCompleting;
-      default:
-        return false;
-    }
+    return switch (_currentPage) {
+      memberRegistrationPageIndex => _isCompleting,
+      kindnessRecordPageIndex => _isRecordingKindness,
+      reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
+      _ => false,
+    };
   }
 
   /// 次へボタンが無効かどうか
   bool isNextButtonDisabled() {
-    switch (_currentPage) {
-      case memberRegistrationPageIndex:
-        return _kindnessGiverName.trim().isEmpty || _isCompleting;
-      case kindnessRecordPageIndex:
-        return _isRecordingKindness;
-      case reflectionSettingPageIndex:
-        return _isSettingReflection || _isCompleting;
-      default:
-        return false;
-    }
+    return switch (_currentPage) {
+      memberRegistrationPageIndex =>
+        _kindnessGiverName.trim().isEmpty || _isCompleting,
+      kindnessRecordPageIndex => _isRecordingKindness,
+      reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
+      _ => false,
+    };
   }
+
+  // =============================================================================
+  // アクション実行メソッド
+  // =============================================================================
 
   /// スキップアクションを実行
   void executeSkipAction() {
     if (_currentPage == kindnessRecordPageIndex) {
       // 優しさ記録をスキップして次のページへ
       nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
     }
   }
 
   /// 次へアクションを実行
-  Future<String> executeNextAction() async {
+  Future<void> executeNextAction() async {
     switch (_currentPage) {
       case introductionPageIndex:
-        nextPage();
-        return 'next_page';
+        _executeIntroductionAction();
+        break;
       case memberRegistrationPageIndex:
-        final success = await completeTutorial();
-        if (success) {
-          nextPage();
-          return 'next_page';
-        }
-        return 'error';
+        await _executeMemberRegistrationAction();
+        break;
       case kindnessRecordPageIndex:
-        final success = await recordKindness();
-        if (success) {
-          nextPage();
-          return 'next_page';
-        }
-        return 'error';
+        await _executeKindnessRecordAction();
+        break;
       case reflectionSettingPageIndex:
-        final success = await saveReflectionSettings();
-        if (success) {
-          return 'navigate_to_main';
-        }
-        return 'error';
-      default:
-        return 'error';
+        await _executeReflectionSettingAction();
+        break;
+    }
+  }
+
+  /// 各ページのアクション実行メソッド
+  void _executeIntroductionAction() {
+    nextPage();
+    _shouldNavigateNext = true;
+    notifyListeners();
+  }
+
+  Future<void> _executeMemberRegistrationAction() async {
+    final success = await completeTutorial();
+    if (success) {
+      nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _executeKindnessRecordAction() async {
+    final success = await recordKindness();
+    if (success) {
+      nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _executeReflectionSettingAction() async {
+    final success = await saveReflectionSettings();
+    if (success) {
+      _shouldNavigateToMain = true;
+      notifyListeners();
     }
   }
 

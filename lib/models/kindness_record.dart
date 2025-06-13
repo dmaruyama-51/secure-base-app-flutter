@@ -59,7 +59,7 @@ class KindnessRecord {
   /// 新しいやさしさ記録を作成する
   static Future<KindnessRecord> createKindnessRecord({
     required String content,
-    required KindnessGiver selectedKindnessGiver,
+    required KindnessGiver? selectedKindnessGiver,
     KindnessRecordRepository? repository,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
@@ -77,7 +77,7 @@ class KindnessRecord {
     final now = DateTime.now();
     final kindnessRecord = KindnessRecord(
       userId: user.id,
-      giverId: selectedKindnessGiver.id,
+      giverId: selectedKindnessGiver!.id,
       content: content.trim(),
       createdAt: now,
       updatedAt: now,
@@ -99,7 +99,7 @@ class KindnessRecord {
   static Future<KindnessRecord> updateKindnessRecord({
     required KindnessRecord originalRecord,
     required String content,
-    required KindnessGiver selectedKindnessGiver,
+    required KindnessGiver? selectedKindnessGiver,
     KindnessRecordRepository? repository,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
@@ -121,7 +121,7 @@ class KindnessRecord {
     final updatedRecord = KindnessRecord(
       id: originalRecord.id,
       userId: user.id,
-      giverId: selectedKindnessGiver.id,
+      giverId: selectedKindnessGiver!.id,
       content: content.trim(),
       createdAt: originalRecord.createdAt,
       updatedAt: DateTime.now(),

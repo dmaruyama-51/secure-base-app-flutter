@@ -22,7 +22,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
@@ -151,84 +150,73 @@ class _RegisterPageState extends State<RegisterPage> {
   }
 
   Widget _buildRegisterForm(AuthViewModel viewModel) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // メールアドレス
-          _buildTextField(
-            controller: _emailController,
-            label: 'メールアドレス',
-            keyboardType: TextInputType.emailAddress,
-            validator: (val) {
-              if (val == null || val.isEmpty) {
-                return '必須';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 16),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        // メールアドレス
+        _buildTextField(
+          controller: _emailController,
+          label: 'メールアドレス',
+          keyboardType: TextInputType.emailAddress,
+          errorText: viewModel.emailError,
+          onChanged: (_) => viewModel.clearValidationErrors(),
+        ),
+        const SizedBox(height: 16),
 
-          // パスワード
-          _buildTextField(
-            controller: _passwordController,
-            label: 'パスワード',
-            obscureText: true,
-            validator: (val) {
-              if (val == null || val.isEmpty) {
-                return '必須';
-              }
-              if (val.length < 6) {
-                return '6文字以上';
-              }
-              return null;
-            },
-          ),
-          const SizedBox(height: 24),
+        // パスワード
+        _buildTextField(
+          controller: _passwordController,
+          label: 'パスワード',
+          obscureText: true,
+          errorText: viewModel.passwordError,
+          onChanged: (_) => viewModel.clearValidationErrors(),
+        ),
+        const SizedBox(height: 24),
 
-          // 登録ボタン
-          SizedBox(
-            height: 44,
-            child: ElevatedButton(
-              onPressed:
-                  viewModel.isLoading ? null : () => _handleSignUp(viewModel),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: AppColors.textOnPrimary,
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
+        // 登録ボタン
+        SizedBox(
+          height: 44,
+          child: ElevatedButton(
+            onPressed:
+                viewModel.isLoading ? null : () => _handleSignUp(viewModel),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: AppColors.textOnPrimary,
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(6),
               ),
-              child:
-                  viewModel.isLoading
-                      ? const SizedBox(
-                        height: 16,
-                        width: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            AppColors.textOnPrimary,
-                          ),
-                        ),
-                      )
-                      : const Text(
-                        'アカウントを作成',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+            ),
+            child:
+                viewModel.isLoading
+                    ? const SizedBox(
+                      height: 16,
+                      width: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          AppColors.textOnPrimary,
                         ),
                       ),
-            ),
+                    )
+                    : const Text(
+                      'アカウントを作成',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
   void _handleSignUp(AuthViewModel viewModel) {
-    final isValid = _formKey.currentState!.validate();
+    final isValid = viewModel.validateForm(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
     if (!isValid) {
       return;
     }
@@ -244,7 +232,8 @@ class _RegisterPageState extends State<RegisterPage> {
     required String label,
     TextInputType? keyboardType,
     bool obscureText = false,
-    String? Function(String?)? validator,
+    String? errorText,
+    Function(String)? onChanged,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,11 +248,11 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ),
         const SizedBox(height: 6),
-        TextFormField(
+        TextField(
           controller: controller,
           keyboardType: keyboardType,
           obscureText: obscureText,
-          validator: validator,
+          onChanged: onChanged,
           style: const TextStyle(
             fontSize: 16,
             color: AppColors.text,
@@ -302,6 +291,14 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
+        if (errorText != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4),
+            child: Text(
+              errorText,
+              style: const TextStyle(fontSize: 12, color: Colors.red),
+            ),
+          ),
       ],
     );
   }
