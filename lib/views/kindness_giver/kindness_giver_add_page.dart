@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
 import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
@@ -8,15 +8,14 @@ import '../../utils/app_colors.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
 import '../../widgets/kindness_giver/relation_selection.dart';
 
-class KindnessGiverAddPage extends ConsumerStatefulWidget {
+class KindnessGiverAddPage extends StatefulWidget {
   const KindnessGiverAddPage({Key? key}) : super(key: key);
 
   @override
-  ConsumerState<KindnessGiverAddPage> createState() =>
-      _KindnessGiverAddPageState();
+  State<KindnessGiverAddPage> createState() => _KindnessGiverAddPageState();
 }
 
-class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
+class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
   late TextEditingController _nameController;
 
   @override
@@ -33,69 +32,44 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(kindnessGiverAddViewModelProvider);
-    final viewModel = ref.read(kindnessGiverAddViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => KindnessGiverAddViewModel(),
+      child: Consumer<KindnessGiverAddViewModel>(
+        builder: (context, viewModel, child) {
+          final state = viewModel.state;
+          final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(theme),
-      body: Builder(
-        builder: (context) {
           // エラーメッセージがあればSnackBarで表示
-          if (state.errorMessage != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: theme.colorScheme.error,
-                ),
-              );
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
               viewModel.clearMessages();
-            });
-          }
+            }
+          });
 
-          // 成功メッセージがあればSnackBarで表示し、必要なら画面を戻す
-          if (state.successMessage != null) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
+          // 成功メッセージがあればSnackBarで表示し、画面を戻す
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.successMessage != null) {
               ScaffoldMessenger.of(
                 context,
               ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
               if (state.shouldNavigateBack) {
-                ref
-                    .read(kindnessGiverListViewModelProvider.notifier)
-                    .loadKindnessGivers();
                 GoRouter.of(context).pop();
               }
               viewModel.clearMessages();
-            });
-          }
+            }
+          });
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.only(
-              left: 24.0,
-              right: 24.0,
-              top: 8.0,
-              bottom: 24.0,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(theme),
-                const SizedBox(height: 24),
-                _buildNameSection(state, viewModel, theme),
-                const SizedBox(height: 20),
-                _buildGenderSection(state, viewModel, theme),
-                const SizedBox(height: 20),
-                _buildRelationSection(state, viewModel, theme),
-                const SizedBox(height: 32),
-                _buildSaveButton(state, viewModel, theme),
-              ],
-            ),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: _buildAppBar(theme),
+            body: _buildBody(state, viewModel, theme),
+            bottomNavigationBar: const BottomNavigation(currentIndex: 1),
           );
         },
       ),
-      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
@@ -321,6 +295,31 @@ class _KindnessGiverAddPageState extends ConsumerState<KindnessGiverAddPage> {
                     ),
                   ],
                 ),
+      ),
+    );
+  }
+
+  Widget _buildBody(state, viewModel, ThemeData theme) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(
+        left: 24.0,
+        right: 24.0,
+        top: 8.0,
+        bottom: 24.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(theme),
+          const SizedBox(height: 24),
+          _buildNameSection(state, viewModel, theme),
+          const SizedBox(height: 20),
+          _buildGenderSection(state, viewModel, theme),
+          const SizedBox(height: 20),
+          _buildRelationSection(state, viewModel, theme),
+          const SizedBox(height: 32),
+          _buildSaveButton(state, viewModel, theme),
+        ],
       ),
     );
   }

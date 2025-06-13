@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
@@ -8,64 +8,59 @@ import '../../widgets/common/delete_confirm_dialog.dart';
 import '../../models/kindness_giver.dart';
 import 'package:go_router/go_router.dart';
 
-class KindnessGiverListPage extends ConsumerStatefulWidget {
+class KindnessGiverListPage extends StatefulWidget {
   const KindnessGiverListPage({super.key});
 
   @override
-  ConsumerState<KindnessGiverListPage> createState() =>
-      _KindnessGiverListPageState();
+  State<KindnessGiverListPage> createState() => _KindnessGiverListPageState();
 }
 
-class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
-  @override
-  void initState() {
-    super.initState();
-    // 初期化時にデータを読み込む
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(kindnessGiverListViewModelProvider.notifier)
-          .loadKindnessGivers();
-    });
-  }
-
+class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(kindnessGiverListViewModelProvider);
-    final viewModel = ref.read(kindnessGiverListViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => KindnessGiverListViewModel()..loadKindnessGivers(),
+      child: Consumer<KindnessGiverListViewModel>(
+        builder: (context, viewModel, child) {
+          final state = viewModel.state;
+          final theme = Theme.of(context);
 
-    // 削除確認ダイアログの表示監視
-    ref.listen(kindnessGiverListViewModelProvider, (previous, next) {
-      if (next.showDeleteConfirmation && next.kindnessGiverToDelete != null) {
-        _showDeleteConfirmDialog(
-          context,
-          next.kindnessGiverToDelete!,
-          viewModel,
-        );
-      }
-    });
+          // 削除確認ダイアログの表示監視
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.showDeleteConfirmation &&
+                state.kindnessGiverToDelete != null) {
+              _showDeleteConfirmDialog(
+                context,
+                state.kindnessGiverToDelete!,
+                viewModel,
+              );
+            }
+          });
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(theme),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          right: 20.0,
-          top: 8.0,
-          bottom: 20.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(theme),
-            const SizedBox(height: 24),
-            _buildMembersSection(state, viewModel, theme),
-          ],
-        ),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: _buildAppBar(theme),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: 8.0,
+                bottom: 20.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(theme),
+                  const SizedBox(height: 24),
+                  _buildMembersSection(state, viewModel, theme),
+                ],
+              ),
+            ),
+            floatingActionButton: _buildFloatingActionButton(viewModel, theme),
+            bottomNavigationBar: const BottomNavigation(currentIndex: 1),
+          );
+        },
       ),
-      floatingActionButton: _buildFloatingActionButton(viewModel, theme),
-      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
@@ -133,7 +128,11 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildMembersSection(state, viewModel, ThemeData theme) {
+  Widget _buildMembersSection(
+    state,
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
     if (state.isLoading) {
       return _buildLoadingCard(theme);
     }
@@ -388,10 +387,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
 
   /// 編集ページへの遷移
   void _navigateToEdit(KindnessGiver kindnessGiver) {
-    GoRouter.of(context).push(
-      '/kindness-givers/edit/${kindnessGiver.giverName}',
-      extra: kindnessGiver,
-    );
+    GoRouter.of(context).push('/kindness-givers/edit', extra: kindnessGiver);
   }
 
   /// 追加ページへの遷移

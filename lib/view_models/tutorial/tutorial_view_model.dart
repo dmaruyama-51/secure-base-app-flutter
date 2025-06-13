@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../../states/tutorial/tutorial_state.dart';
 import '../../repositories/tutorial_repository.dart';
 import '../../repositories/kindness_giver_repository.dart';
@@ -7,10 +7,12 @@ import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-class TutorialViewModel extends StateNotifier<TutorialState> {
+/// チュートリアルのViewModel
+class TutorialViewModel extends ChangeNotifier {
   final KindnessGiverRepository _kindnessGiverRepository;
   final TutorialRepository _tutorialRepository;
   final KindnessRecordRepository _kindnessRecordRepository;
+  TutorialState _state = const TutorialState();
 
   // チュートリアルページ関連の定数
   static const int totalPages = 4;
@@ -30,47 +32,55 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   TutorialViewModel()
     : _kindnessGiverRepository = KindnessGiverRepository(),
       _tutorialRepository = TutorialRepository(),
-      _kindnessRecordRepository = KindnessRecordRepository(),
-      super(const TutorialState());
+      _kindnessRecordRepository = KindnessRecordRepository();
+
+  TutorialState get state => _state;
+
+  void _updateState(TutorialState newState) {
+    _state = newState;
+    notifyListeners();
+  }
 
   void nextPage() {
-    if (state.currentPage < lastPageIndex) {
-      state = state.copyWith(currentPage: state.currentPage + 1);
+    if (_state.currentPage < lastPageIndex) {
+      _updateState(_state.copyWith(currentPage: _state.currentPage + 1));
     }
   }
 
   void previousPage() {
-    if (state.currentPage > firstPageIndex) {
-      state = state.copyWith(currentPage: state.currentPage - 1);
+    if (_state.currentPage > firstPageIndex) {
+      _updateState(_state.copyWith(currentPage: _state.currentPage - 1));
     }
   }
 
   void updateName(String name) {
-    state = state.copyWith(kindnessGiverName: name);
+    _updateState(_state.copyWith(kindnessGiverName: name));
   }
 
   void updateGender(String gender) {
-    state = state.copyWith(selectedGender: gender);
+    _updateState(_state.copyWith(selectedGender: gender));
   }
 
   void updateRelation(String relation) {
-    state = state.copyWith(selectedRelation: relation);
+    _updateState(_state.copyWith(selectedRelation: relation));
   }
 
   void updateKindnessContent(String content) {
-    state = state.copyWith(kindnessContent: content);
+    _updateState(_state.copyWith(kindnessContent: content));
   }
 
   void updateReflectionFrequency(String frequency) {
-    state = state.copyWith(selectedReflectionFrequency: frequency);
+    _updateState(_state.copyWith(selectedReflectionFrequency: frequency));
   }
 
   Future<bool> recordKindness() async {
-    if (state.kindnessContent.trim().isEmpty) {
+    if (_state.kindnessContent.trim().isEmpty) {
       return true;
     }
 
-    state = state.copyWith(isRecordingKindness: true, errorMessage: null);
+    _updateState(
+      _state.copyWith(isRecordingKindness: true, errorMessage: null),
+    );
 
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -85,34 +95,37 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
       }
 
       final kindnessGiver = kindnessGivers.first;
-
       final kindnessRecord = KindnessRecord(
         userId: user.id,
         giverId: kindnessGiver.id,
-        content: state.kindnessContent,
+        content: _state.kindnessContent,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         giverName: kindnessGiver.giverName,
         giverAvatarUrl: kindnessGiver.avatarUrl,
-        giverCategory: kindnessGiver.relationshipName ?? state.selectedRelation,
-        giverGender: kindnessGiver.genderName ?? state.selectedGender,
+        giverCategory:
+            kindnessGiver.relationshipName ?? _state.selectedRelation,
+        giverGender: kindnessGiver.genderName ?? _state.selectedGender,
       );
 
       await _kindnessRecordRepository.saveKindnessRecord(kindnessRecord);
-
-      state = state.copyWith(isRecordingKindness: false);
+      _updateState(_state.copyWith(isRecordingKindness: false));
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isRecordingKindness: false,
-        errorMessage: '優しさの記録に失敗しました: ${e.toString()}',
+      _updateState(
+        _state.copyWith(
+          isRecordingKindness: false,
+          errorMessage: '優しさの記録に失敗しました: ${e.toString()}',
+        ),
       );
       return false;
     }
   }
 
   Future<bool> saveReflectionSettings() async {
-    state = state.copyWith(isSettingReflection: true, errorMessage: null);
+    _updateState(
+      _state.copyWith(isSettingReflection: true, errorMessage: null),
+    );
 
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -121,26 +134,28 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
       }
 
       await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
-      print('リフレクション頻度を保存しました: ${state.selectedReflectionFrequency}');
+      print('リフレクション頻度を保存しました: ${_state.selectedReflectionFrequency}');
 
-      state = state.copyWith(isSettingReflection: false);
+      _updateState(_state.copyWith(isSettingReflection: false));
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSettingReflection: false,
-        errorMessage: 'リフレクション設定の保存に失敗しました: ${e.toString()}',
+      _updateState(
+        _state.copyWith(
+          isSettingReflection: false,
+          errorMessage: 'リフレクション設定の保存に失敗しました: ${e.toString()}',
+        ),
       );
       return false;
     }
   }
 
   Future<bool> completeTutorial() async {
-    if (state.kindnessGiverName.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '名前を入力してください');
+    if (_state.kindnessGiverName.trim().isEmpty) {
+      _updateState(_state.copyWith(errorMessage: '名前を入力してください'));
       return false;
     }
 
-    state = state.copyWith(isCompleting: true, errorMessage: null);
+    _updateState(_state.copyWith(isCompleting: true, errorMessage: null));
 
     try {
       final user = Supabase.instance.client.auth.currentUser;
@@ -148,50 +163,50 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
         throw Exception('ユーザーが認証されていません');
       }
 
-      // データベースのマスターテーブルから正しいIDを取得
       final genderId = await _kindnessGiverRepository.getGenderIdByName(
-        state.selectedGender,
+        _state.selectedGender,
       );
       final relationshipId = await _kindnessGiverRepository
-          .getRelationshipIdByName(state.selectedRelation);
+          .getRelationshipIdByName(_state.selectedRelation);
 
       if (genderId == null) {
-        throw Exception('選択された性別が見つかりません: ${state.selectedGender}');
+        throw Exception('選択された性別が見つかりません: ${_state.selectedGender}');
       }
 
       if (relationshipId == null) {
-        throw Exception('選択された関係性が見つかりません: ${state.selectedRelation}');
+        throw Exception('選択された関係性が見つかりません: ${_state.selectedRelation}');
       }
 
       final kindnessGiver = KindnessGiver.create(
         userId: user.id,
-        giverName: state.kindnessGiverName,
+        giverName: _state.kindnessGiverName,
         relationshipId: relationshipId,
         genderId: genderId,
       );
 
       await _kindnessGiverRepository.createKindnessGiver(kindnessGiver);
-
       await _tutorialRepository.markTutorialCompleted();
 
-      state = state.copyWith(isCompleting: false);
+      _updateState(_state.copyWith(isCompleting: false));
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isCompleting: false,
-        errorMessage: 'メンバーの登録に失敗しました: ${e.toString()}',
+      _updateState(
+        _state.copyWith(
+          isCompleting: false,
+          errorMessage: 'メンバーの登録に失敗しました: ${e.toString()}',
+        ),
       );
       return false;
     }
   }
 
   void clearError() {
-    state = state.copyWith(errorMessage: null);
+    _updateState(_state.copyWith(errorMessage: null));
   }
 
   /// 現在のページに応じたボタンテキストを取得
   String getNextButtonText() {
-    switch (state.currentPage) {
+    switch (_state.currentPage) {
       case introductionPageIndex:
         return '次へ';
       case memberRegistrationPageIndex:
@@ -199,7 +214,7 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
       case kindnessRecordPageIndex:
         return '記録して次へ';
       case reflectionSettingPageIndex:
-        return '設定して始める';
+        return 'チュートリアル完了';
       default:
         return '次へ';
     }
@@ -207,80 +222,83 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
-    return state.currentPage > firstPageIndex &&
-        state.currentPage != kindnessRecordPageIndex;
+    return _state.currentPage > firstPageIndex;
+  }
+
+  /// 次へボタンを表示するかどうか
+  bool shouldShowNextButton() {
+    return _state.currentPage <= lastPageIndex;
   }
 
   /// スキップボタンを表示するかどうか
   bool shouldShowSkipButton() {
-    return state.currentPage == kindnessRecordPageIndex;
+    return _state.currentPage == kindnessRecordPageIndex;
   }
 
   /// 次へボタンが無効かどうか
   bool isNextButtonDisabled() {
-    return state.isCompleting ||
-        state.isRecordingKindness ||
-        state.isSettingReflection;
-  }
-
-  /// リフレクション頻度の説明テキストを取得
-  String getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return 'こまめに振り返りたい方におすすめ';
-      case '2週に1回':
-        return 'バランスよく振り返れる推奨設定';
-      case '月に1回':
-        return '記録する頻度が少ない方におすすめ';
+    switch (_state.currentPage) {
+      case memberRegistrationPageIndex:
+        return _state.kindnessGiverName.trim().isEmpty || _state.isCompleting;
+      case kindnessRecordPageIndex:
+        return _state.isRecordingKindness;
+      case reflectionSettingPageIndex:
+        return _state.isSettingReflection || _state.isCompleting;
       default:
-        return '';
+        return false;
     }
   }
 
-  /// 次へボタンのアクション実行
-  Future<String?> executeNextAction() async {
-    switch (state.currentPage) {
+  /// スキップアクションを実行
+  void executeSkipAction() {
+    if (_state.currentPage == kindnessRecordPageIndex) {
+      // 優しさ記録をスキップして次のページへ
+      nextPage();
+    }
+  }
+
+  /// 次へアクションを実行
+  Future<String> executeNextAction() async {
+    switch (_state.currentPage) {
       case introductionPageIndex:
-        // 1ページ目：次のページへ
         nextPage();
         return 'next_page';
       case memberRegistrationPageIndex:
-        // 2ページ目：メンバー登録完了後、3ページ目へ
         final success = await completeTutorial();
         if (success) {
           nextPage();
           return 'next_page';
         }
-        return null;
+        return 'error';
       case kindnessRecordPageIndex:
-        // 3ページ目：優しさ記録後、4ページ目へ
         final success = await recordKindness();
         if (success) {
           nextPage();
           return 'next_page';
         }
-        return null;
+        return 'error';
       case reflectionSettingPageIndex:
-        // 4ページ目：リフレクション設定後、メイン画面へ
         final success = await saveReflectionSettings();
         if (success) {
           return 'navigate_to_main';
         }
-        return null;
+        return 'error';
       default:
-        return null;
+        return 'error';
     }
   }
 
-  /// スキップアクション実行
-  void executeSkipAction() {
-    if (state.currentPage == kindnessRecordPageIndex) {
-      nextPage();
+  /// 頻度の説明文を取得
+  String getFrequencyDescription(String frequency) {
+    switch (frequency) {
+      case '週に1回':
+        return '毎週、受け取った優しさを振り返ります';
+      case '2週に1回':
+        return '2週間ごとに振り返りの時間をお届けします';
+      case '月に1回':
+        return '月末に1ヶ月分の優しさをまとめて振り返ります';
+      default:
+        return '';
     }
   }
 }
-
-final tutorialViewModelProvider =
-    StateNotifierProvider<TutorialViewModel, TutorialState>((ref) {
-      return TutorialViewModel();
-    });

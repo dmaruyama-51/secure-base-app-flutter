@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../models/kindness_giver.dart';
 import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
-import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
 
-class KindnessGiverEditPage extends ConsumerStatefulWidget {
+class KindnessGiverEditPage extends StatefulWidget {
   final KindnessGiver kindnessGiver;
 
   const KindnessGiverEditPage({super.key, required this.kindnessGiver});
 
   @override
-  ConsumerState<KindnessGiverEditPage> createState() =>
-      _KindnessGiverEditPageState();
+  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
 }
 
-class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
+class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
   late TextEditingController _nameController;
 
   @override
@@ -36,65 +34,47 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(
-      kindnessGiverEditViewModelProvider(widget.kindnessGiver),
-    );
-    final viewModel = ref.read(
-      kindnessGiverEditViewModelProvider(widget.kindnessGiver).notifier,
-    );
-    final theme = Theme.of(context);
-
-    // 成功メッセージと画面遷移の処理
-    ref.listen(kindnessGiverEditViewModelProvider(widget.kindnessGiver), (
-      previous,
-      next,
-    ) {
-      if (next.shouldNavigateBack) {
-        viewModel.clearMessages();
-        ref
-            .read(kindnessGiverListViewModelProvider.notifier)
-            .loadKindnessGivers();
-        GoRouter.of(context).pop();
-      }
-
-      if (next.successMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.successMessage!)));
-      }
-
-      if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: theme.colorScheme.error,
+    return ChangeNotifierProvider(
+      create:
+          (_) => KindnessGiverEditViewModel(
+            originalKindnessGiver: widget.kindnessGiver,
           ),
-        );
-      }
-    });
+      child: Consumer<KindnessGiverEditViewModel>(
+        builder: (context, viewModel, child) {
+          final state = viewModel.state;
+          final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(theme),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          right: 20.0,
-          top: 8.0,
-          bottom: 20.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(theme),
-            const SizedBox(height: 20),
-            _buildNameSection(state, viewModel, theme),
-            const SizedBox(height: 28),
-            _buildUpdateButton(state, viewModel, theme),
-          ],
-        ),
+          // 成功メッセージと画面遷移の処理
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.shouldNavigateBack) {
+              viewModel.clearMessages();
+              GoRouter.of(context).pop();
+            }
+
+            if (state.successMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+            }
+
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+            }
+          });
+
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: _buildAppBar(theme),
+            body: _buildBody(state, viewModel, theme),
+            bottomNavigationBar: const BottomNavigation(currentIndex: 1),
+          );
+        },
       ),
-      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
@@ -289,6 +269,27 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
                     ),
                   ],
                 ),
+      ),
+    );
+  }
+
+  Widget _buildBody(state, viewModel, ThemeData theme) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(
+        left: 20.0,
+        right: 20.0,
+        top: 8.0,
+        bottom: 20.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(theme),
+          const SizedBox(height: 20),
+          _buildNameSection(state, viewModel, theme),
+          const SizedBox(height: 28),
+          _buildUpdateButton(state, viewModel, theme),
+        ],
       ),
     );
   }

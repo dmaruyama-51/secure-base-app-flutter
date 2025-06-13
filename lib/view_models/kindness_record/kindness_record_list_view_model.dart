@@ -1,34 +1,38 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../../repositories/kindness_record_repository.dart';
 import '../../states/kindness_record/kindness_record_list_state.dart';
 
-// StateNotifierベースのKindnessRecordListViewModel
-class KindnessRecordListViewModel
-    extends StateNotifier<KindnessRecordListState> {
+/// やさしさ記録一覧のViewModel
+class KindnessRecordListViewModel extends ChangeNotifier {
   final KindnessRecordRepository _kindnessRecordRepository;
+  KindnessRecordListState _state = const KindnessRecordListState();
 
-  // コンストラクタを修正してRepositoryを直接インスタンス化
   KindnessRecordListViewModel()
-    : _kindnessRecordRepository = KindnessRecordRepository(),
-      super(const KindnessRecordListState());
+    : _kindnessRecordRepository = KindnessRecordRepository();
 
-  // やさしさ記録一覧を取得する
+  KindnessRecordListState get state => _state;
+
+  void _updateState(KindnessRecordListState newState) {
+    _state = newState;
+    notifyListeners();
+  }
+
+  /// やさしさ記録一覧を取得する
   Future<void> loadKindnessRecords() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    _updateState(_state.copyWith(isLoading: true, errorMessage: null));
 
     try {
       final records = await _kindnessRecordRepository.fetchKindnessRecords();
-      state = state.copyWith(kindnessRecords: records, isLoading: false);
+      _updateState(_state.copyWith(kindnessRecords: records, isLoading: false));
     } catch (e) {
-      state = state.copyWith(isLoading: false, errorMessage: 'データの取得に失敗しました');
+      _updateState(
+        _state.copyWith(isLoading: false, errorMessage: 'データの取得に失敗しました'),
+      );
     }
   }
-}
 
-// ViewModelプロバイダーを簡素化
-final kindnessRecordListViewModelProvider =
-    StateNotifierProvider<KindnessRecordListViewModel, KindnessRecordListState>(
-      (ref) {
-        return KindnessRecordListViewModel();
-      },
-    );
+  /// エラーメッセージをクリアする
+  void clearMessages() {
+    _updateState(_state.copyWith(errorMessage: null));
+  }
+}

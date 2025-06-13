@@ -1,56 +1,70 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../states/kindness_giver/kindness_giver_list_state.dart';
 import '../../models/kindness_giver.dart';
 
 /// メンバー一覧のViewModel
-class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
+class KindnessGiverListViewModel extends ChangeNotifier {
   final KindnessGiverRepository _repository;
+  KindnessGiverListState _state = const KindnessGiverListState();
 
-  // コンストラクタを修正してRepositoryを直接インスタンス化
-  KindnessGiverListViewModel()
-    : _repository = KindnessGiverRepository(),
-      super(const KindnessGiverListState());
+  KindnessGiverListViewModel() : _repository = KindnessGiverRepository();
+
+  KindnessGiverListState get state => _state;
+
+  void _updateState(KindnessGiverListState newState) {
+    _state = newState;
+    notifyListeners();
+  }
 
   /// メンバー一覧を読み込む
   Future<void> loadKindnessGivers() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
+    _updateState(_state.copyWith(isLoading: true, errorMessage: null));
 
     try {
       final kindnessGivers = await _repository.fetchKindnessGivers();
-      state = state.copyWith(kindnessGivers: kindnessGivers, isLoading: false);
+      _updateState(
+        _state.copyWith(kindnessGivers: kindnessGivers, isLoading: false),
+      );
     } catch (e) {
       String errorMessage = 'メンバー一覧の取得に失敗しました';
-
-      state = state.copyWith(isLoading: false, errorMessage: errorMessage);
+      _updateState(
+        _state.copyWith(isLoading: false, errorMessage: errorMessage),
+      );
     }
   }
 
   /// 削除確認の要求
   void requestDeleteConfirmation(KindnessGiver kindnessGiver) {
-    state = state.copyWith(
-      kindnessGiverToDelete: kindnessGiver,
-      showDeleteConfirmation: true,
+    _updateState(
+      _state.copyWith(
+        kindnessGiverToDelete: kindnessGiver,
+        showDeleteConfirmation: true,
+      ),
     );
   }
 
   /// 削除確認のキャンセル
   void cancelDeleteConfirmation() {
-    state = state.copyWith(
-      kindnessGiverToDelete: null,
-      showDeleteConfirmation: false,
+    _updateState(
+      _state.copyWith(
+        kindnessGiverToDelete: null,
+        showDeleteConfirmation: false,
+      ),
     );
   }
 
   /// 削除の実行
   Future<void> confirmDelete() async {
-    final kindnessGiver = state.kindnessGiverToDelete;
+    final kindnessGiver = _state.kindnessGiverToDelete;
     if (kindnessGiver?.id == null) return;
 
     // 確認状態をクリア
-    state = state.copyWith(
-      kindnessGiverToDelete: null,
-      showDeleteConfirmation: false,
+    _updateState(
+      _state.copyWith(
+        kindnessGiverToDelete: null,
+        showDeleteConfirmation: false,
+      ),
     );
 
     try {
@@ -58,26 +72,20 @@ class KindnessGiverListViewModel extends StateNotifier<KindnessGiverListState> {
 
       if (success) {
         final updatedList =
-            state.kindnessGivers
+            _state.kindnessGivers
                 .where((giver) => giver.id != kindnessGiver.id)
                 .toList();
-        state = state.copyWith(
-          kindnessGivers: updatedList,
-          successMessage: '${kindnessGiver.name}さんを削除しました',
+        _updateState(
+          _state.copyWith(
+            kindnessGivers: updatedList,
+            successMessage: '${kindnessGiver.name}さんを削除しました',
+          ),
         );
       } else {
-        state = state.copyWith(errorMessage: '削除に失敗しました');
+        _updateState(_state.copyWith(errorMessage: '削除に失敗しました'));
       }
     } catch (e) {
-      state = state.copyWith(errorMessage: '削除中にエラーが発生しました: $e');
+      _updateState(_state.copyWith(errorMessage: '削除中にエラーが発生しました: $e'));
     }
   }
 }
-
-// ViewModelプロバイダーを簡素化
-final kindnessGiverListViewModelProvider =
-    StateNotifierProvider<KindnessGiverListViewModel, KindnessGiverListState>((
-      ref,
-    ) {
-      return KindnessGiverListViewModel();
-    });

@@ -1,204 +1,87 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../view_models/settings/settings_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../utils/app_colors.dart';
 
 /// 設定画面
-class SettingsPage extends ConsumerWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-    final state = ref.watch(settingsViewModelProvider);
-    final viewModel = ref.read(settingsViewModelProvider.notifier);
+  State<SettingsPage> createState() => _SettingsPageState();
+}
 
-    // ログアウト完了時の処理
-    ref.listen(settingsViewModelProvider, (previous, next) {
-      if (next.successMessage != null) {
-        // ログアウト成功時はログイン画面に遷移
-        context.go('/login');
-      }
+class _SettingsPageState extends State<SettingsPage> {
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+      create: (_) => SettingsViewModel(),
+      child: Consumer<SettingsViewModel>(
+        builder: (context, viewModel, child) {
+          final state = viewModel.state;
+          final theme = Theme.of(context);
 
-      if (next.errorMessage != null) {
-        // エラー時はスナックバーで表示
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: Colors.red,
-          ),
-        );
-        viewModel.clearMessages();
-      }
-    });
-
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: false,
-        title: Text('Settings', style: theme.textTheme.titleLarge),
-      ),
-      body: _buildBody(context, theme, state, viewModel),
-      bottomNavigationBar: const BottomNavigation(
-        currentIndex: 3, // Settingsタブを選択済みとして表示
-      ),
-    );
-  }
-
-  Widget _buildBody(
-    BuildContext context,
-    ThemeData theme,
-    dynamic state,
-    dynamic viewModel,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // アカウント設定セクション
-          _buildSectionHeader(theme, 'アカウント'),
-          const SizedBox(height: 12),
-
-          // ログアウトボタン
-          _buildLogoutButton(context, theme, state, viewModel),
-
-          const Spacer(),
-
-          // アプリ情報
-          _buildAppInfo(theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSectionHeader(ThemeData theme, String title) {
-    return Text(
-      title,
-      style: theme.textTheme.titleMedium?.copyWith(
-        fontWeight: FontWeight.w600,
-        color: AppColors.text,
-      ),
-    );
-  }
-
-  Widget _buildLogoutButton(
-    BuildContext context,
-    ThemeData theme,
-    dynamic state,
-    dynamic viewModel,
-  ) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade200),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap:
-              state.isLoading
-                  ? null
-                  : () => _showLogoutDialog(context, viewModel),
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Icon(Icons.logout, size: 20, color: Colors.red.shade600),
-                const SizedBox(width: 12),
-                Text(
-                  'ログアウト',
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    color: Colors.red.shade600,
-                    fontWeight: FontWeight.w500,
-                  ),
+          // エラーメッセージと成功メッセージの監視
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: theme.colorScheme.error,
                 ),
-                const Spacer(),
-                if (state.isLoading)
-                  SizedBox(
-                    width: 16,
-                    height: 16,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        Colors.red.shade600,
+              );
+              viewModel.clearMessages();
+            }
+            if (state.successMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+              viewModel.clearMessages();
+            }
+          });
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('設定'),
+              automaticallyImplyLeading: false,
+            ),
+            body: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  if (state.errorMessage != null)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Text(
+                        state.errorMessage!,
+                        style: TextStyle(color: Colors.red.shade800),
                       ),
                     ),
-                  )
-                else
-                  Icon(
-                    Icons.chevron_right,
-                    size: 20,
-                    color: Colors.grey.shade400,
+                  ElevatedButton(
+                    onPressed: state.isLoading ? null : viewModel.signOut,
+                    child:
+                        state.isLoading
+                            ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                            : const Text('ログアウト'),
                   ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppInfo(ThemeData theme) {
-    return Center(
-      child: Column(
-        children: [
-          Text(
-            'Kindly',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textLight,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Version 1.0.0',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textLight,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showLogoutDialog(BuildContext context, dynamic viewModel) {
-    final theme = Theme.of(context);
-    showDialog<void>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('ログアウト'),
-          content: const Text('本当にログアウトしますか？'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: theme.colorScheme.onSurface,
+                ],
               ),
-              child: const Text('キャンセル'),
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                viewModel.signOut();
-              },
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: const Text('ログアウト'),
-            ),
-          ],
-        );
-      },
+            bottomNavigationBar: const BottomNavigation(currentIndex: 2),
+          );
+        },
+      ),
     );
   }
 }

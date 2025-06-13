@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../view_models/tutorial/tutorial_view_model.dart';
 import '../../states/tutorial/tutorial_state.dart';
@@ -8,14 +8,14 @@ import '../../widgets/kindness_giver/relation_selection.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
 import '../../utils/app_colors.dart';
 
-class TutorialPage extends ConsumerStatefulWidget {
+class TutorialPage extends StatefulWidget {
   const TutorialPage({super.key});
 
   @override
-  ConsumerState<TutorialPage> createState() => _TutorialPageState();
+  State<TutorialPage> createState() => _TutorialPageState();
 }
 
-class _TutorialPageState extends ConsumerState<TutorialPage> {
+class _TutorialPageState extends State<TutorialPage> {
   final PageController _pageController = PageController();
   late TextEditingController _nameController;
   late TextEditingController _kindnessController;
@@ -37,47 +37,57 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(tutorialViewModelProvider);
-    final viewModel = ref.read(tutorialViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => TutorialViewModel(),
+      child: Consumer<TutorialViewModel>(
+        builder: (context, viewModel, child) {
+          final state = viewModel.state;
+          final theme = Theme.of(context);
 
-    // エラーメッセージの表示
-    ref.listen(tutorialViewModelProvider, (previous, next) {
-      if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
-        viewModel.clearError();
-      }
-    });
+          // エラーメッセージの表示
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (state.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(state.errorMessage!),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+              viewModel.clearError();
+            }
+          });
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // プログレスバー
-            _buildProgressBar(state.currentPage, theme),
-            // メインコンテンツ
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: SafeArea(
+              child: Column(
                 children: [
-                  _buildWelcomePage(theme),
-                  _buildKindnessGiverRegistrationPage(state, viewModel, theme),
-                  _buildKindnessRecordPage(state, viewModel, theme),
-                  _buildReflectionSettingPage(state, viewModel, theme),
+                  // プログレスバー
+                  _buildProgressBar(state.currentPage, theme),
+                  // メインコンテンツ
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _buildWelcomePage(theme),
+                        _buildKindnessGiverRegistrationPage(
+                          state,
+                          viewModel,
+                          theme,
+                        ),
+                        _buildKindnessRecordPage(state, viewModel, theme),
+                        _buildReflectionSettingPage(state, viewModel, theme),
+                      ],
+                    ),
+                  ),
+                  // ナビゲーションボタン
+                  _buildNavigationButtons(state, viewModel, theme),
                 ],
               ),
             ),
-            // ナビゲーションボタン
-            _buildNavigationButtons(state, viewModel, theme),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

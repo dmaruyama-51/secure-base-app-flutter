@@ -1,39 +1,45 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../states/settings/settings_state.dart';
 
 /// 設定画面のViewModel
-class SettingsViewModel extends StateNotifier<SettingsState> {
-  SettingsViewModel() : super(const SettingsState());
+class SettingsViewModel extends ChangeNotifier {
+  SettingsState _state = const SettingsState();
+
+  SettingsState get state => _state;
+
+  void _updateState(SettingsState newState) {
+    _state = newState;
+    notifyListeners();
+  }
 
   /// ログアウト処理
   Future<void> signOut() async {
-    state = state.copyWith(
-      isLoading: true,
-      errorMessage: null,
-      successMessage: null,
+    _updateState(
+      _state.copyWith(
+        isLoading: true,
+        errorMessage: null,
+        successMessage: null,
+      ),
     );
 
     try {
       await Supabase.instance.client.auth.signOut();
-
-      state = state.copyWith(isLoading: false, successMessage: 'ログアウトしました');
+      _updateState(
+        _state.copyWith(isLoading: false, successMessage: 'ログアウトしました'),
+      );
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'ログアウトに失敗しました: ${e.toString()}',
+      _updateState(
+        _state.copyWith(
+          isLoading: false,
+          errorMessage: 'ログアウトに失敗しました: ${e.toString()}',
+        ),
       );
     }
   }
 
   /// エラーメッセージをクリア
   void clearMessages() {
-    state = state.copyWith(errorMessage: null, successMessage: null);
+    _updateState(_state.copyWith(errorMessage: null, successMessage: null));
   }
 }
-
-/// 設定画面ViewModelのProvider
-final settingsViewModelProvider =
-    StateNotifierProvider<SettingsViewModel, SettingsState>(
-      (ref) => SettingsViewModel(),
-    );
