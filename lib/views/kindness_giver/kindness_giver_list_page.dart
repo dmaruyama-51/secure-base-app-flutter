@@ -447,36 +447,23 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   ) {
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-            spreadRadius: 2,
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: theme.colorScheme.primary.withOpacity(0.3),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
         ],
       ),
-      child: FloatingActionButton(
-        backgroundColor: theme.colorScheme.primary,
-        elevation: 0,
+      child: FloatingActionButton.extended(
         onPressed: _navigateToAdd,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.white.withOpacity(0.2), Colors.transparent],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Icon(Icons.add, color: theme.colorScheme.onPrimary, size: 30),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text(
+          'メンバーを追加',
+          style: TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
     );

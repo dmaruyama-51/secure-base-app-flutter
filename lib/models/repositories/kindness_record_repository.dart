@@ -10,6 +10,12 @@ class KindnessRecordRepository {
     int offset = 0,
   }) async {
     try {
+      // 現在のユーザーを取得
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
       // ページネーション機能を追加してパフォーマンス向上
       final response = await Supabase.instance.client
           .from('kindness_records')
@@ -21,6 +27,7 @@ class KindnessRecordRepository {
               gender_master:gender_id (name)
             )
           ''')
+          .eq('user_id', currentUser.id)
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
@@ -54,9 +61,16 @@ class KindnessRecordRepository {
   /// 記録の総数を取得（ページネーション用）
   Future<int> getKindnessRecordsCount() async {
     try {
+      // 現在のユーザーを取得
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
       final response = await Supabase.instance.client
           .from('kindness_records')
-          .select('id');
+          .select('id')
+          .eq('user_id', currentUser.id);
 
       return response.length;
     } catch (e) {
@@ -67,6 +81,12 @@ class KindnessRecordRepository {
 
   Future<KindnessRecord?> fetchKindnessRecordById(int id) async {
     try {
+      // 現在のユーザーを取得
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
       final response =
           await Supabase.instance.client
               .from('kindness_records')
@@ -79,6 +99,7 @@ class KindnessRecordRepository {
             )
           ''')
               .eq('id', id)
+              .eq('user_id', currentUser.id)
               .maybeSingle();
 
       if (response == null) return null;
@@ -136,6 +157,12 @@ class KindnessRecordRepository {
 
   Future<bool> updateKindnessRecord(KindnessRecord record) async {
     try {
+      // 現在のユーザーを取得
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
       await Supabase.instance.client
           .from('kindness_records')
           .update({
@@ -143,7 +170,8 @@ class KindnessRecordRepository {
             'content': record.content,
             'updated_at': record.updatedAt.toIso8601String(),
           })
-          .eq('id', record.id!);
+          .eq('id', record.id!)
+          .eq('user_id', currentUser.id);
       return true;
     } catch (e) {
       throw Exception('やさしさ記録の更新に失敗しました: $e');
@@ -152,10 +180,17 @@ class KindnessRecordRepository {
 
   Future<bool> deleteKindnessRecord(int id) async {
     try {
+      // 現在のユーザーを取得
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
       await Supabase.instance.client
           .from('kindness_records')
           .delete()
-          .eq('id', id);
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
       return true;
     } catch (e) {
       throw Exception('やさしさ記録の削除に失敗しました: $e');

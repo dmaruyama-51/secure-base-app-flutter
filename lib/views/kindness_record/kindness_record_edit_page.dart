@@ -114,7 +114,7 @@ class _KindnessRecordEditPageState extends State<KindnessRecordEditPage> {
       ),
       title: Text(
         'やさしさ記録を編集',
-        style: theme.textTheme.titleLarge?.copyWith(
+        style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
           color: theme.colorScheme.onSurface,
         ),
@@ -132,73 +132,9 @@ class _KindnessRecordEditPageState extends State<KindnessRecordEditPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(theme),
-          const SizedBox(height: 24),
           _buildFormCard(viewModel, theme),
           const SizedBox(height: 24),
           _buildActionButtons(viewModel, theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.05),
-            theme.colorScheme.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.edit,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'やさしさ記録を編集',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '記録した内容を見直して、より良い記録に更新しましょう',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 12,
-              height: 1.5,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
         ],
       ),
     );

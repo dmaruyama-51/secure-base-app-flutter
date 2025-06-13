@@ -101,7 +101,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       ),
       title: Text(
         'やさしさ記録',
-        style: theme.textTheme.titleLarge?.copyWith(
+        style: theme.textTheme.titleMedium?.copyWith(
           fontWeight: FontWeight.bold,
           color: theme.colorScheme.onSurface,
         ),
@@ -124,71 +124,9 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(theme),
-          const SizedBox(height: 24),
           _buildFormCard(viewModel, theme),
           const SizedBox(height: 24),
           _buildSaveButton(viewModel, theme),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeader(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.05),
-            theme.colorScheme.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.favorite,
-                  size: 20,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                'やさしさを記録する',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '今日受け取った小さなやさしさを記録して、心の安全基地を育てていきましょう',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 13,
-              height: 1.5,
-            ),
-          ),
         ],
       ),
     );

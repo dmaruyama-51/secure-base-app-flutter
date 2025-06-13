@@ -82,85 +82,34 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
       elevation: 0,
       centerTitle: false,
       toolbarHeight: 48.0, // 戻るボタンがあるので少し高めに設定
-      leading: Padding(
-        padding: const EdgeInsets.only(left: 16.0, top: 4.0), // 位置調整
-        child: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: theme.colorScheme.secondary.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(
-              Icons.arrow_back,
-              color: theme.colorScheme.onSurface,
-              size: 20,
-            ),
+      leading: IconButton(
+        icon: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.secondary.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
           ),
-          onPressed: () => GoRouter.of(context).pop(),
+          child: Icon(
+            Icons.arrow_back,
+            color: theme.colorScheme.onSurface,
+            size: 20,
+          ),
         ),
+        onPressed: () => GoRouter.of(context).pop(),
       ),
-    );
-  }
-
-  Widget _buildHeader(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.05),
-            theme.colorScheme.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      title: Text(
+        'メンバーを追加',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                '新しいメンバーを追加',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'あなたの心の安全基地になる人を登録しましょう',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
       ),
     );
   }
 
   Widget _buildNameSection(viewModel, ThemeData theme) {
-    // ViewModelからの同期でない場合のみTextEditingControllerを更新
-    if (!viewModel.isTextControllerSyncing &&
-        _nameController.text != viewModel.name) {
+    // ViewModelの値でTextEditingControllerを更新
+    if (_nameController.text != viewModel.name) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _nameController.text = viewModel.name;
       });
@@ -316,8 +265,6 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(theme),
-          const SizedBox(height: 24),
           _buildNameSection(viewModel, theme),
           const SizedBox(height: 20),
           _buildGenderSection(viewModel, theme),

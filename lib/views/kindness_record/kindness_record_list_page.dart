@@ -305,18 +305,6 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
             style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _navigateToAdd,
-            icon: const Icon(Icons.add, size: 16),
-            label: const Text('記録をつける'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              textStyle: const TextStyle(fontSize: 14),
-            ),
-          ),
         ],
       ),
     );

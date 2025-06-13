@@ -87,6 +87,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       centerTitle: false,
+      toolbarHeight: 48.0,
       leading: IconButton(
         icon: Container(
           padding: const EdgeInsets.all(8),
@@ -102,59 +103,12 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
         ),
         onPressed: () => GoRouter.of(context).pop(),
       ),
-    );
-  }
-
-  Widget _buildHeader(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.05),
-            theme.colorScheme.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      title: Text(
+        'メンバーを編集',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'メンバー情報を編集',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${widget.kindnessGiver.giverName}さんの情報を更新できます',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -392,8 +346,6 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildHeader(theme),
-          const SizedBox(height: 20),
           _buildNameSection(viewModel, theme),
           const SizedBox(height: 28),
           _buildActionButtons(viewModel, theme),

@@ -15,9 +15,6 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   String? _successMessage;
   bool _shouldNavigateBack = false;
 
-  // TextEditingController同期用
-  bool _isTextControllerSyncing = false;
-
   // ゲッター
   String get name => _name;
   String get selectedGender => _selectedGender;
@@ -26,26 +23,12 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
-  bool get isTextControllerSyncing => _isTextControllerSyncing;
 
   /// 名前を更新（TextEditingControllerからの呼び出し）
   void updateName(String name) {
     if (_name != name) {
       _name = name;
       notifyListeners();
-    }
-  }
-
-  /// 名前を設定（プログラムからの設定）
-  void setName(String name) {
-    if (_name != name) {
-      _isTextControllerSyncing = true;
-      _name = name;
-      notifyListeners();
-      Future.microtask(() {
-        _isTextControllerSyncing = false;
-        notifyListeners();
-      });
     }
   }
 
