@@ -7,10 +7,10 @@ import 'package:provider/provider.dart';
 
 // Project imports:
 import '../../models/kindness_record.dart';
+import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_edit_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
-import '../../utils/app_colors.dart';
 
 /// やさしさ記録編集ページ
 class KindnessRecordEditPage extends StatefulWidget {

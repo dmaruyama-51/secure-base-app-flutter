@@ -1,7 +1,10 @@
+// Package imports:
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'repositories/kindness_record_repository.dart';
-import 'repositories/kindness_giver_repository.dart';
+
+// Project imports:
 import 'kindness_giver.dart';
+import 'repositories/kindness_giver_repository.dart';
+import 'repositories/kindness_record_repository.dart';
 
 /// バリデーションエラー用の例外クラス（KindnessRecord用）
 class KindnessRecordValidationException implements Exception {

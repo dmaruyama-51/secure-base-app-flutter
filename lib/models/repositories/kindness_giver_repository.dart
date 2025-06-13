@@ -3,8 +3,8 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
 import '../entities/gender_master.dart';
-import '../kindness_giver.dart';
 import '../entities/relationship_master.dart';
+import '../kindness_giver.dart';
 
 /// メンバーデータのリポジトリクラス
 class KindnessGiverRepository {

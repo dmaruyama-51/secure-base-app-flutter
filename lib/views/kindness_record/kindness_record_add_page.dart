@@ -6,10 +6,10 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
+import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
-import '../../utils/app_colors.dart';
 
 /// やさしさ記録追加ページ
 class KindnessRecordAddPage extends StatefulWidget {

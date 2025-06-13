@@ -1,9 +1,12 @@
+// Package imports:
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Project imports:
+import 'kindness_giver.dart';
+import 'kindness_record.dart';
 import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';
 import 'repositories/tutorial_repository.dart';
-import 'kindness_giver.dart';
-import 'kindness_record.dart';
 
 /// チュートリアル関連のバリデーションエラー用の例外クラス
 class TutorialValidationException implements Exception {
