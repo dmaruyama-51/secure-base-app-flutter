@@ -3,12 +3,9 @@ import 'package:flutter/foundation.dart';
 
 // Project imports:
 import '../../models/kindness_giver.dart';
-import '../../repositories/kindness_giver_repository.dart';
 
 /// メンバー追加のViewModel（Provider対応版）
 class KindnessGiverAddViewModel extends ChangeNotifier {
-  final KindnessGiverRepository _repository;
-
   // 状態プロパティ
   String _name = '';
   String _selectedGender = '女性';
@@ -17,8 +14,6 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
-
-  KindnessGiverAddViewModel() : _repository = KindnessGiverRepository();
 
   // ゲッター
   String get name => _name;
@@ -47,77 +42,26 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// 入力バリデーション
-  bool _validateInput() {
-    if (_name.trim().isEmpty) {
-      _errorMessage = '名前を入力してください';
-      notifyListeners();
-      return false;
-    }
-    if (_selectedGender.isEmpty) {
-      _errorMessage = '性別を選択してください';
-      notifyListeners();
-      return false;
-    }
-    if (_selectedRelation.isEmpty) {
-      _errorMessage = '関係性を選択してください';
-      notifyListeners();
-      return false;
-    }
-    return true;
-  }
-
   /// やさしさをくれる人を保存
   Future<void> saveKindnessGiver() async {
-    if (!_validateInput()) return;
-
     _isSaving = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      // マスターデータからIDを取得
-      final genderId = await _repository.getGenderIdByName(_selectedGender);
-      final relationshipId = await _repository.getRelationshipIdByName(
-        _selectedRelation,
+      await KindnessGiver.createKindnessGiver(
+        giverName: _name,
+        genderName: _selectedGender,
+        relationshipName: _selectedRelation,
       );
 
-      if (genderId == null) {
-        _isSaving = false;
-        _errorMessage = '選択された性別が見つかりません';
-        notifyListeners();
-        return;
-      }
-
-      if (relationshipId == null) {
-        _isSaving = false;
-        _errorMessage = '選択された関係性が見つかりません';
-        notifyListeners();
-        return;
-      }
-
-      final kindnessGiver = KindnessGiver.create(
-        userId: '', // Repository内で現在のユーザーIDを設定
-        giverName: _name.trim(),
-        relationshipId: relationshipId,
-        genderId: genderId,
-      );
-
-      final createdGiver = await _repository.createKindnessGiver(kindnessGiver);
-
-      if (createdGiver.id != null) {
-        _isSaving = false;
-        _successMessage = 'メンバーを保存しました';
-        _shouldNavigateBack = true;
-        notifyListeners();
-      } else {
-        _isSaving = false;
-        _errorMessage = '保存に失敗しました';
-        notifyListeners();
-      }
+      _isSaving = false;
+      _successMessage = 'メンバーを保存しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
     } catch (e) {
       _isSaving = false;
-      _errorMessage = 'エラーが発生しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }

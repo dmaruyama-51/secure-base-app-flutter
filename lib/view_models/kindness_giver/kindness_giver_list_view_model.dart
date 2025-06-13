@@ -3,12 +3,9 @@ import 'package:flutter/foundation.dart';
 
 // Project imports:
 import '../../models/kindness_giver.dart';
-import '../../repositories/kindness_giver_repository.dart';
 
 /// メンバー一覧のViewModel
 class KindnessGiverListViewModel extends ChangeNotifier {
-  final KindnessGiverRepository _repository;
-
   // 状態プロパティ
   List<KindnessGiver> _kindnessGivers = const [];
   bool _isLoading = false;
@@ -16,8 +13,6 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   String? _successMessage;
   bool _showDeleteConfirmation = false;
   KindnessGiver? _kindnessGiverToDelete;
-
-  KindnessGiverListViewModel() : _repository = KindnessGiverRepository();
 
   // ゲッター
   List<KindnessGiver> get kindnessGivers => _kindnessGivers;
@@ -34,12 +29,12 @@ class KindnessGiverListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _kindnessGivers = await _repository.fetchKindnessGivers();
+      _kindnessGivers = await KindnessGiver.fetchKindnessGivers();
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'メンバー一覧の取得に失敗しました';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }
@@ -69,21 +64,17 @@ class KindnessGiverListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final success = await _repository.deleteKindnessGiver(kindnessGiver!.id!);
+      await KindnessGiver.deleteKindnessGiver(kindnessGiver!.id!);
 
-      if (success) {
-        _kindnessGivers =
-            _kindnessGivers
-                .where((giver) => giver.id != kindnessGiver.id)
-                .toList();
-        _successMessage = '${kindnessGiver.name}さんを削除しました';
-        notifyListeners();
-      } else {
-        _errorMessage = '削除に失敗しました';
-        notifyListeners();
-      }
+      // リストから削除
+      _kindnessGivers =
+          _kindnessGivers
+              .where((giver) => giver.id != kindnessGiver.id)
+              .toList();
+      _successMessage = '${kindnessGiver.name}さんを削除しました';
+      notifyListeners();
     } catch (e) {
-      _errorMessage = '削除中にエラーが発生しました: $e';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }
