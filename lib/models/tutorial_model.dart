@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../repositories/kindness_giver_repository.dart';
-import '../repositories/kindness_record_repository.dart';
-import '../repositories/tutorial_repository.dart';
+import 'repositories/kindness_giver_repository.dart';
+import 'repositories/kindness_record_repository.dart';
+import 'repositories/tutorial_repository.dart';
 import 'kindness_giver.dart';
 import 'kindness_record.dart';
 
@@ -102,12 +102,13 @@ class Tutorial {
       final kindnessGiver = kindnessGivers.first;
 
       // KindnessRecord作成
+      final now = DateTime.now();
       final kindnessRecord = KindnessRecord(
         userId: user.id,
         giverId: kindnessGiver.id,
         content: kindnessContent,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: now,
+        updatedAt: now,
         giverName: kindnessGiver.giverName,
         giverAvatarUrl: kindnessGiver.avatarUrl,
         giverCategory: kindnessGiver.relationshipName ?? selectedRelation,

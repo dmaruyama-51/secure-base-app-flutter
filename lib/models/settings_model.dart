@@ -1,4 +1,4 @@
-import '../repositories/auth_repository.dart';
+import 'repositories/auth_repository.dart';
 
 /// 設定関連のビジネスロジックを担当するクラス
 class Settings {

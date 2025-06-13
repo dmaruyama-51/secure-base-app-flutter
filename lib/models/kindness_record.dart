@@ -1,6 +1,6 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../repositories/kindness_record_repository.dart';
-import '../repositories/kindness_giver_repository.dart';
+import 'repositories/kindness_record_repository.dart';
+import 'repositories/kindness_giver_repository.dart';
 import 'kindness_giver.dart';
 
 /// バリデーションエラー用の例外クラス（KindnessRecord用）
@@ -74,12 +74,13 @@ class KindnessRecord {
     }
 
     // レコード作成
+    final now = DateTime.now();
     final kindnessRecord = KindnessRecord(
       userId: user.id,
       giverId: selectedKindnessGiver.id,
       content: content.trim(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
+      createdAt: now,
+      updatedAt: now,
       giverName: selectedKindnessGiver.giverName,
       giverAvatarUrl: selectedKindnessGiver.avatarUrl,
       giverCategory: selectedKindnessGiver.relationshipName ?? '',
@@ -141,10 +142,12 @@ class KindnessRecord {
   /// やさしさ記録一覧を取得する
   static Future<List<KindnessRecord>> fetchKindnessRecords({
     KindnessRecordRepository? repository,
+    int limit = 50,
+    int offset = 0,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
     try {
-      return await repo.fetchKindnessRecords();
+      return await repo.fetchKindnessRecords(limit: limit, offset: offset);
     } catch (e) {
       throw Exception('やさしさ記録の取得に失敗しました: $e');
     }
@@ -175,6 +178,23 @@ class KindnessRecord {
       return (kindnessGivers: kindnessGivers, selectedGiver: selectedGiver);
     } catch (e) {
       throw Exception('メンバー一覧の取得に失敗しました: $e');
+    }
+  }
+
+  /// やさしさ記録を削除する
+  static Future<void> deleteKindnessRecord({
+    required int recordId,
+    KindnessRecordRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessRecordRepository();
+
+    try {
+      final success = await repo.deleteKindnessRecord(recordId);
+      if (!success) {
+        throw Exception('やさしさ記録の削除に失敗しました');
+      }
+    } catch (e) {
+      throw Exception('やさしさ記録の削除に失敗しました: $e');
     }
   }
 

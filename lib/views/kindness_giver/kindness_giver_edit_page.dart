@@ -232,26 +232,44 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
   }
 
-  Widget _buildUpdateButton(viewModel, ThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
+  Widget _buildActionButtons(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Row(
+      children: [
+        Expanded(child: _buildUpdateButton(viewModel, theme)),
+        const SizedBox(width: 12),
+        Expanded(child: _buildDeleteButton(viewModel, theme)),
+      ],
+    );
+  }
+
+  Widget _buildUpdateButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
       child: ElevatedButton(
-        onPressed: viewModel.isSaving ? null : viewModel.updateKindnessGiver,
+        onPressed:
+            viewModel.isSaving || viewModel.isDeleting
+                ? null
+                : viewModel.updateKindnessGiver,
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child:
             viewModel.isSaving
                 ? SizedBox(
-                  height: 18,
-                  width: 18,
+                  width: 20,
+                  height: 20,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
                     color: theme.colorScheme.onPrimary,
+                    strokeWidth: 2,
                   ),
                 )
                 : Row(
@@ -259,22 +277,108 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                   children: [
                     Icon(
                       Icons.update_outlined,
-                      size: 18,
+                      size: 16,
                       color: theme.colorScheme.onPrimary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
-                      'メンバー情報を更新',
+                      '更新',
                       style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
                         color: theme.colorScheme.onPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
       ),
     );
+  }
+
+  Widget _buildDeleteButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.grey[600],
+          side: BorderSide(color: Colors.grey[300]!, width: 1.5),
+          backgroundColor: Colors.grey[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed:
+            viewModel.isDeleting || viewModel.isSaving
+                ? null
+                : () => _showDeleteConfirmDialog(viewModel, theme),
+        child:
+            viewModel.isDeleting
+                ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.grey[600],
+                    strokeWidth: 2,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '削除',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmDialog(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('削除確認'),
+            content: Text(
+              '${widget.kindnessGiver.giverName}さんを削除しますか？\n削除すると元に戻すことはできません。',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  '削除',
+                  style: TextStyle(
+                    color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      viewModel.deleteKindnessGiver();
+    }
   }
 
   Widget _buildBody(viewModel, ThemeData theme) {
@@ -292,7 +396,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
           const SizedBox(height: 20),
           _buildNameSection(viewModel, theme),
           const SizedBox(height: 28),
-          _buildUpdateButton(viewModel, theme),
+          _buildActionButtons(viewModel, theme),
         ],
       ),
     );

@@ -5,7 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Project imports:
 import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
-import '../repositories/tutorial_repository.dart';
+import '../models/repositories/tutorial_repository.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../views/kindness_giver/kindness_giver_list_page.dart';

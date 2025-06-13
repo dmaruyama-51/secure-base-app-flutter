@@ -1,4 +1,4 @@
-import '../repositories/kindness_giver_repository.dart';
+import 'repositories/kindness_giver_repository.dart';
 
 /// バリデーションエラー用の例外クラス
 class ValidationException implements Exception {

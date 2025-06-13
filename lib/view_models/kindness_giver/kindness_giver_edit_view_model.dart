@@ -12,6 +12,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   String _selectedGender = '女性';
   String _selectedRelation = '家族';
   bool _isSaving = false;
+  bool _isDeleting = false;
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
@@ -28,6 +29,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   String get selectedGender => _selectedGender;
   String get selectedRelation => _selectedRelation;
   bool get isSaving => _isSaving;
+  bool get isDeleting => _isDeleting;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
@@ -72,6 +74,38 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isSaving = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// やさしさをくれる人削除処理
+  Future<void> deleteKindnessGiver() async {
+    if (_originalKindnessGiver == null) {
+      _errorMessage = '削除対象のメンバーが見つかりません';
+      notifyListeners();
+      return;
+    }
+
+    if (_originalKindnessGiver!.id == null) {
+      _errorMessage = '無効なメンバーIDです';
+      notifyListeners();
+      return;
+    }
+
+    _isDeleting = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await KindnessGiver.deleteKindnessGiver(_originalKindnessGiver!.id!);
+
+      _isDeleting = false;
+      _successMessage = 'メンバーを削除しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isDeleting = false;
       _errorMessage = e.toString();
       notifyListeners();
     }

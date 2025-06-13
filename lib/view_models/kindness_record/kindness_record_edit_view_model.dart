@@ -14,6 +14,7 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
   String _content = '';
   bool _isLoading = false;
   bool _isSaving = false;
+  bool _isDeleting = false;
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
@@ -29,6 +30,7 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
   String get content => _content;
   bool get isLoading => _isLoading;
   bool get isSaving => _isSaving;
+  bool get isDeleting => _isDeleting;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
@@ -100,6 +102,38 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isSaving = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// やさしさ記録を削除
+  Future<void> deleteKindnessRecord() async {
+    if (_originalRecord == null) {
+      _errorMessage = '削除対象のレコードが見つかりません';
+      notifyListeners();
+      return;
+    }
+
+    if (_originalRecord!.id == null) {
+      _errorMessage = '無効なレコードIDです';
+      notifyListeners();
+      return;
+    }
+
+    _isDeleting = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await KindnessRecord.deleteKindnessRecord(recordId: _originalRecord!.id!);
+
+      _isDeleting = false;
+      _successMessage = 'やさしさ記録を削除しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isDeleting = false;
       _errorMessage = e.toString();
       notifyListeners();
     }

@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 // Project imports:
 import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
+import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
+import '../../utils/app_colors.dart';
 
 /// やさしさ記録追加ページ
 class KindnessRecordAddPage extends StatefulWidget {
@@ -83,13 +85,25 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       leading: IconButton(
-        icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
+        icon: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.colorScheme.secondary.withOpacity(0.5),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Icon(
+            Icons.arrow_back,
+            color: theme.colorScheme.onSurface,
+            size: 20,
+          ),
+        ),
         onPressed: () => GoRouter.of(context).pop(),
       ),
       title: Text(
         'やさしさ記録',
         style: theme.textTheme.titleLarge?.copyWith(
           fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
         ),
       ),
     );
@@ -106,95 +120,319 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
     }
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'どんなやさしさを受け取りましたか？',
-            style: theme.textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+          _buildHeader(theme),
           const SizedBox(height: 24),
-          // やさしさ内容入力欄
-          TextField(
-            controller: _contentController,
-            minLines: 4,
-            maxLines: 6,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: theme.colorScheme.surface,
-              hintText: '受け取ったやさしさを記録してください',
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
-              ),
-            ),
-            onChanged: viewModel.updateContent,
-          ),
-          const SizedBox(height: 16),
-          // メンバー選択
-          if (viewModel.kindnessGivers.isNotEmpty) ...[
-            Text(
-              '誰からのやさしさですか？',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                border: Border.all(color: theme.colorScheme.outline),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton(
-                  isExpanded: true,
-                  value: viewModel.selectedKindnessGiver,
-                  hint: const Text('メンバーを選択'),
-                  items:
-                      viewModel.kindnessGivers.map((kindnessGiver) {
-                        return DropdownMenuItem(
-                          value: kindnessGiver,
-                          child: Text(kindnessGiver.giverName),
-                        );
-                      }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      viewModel.selectKindnessGiver(value);
-                    }
-                  },
-                ),
-              ),
-            ),
+          _buildFormCard(viewModel, theme),
+          const SizedBox(height: 24),
+          _buildSaveButton(viewModel, theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            theme.colorScheme.primary.withOpacity(0.05),
+            theme.colorScheme.primary.withOpacity(0.02),
           ],
-          const SizedBox(height: 32),
-          // 保存ボタン
-          SizedBox(
-            width: double.infinity,
-            height: 48,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  Icons.favorite,
+                  size: 20,
+                  color: theme.colorScheme.primary,
                 ),
               ),
-              onPressed:
-                  viewModel.isSaving ? null : viewModel.saveKindnessRecord,
-              child:
-                  viewModel.isSaving
-                      ? const CircularProgressIndicator(color: Colors.white)
-                      : const Text('記録を保存'),
+              const SizedBox(width: 12),
+              Text(
+                'やさしさを記録する',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: theme.colorScheme.primary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(
+            '今日受け取った小さなやさしさを記録して、心の安全基地を育てていきましょう',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 13,
+              height: 1.5,
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildFormCard(KindnessRecordAddViewModel viewModel, ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.08),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('どんなやさしさを受け取りましたか？', Icons.edit, theme),
+          const SizedBox(height: 16),
+          _buildContentField(viewModel, theme),
+          const SizedBox(height: 24),
+          if (viewModel.kindnessGivers.isNotEmpty) ...[
+            _buildSectionTitle('誰からのやさしさですか？', Icons.person, theme),
+            const SizedBox(height: 16),
+            _buildKindnessGiverSelector(viewModel, theme),
+            const SizedBox(height: 16),
+            _buildExampleSection(theme),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSectionTitle(String title, IconData icon, ThemeData theme) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: theme.colorScheme.primary),
+        const SizedBox(width: 8),
+        Text(
+          title,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            fontSize: 14,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildContentField(
+    KindnessRecordAddViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.1),
+          width: 1,
+        ),
+      ),
+      child: TextField(
+        controller: _contentController,
+        minLines: 4,
+        maxLines: 6,
+        decoration: InputDecoration(
+          hintText: '例：「お疲れさま」と声をかけてくれた\n　　◯◯◯について話を聞いてくれた',
+          hintStyle: theme.textTheme.bodyMedium?.copyWith(
+            color: AppColors.textLight.withOpacity(0.8),
+            fontSize: 13,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.all(16),
+        ),
+        style: theme.textTheme.bodyMedium?.copyWith(height: 1.5),
+        onChanged: viewModel.updateContent,
+      ),
+    );
+  }
+
+  Widget _buildKindnessGiverSelector(
+    KindnessRecordAddViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface.withOpacity(0.5),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.1),
+          width: 1,
+        ),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton(
+          isExpanded: true,
+          value: viewModel.selectedKindnessGiver,
+          hint: Text('メンバーを選択', style: TextStyle(color: AppColors.textLight)),
+          items:
+              viewModel.kindnessGivers.map((kindnessGiver) {
+                return DropdownMenuItem(
+                  value: kindnessGiver,
+                  child: Row(
+                    children: [
+                      KindnessGiverAvatar(
+                        kindnessGiver: kindnessGiver,
+                        size: 32,
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        kindnessGiver.giverName,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+          onChanged: (value) {
+            if (value != null) {
+              viewModel.selectKindnessGiver(value);
+            }
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExampleSection(ThemeData theme) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.lightbulb_outline,
+                size: 16,
+                color: theme.colorScheme.primary,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                '記録のヒント',
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.primary,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Text(
+            '小さなことでも大切な記録になります：\n・笑顔で挨拶してくれた  ・体調を気遣ってくれた\n・話を最後まで聞いてくれた  ・手伝ってくれた',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: AppColors.textLight,
+              height: 1.4,
+              fontSize: 11,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSaveButton(
+    KindnessRecordAddViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      width: double.infinity,
+      height: 56,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(28),
+        boxShadow:
+            viewModel.isSaving
+                ? []
+                : [
+                  BoxShadow(
+                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+      ),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: theme.colorScheme.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(28),
+          ),
+        ),
+        onPressed: viewModel.isSaving ? null : viewModel.saveKindnessRecord,
+        child:
+            viewModel.isSaving
+                ? const SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.favorite, size: 20),
+                    const SizedBox(width: 8),
+                    Text(
+                      'やさしさを記録する',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
       ),
     );
   }
