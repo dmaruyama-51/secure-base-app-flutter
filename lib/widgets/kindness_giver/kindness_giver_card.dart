@@ -137,7 +137,7 @@ class _KindnessGiverCardState extends State<KindnessGiverCard>
                             children: [
                               Expanded(
                                 child: Text(
-                                  widget.kindnessGiver.name,
+                                  widget.kindnessGiver.giverName,
                                   style: theme.textTheme.titleMedium?.copyWith(
                                     fontWeight: FontWeight.w700,
                                     fontSize: 15,

@@ -34,11 +34,11 @@ class KindnessGiverListItem extends StatelessWidget {
                 : null,
       ),
       title: Text(
-        kindnessGiver.name,
+        kindnessGiver.giverName,
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        kindnessGiver.category,
+        kindnessGiver.relationshipName ?? '',
         style: TextStyle(
           fontSize: 14,
           color: theme.colorScheme.primary.withAlpha(200),

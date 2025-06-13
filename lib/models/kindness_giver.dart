@@ -36,11 +36,6 @@ class KindnessGiver {
     this.genderName,
   });
 
-  // 後方互換性のためのgetter（kindness_record用）
-  String get name => giverName;
-  String get category => relationshipName ?? '';
-  String get gender => genderName ?? '';
-
   factory KindnessGiver.fromJson(Map<String, dynamic> json) {
     return KindnessGiver(
       id: json['id'] as int?,
