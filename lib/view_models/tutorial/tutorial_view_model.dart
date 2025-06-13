@@ -1,10 +1,15 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
-import '../../repositories/tutorial_repository.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
+
+// Package imports:
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../repositories/kindness_record_repository.dart';
+import '../../repositories/tutorial_repository.dart';
 
 /// チュートリアルのViewModel
 class TutorialViewModel extends ChangeNotifier {

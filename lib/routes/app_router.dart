@@ -1,18 +1,21 @@
+// Package imports:
 import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../views/login_page.dart';
-import '../views/register_page.dart';
-import '../views/kindness_giver/kindness_giver_list_page.dart';
-import '../views/kindness_giver/kindness_giver_add_page.dart';
-import '../views/kindness_giver/kindness_giver_edit_page.dart';
-import '../views/tutorial/tutorial_page.dart';
-import '../views/settings/settings_page.dart';
-import '../repositories/tutorial_repository.dart';
+
+// Project imports:
 import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
-import '../views/kindness_record/kindness_record_list_page.dart';
+import '../repositories/tutorial_repository.dart';
+import '../views/kindness_giver/kindness_giver_add_page.dart';
+import '../views/kindness_giver/kindness_giver_edit_page.dart';
+import '../views/kindness_giver/kindness_giver_list_page.dart';
 import '../views/kindness_record/kindness_record_add_page.dart';
 import '../views/kindness_record/kindness_record_edit_page.dart';
+import '../views/kindness_record/kindness_record_list_page.dart';
+import '../views/login_page.dart';
+import '../views/register_page.dart';
+import '../views/settings/settings_page.dart';
+import '../views/tutorial/tutorial_page.dart';
 
 /// 認証とチュートリアルのガード処理
 Future<String?> _authAndTutorialGuard(String location) async {

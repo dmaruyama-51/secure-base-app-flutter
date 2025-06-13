@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 
 /// KindnessGiverのアバター表示ウィジェット

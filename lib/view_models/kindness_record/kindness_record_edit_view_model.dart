@@ -1,9 +1,14 @@
+// Flutter imports:
 import 'package:flutter/foundation.dart';
+
+// Package imports:
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../repositories/kindness_record_repository.dart';
-import '../../repositories/kindness_giver_repository.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
+import '../../repositories/kindness_giver_repository.dart';
+import '../../repositories/kindness_record_repository.dart';
 
 /// やさしさ記録編集のViewModel
 class KindnessRecordEditViewModel extends ChangeNotifier {

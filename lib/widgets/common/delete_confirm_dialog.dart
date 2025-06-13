@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../../utils/app_colors.dart';
 
 /// 汎用削除確認ダイアログ

@@ -1,8 +1,13 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+
+// Package imports:
 import 'package:go_router/go_router.dart';
-import '../../view_models/kindness_record/kindness_record_edit_view_model.dart';
+import 'package:provider/provider.dart';
+
+// Project imports:
 import '../../models/kindness_record.dart';
+import '../../view_models/kindness_record/kindness_record_edit_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 
 /// やさしさ記録編集ページ

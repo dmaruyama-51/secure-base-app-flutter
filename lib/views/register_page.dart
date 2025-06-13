@@ -1,7 +1,12 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:secure_base/utils/constants.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Package imports:
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+// Project imports:
+import 'package:secure_base/utils/constants.dart';
 import '../utils/app_colors.dart';
 
 class RegisterPage extends StatefulWidget {

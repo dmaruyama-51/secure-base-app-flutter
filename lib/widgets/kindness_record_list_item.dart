@@ -1,5 +1,10 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:intl/intl.dart';
+
+// Project imports:
 import '../models/kindness_record.dart';
 
 // やさしさ記録リストの1件分を表示するウィジェット

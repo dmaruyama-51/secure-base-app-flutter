@@ -47,6 +47,7 @@ dependencies:
   google_fonts: ^6.1.0
 
 dev_dependencies:
+  import_sorter: ^4.6.0
   flutter_test:
     sdk: flutter
 

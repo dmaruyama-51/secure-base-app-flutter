@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 import 'kindness_giver_avatar.dart';
 import 'kindness_giver_info_chip.dart';
