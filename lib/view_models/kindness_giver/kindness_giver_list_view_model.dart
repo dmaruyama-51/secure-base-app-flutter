@@ -1,91 +1,87 @@
 import 'package:flutter/foundation.dart';
 import '../../repositories/kindness_giver_repository.dart';
-import '../../states/kindness_giver/kindness_giver_list_state.dart';
 import '../../models/kindness_giver.dart';
 
 /// メンバー一覧のViewModel
 class KindnessGiverListViewModel extends ChangeNotifier {
   final KindnessGiverRepository _repository;
-  KindnessGiverListState _state = const KindnessGiverListState();
+
+  // 状態プロパティ
+  List<KindnessGiver> _kindnessGivers = const [];
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
+  bool _showDeleteConfirmation = false;
+  KindnessGiver? _kindnessGiverToDelete;
 
   KindnessGiverListViewModel() : _repository = KindnessGiverRepository();
 
-  KindnessGiverListState get state => _state;
-
-  void _updateState(KindnessGiverListState newState) {
-    _state = newState;
-    notifyListeners();
-  }
+  // ゲッター
+  List<KindnessGiver> get kindnessGivers => _kindnessGivers;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
+  bool get showDeleteConfirmation => _showDeleteConfirmation;
+  KindnessGiver? get kindnessGiverToDelete => _kindnessGiverToDelete;
 
   /// メンバー一覧を読み込む
   Future<void> loadKindnessGivers() async {
-    _updateState(_state.copyWith(isLoading: true, errorMessage: null));
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final kindnessGivers = await _repository.fetchKindnessGivers();
-      _updateState(
-        _state.copyWith(kindnessGivers: kindnessGivers, isLoading: false),
-      );
+      _kindnessGivers = await _repository.fetchKindnessGivers();
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
-      String errorMessage = 'メンバー一覧の取得に失敗しました';
-      _updateState(
-        _state.copyWith(isLoading: false, errorMessage: errorMessage),
-      );
+      _isLoading = false;
+      _errorMessage = 'メンバー一覧の取得に失敗しました';
+      notifyListeners();
     }
   }
 
   /// 削除確認の要求
   void requestDeleteConfirmation(KindnessGiver kindnessGiver) {
-    _updateState(
-      _state.copyWith(
-        kindnessGiverToDelete: kindnessGiver,
-        showDeleteConfirmation: true,
-      ),
-    );
+    _kindnessGiverToDelete = kindnessGiver;
+    _showDeleteConfirmation = true;
+    notifyListeners();
   }
 
   /// 削除確認のキャンセル
   void cancelDeleteConfirmation() {
-    _updateState(
-      _state.copyWith(
-        kindnessGiverToDelete: null,
-        showDeleteConfirmation: false,
-      ),
-    );
+    _kindnessGiverToDelete = null;
+    _showDeleteConfirmation = false;
+    notifyListeners();
   }
 
   /// 削除の実行
   Future<void> confirmDelete() async {
-    final kindnessGiver = _state.kindnessGiverToDelete;
+    final kindnessGiver = _kindnessGiverToDelete;
     if (kindnessGiver?.id == null) return;
 
     // 確認状態をクリア
-    _updateState(
-      _state.copyWith(
-        kindnessGiverToDelete: null,
-        showDeleteConfirmation: false,
-      ),
-    );
+    _kindnessGiverToDelete = null;
+    _showDeleteConfirmation = false;
+    notifyListeners();
 
     try {
       final success = await _repository.deleteKindnessGiver(kindnessGiver!.id!);
 
       if (success) {
-        final updatedList =
-            _state.kindnessGivers
+        _kindnessGivers =
+            _kindnessGivers
                 .where((giver) => giver.id != kindnessGiver.id)
                 .toList();
-        _updateState(
-          _state.copyWith(
-            kindnessGivers: updatedList,
-            successMessage: '${kindnessGiver.name}さんを削除しました',
-          ),
-        );
+        _successMessage = '${kindnessGiver.name}さんを削除しました';
+        notifyListeners();
       } else {
-        _updateState(_state.copyWith(errorMessage: '削除に失敗しました'));
+        _errorMessage = '削除に失敗しました';
+        notifyListeners();
       }
     } catch (e) {
-      _updateState(_state.copyWith(errorMessage: '削除中にエラーが発生しました: $e'));
+      _errorMessage = '削除中にエラーが発生しました: $e';
+      notifyListeners();
     }
   }
 }

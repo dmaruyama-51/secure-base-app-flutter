@@ -84,11 +84,9 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/kindness-records/edit/:id',
       builder: (context, state) {
-        final record = state.extra as KindnessRecord?;
-        if (record == null) {
-          return const KindnessRecordListPage();
-        }
-        return KindnessRecordEditPage(record: record);
+        return KindnessRecordEditPage(
+          kindnessRecord: state.extra as KindnessRecord,
+        );
       },
     ),
     // 設定画面（認証必須）

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import '../../view_models/settings/settings_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 
@@ -13,30 +12,37 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
+  bool _initialized = false;
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => SettingsViewModel(),
       child: Consumer<SettingsViewModel>(
         builder: (context, viewModel, child) {
-          final state = viewModel.state;
           final theme = Theme.of(context);
+
+          // 初回読み込み
+          if (!_initialized) {
+            viewModel.initialize();
+            _initialized = true;
+          }
 
           // エラーメッセージと成功メッセージの監視
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.errorMessage != null) {
+            if (viewModel.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text(state.errorMessage!),
+                  content: Text(viewModel.errorMessage!),
                   backgroundColor: theme.colorScheme.error,
                 ),
               );
               viewModel.clearMessages();
             }
-            if (state.successMessage != null) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+            if (viewModel.successMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(viewModel.successMessage!)),
+              );
               viewModel.clearMessages();
             }
           });
@@ -50,7 +56,7 @@ class _SettingsPageState extends State<SettingsPage> {
               padding: const EdgeInsets.all(20.0),
               child: Column(
                 children: [
-                  if (state.errorMessage != null)
+                  if (viewModel.errorMessage != null)
                     Container(
                       padding: const EdgeInsets.all(16),
                       margin: const EdgeInsets.only(bottom: 16),
@@ -60,14 +66,14 @@ class _SettingsPageState extends State<SettingsPage> {
                         border: Border.all(color: Colors.red.shade200),
                       ),
                       child: Text(
-                        state.errorMessage!,
+                        viewModel.errorMessage!,
                         style: TextStyle(color: Colors.red.shade800),
                       ),
                     ),
                   ElevatedButton(
-                    onPressed: state.isLoading ? null : viewModel.signOut,
+                    onPressed: viewModel.isLoading ? null : viewModel.signOut,
                     child:
-                        state.isLoading
+                        viewModel.isLoading
                             ? const SizedBox(
                               width: 20,
                               height: 20,

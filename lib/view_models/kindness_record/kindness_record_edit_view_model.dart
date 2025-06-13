@@ -1,152 +1,146 @@
 import 'package:flutter/foundation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../../repositories/kindness_record_repository.dart';
+import '../../repositories/kindness_giver_repository.dart';
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
-import '../../states/kindness_record/kindness_record_edit_state.dart';
 
-/// やさしさ記録編集のViewModel（Provider対応版）
+/// やさしさ記録編集のViewModel
 class KindnessRecordEditViewModel extends ChangeNotifier {
+  final KindnessRecordRepository _repository;
   final KindnessGiverRepository _kindnessGiverRepository;
-  final KindnessRecordRepository _kindnessRecordRepository;
-  KindnessRecordEditState _state = const KindnessRecordEditState();
 
-  KindnessRecordEditViewModel()
-    : _kindnessGiverRepository = KindnessGiverRepository(),
-      _kindnessRecordRepository = KindnessRecordRepository();
+  // 状態プロパティ
+  KindnessRecord? _originalRecord;
+  List<KindnessGiver> _kindnessGivers = const [];
+  KindnessGiver? _selectedKindnessGiver;
+  String _content = '';
+  bool _isLoading = false;
+  bool _isSaving = false;
+  String? _errorMessage;
+  String? _successMessage;
+  bool _shouldNavigateBack = false;
 
-  KindnessRecordEditState get state => _state;
+  KindnessRecordEditViewModel({required KindnessRecord originalRecord})
+    : _repository = KindnessRecordRepository(),
+      _kindnessGiverRepository = KindnessGiverRepository(),
+      _originalRecord = originalRecord,
+      _content = originalRecord.content;
 
-  void _updateState(KindnessRecordEditState newState) {
-    _state = newState;
+  // ゲッター
+  KindnessRecord? get originalRecord => _originalRecord;
+  List<KindnessGiver> get kindnessGivers => _kindnessGivers;
+  KindnessGiver? get selectedKindnessGiver => _selectedKindnessGiver;
+  String get content => _content;
+  bool get isLoading => _isLoading;
+  bool get isSaving => _isSaving;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
+  bool get shouldNavigateBack => _shouldNavigateBack;
+
+  /// 初期化
+  Future<void> initialize() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
+
+      // 元のレコードに対応するKindnessGiverを選択
+      if (_originalRecord != null) {
+        _selectedKindnessGiver = _kindnessGivers.firstWhere(
+          (giver) => giver.id == _originalRecord!.giverId,
+          orElse:
+              () =>
+                  _kindnessGivers.isNotEmpty
+                      ? _kindnessGivers.first
+                      : _kindnessGivers.first,
+        );
+      }
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = 'メンバー一覧の取得に失敗しました';
+      notifyListeners();
+    }
+  }
+
+  /// メンバーを選択
+  void selectKindnessGiver(KindnessGiver kindnessGiver) {
+    _selectedKindnessGiver = kindnessGiver;
     notifyListeners();
   }
 
-  /// 編集対象の記録を初期化する
-  Future<void> initializeRecord(KindnessRecord record) async {
-    _updateState(
-      _state.copyWith(
-        originalRecord: record,
-        content: record.content,
-        selectedKindnessGiver: KindnessGiver(
-          id: record.giverId,
-          userId: record.userId,
-          giverName: record.giverName,
-          genderId: 1,
-          relationshipId: 1,
-          createdAt: DateTime.now(),
-        ),
-      ),
-    );
-    await loadMembers();
-  }
-
-  /// メンバー一覧を取得する
-  Future<void> loadMembers() async {
-    _updateState(_state.copyWith(isLoading: true, errorMessage: null));
-
-    try {
-      final kindnessGivers =
-          await _kindnessGiverRepository.fetchKindnessGivers();
-      _updateState(
-        _state.copyWith(kindnessGivers: kindnessGivers, isLoading: false),
-      );
-    } catch (e) {
-      _updateState(
-        _state.copyWith(isLoading: false, errorMessage: 'メンバー取得に失敗しました'),
-      );
-    }
-  }
-
-  /// 内容を更新する
+  /// やさしさの内容を更新
   void updateContent(String content) {
-    _updateState(_state.copyWith(content: content));
+    _content = content;
+    notifyListeners();
   }
 
-  /// メンバー選択時の処理
-  void selectKindnessGiver(KindnessGiver? kindnessGiver) {
-    _updateState(_state.copyWith(selectedKindnessGiver: kindnessGiver));
-  }
-
-  /// 入力バリデーション
-  bool _validateInput() {
-    if (_state.content.trim().isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '内容を入力してください'));
-      return false;
-    }
-    if (_state.selectedKindnessGiver == null) {
-      _updateState(_state.copyWith(errorMessage: '人物を選択してください'));
-      return false;
-    }
-    if (_state.selectedKindnessGiver!.category.trim().isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '選択された人物のカテゴリが設定されていません'));
-      return false;
-    }
-    if (_state.selectedKindnessGiver!.gender.trim().isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '選択された人物の性別が設定されていません'));
-      return false;
-    }
-    return true;
-  }
-
-  /// やさしさ記録を更新する
+  /// やさしさ記録を更新
   Future<void> updateKindnessRecord() async {
-    if (!_validateInput() || _state.originalRecord == null) return;
+    if (_content.trim().isEmpty) {
+      _errorMessage = 'やさしさの内容を入力してください';
+      notifyListeners();
+      return;
+    }
 
-    _updateState(
-      _state.copyWith(isSaving: true, errorMessage: null, successMessage: null),
-    );
+    if (_selectedKindnessGiver == null) {
+      _errorMessage = 'メンバーを選択してください';
+      notifyListeners();
+      return;
+    }
+
+    if (_originalRecord == null) {
+      _errorMessage = '編集対象のレコードが見つかりません';
+      notifyListeners();
+      return;
+    }
+
+    _isSaving = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final now = DateTime.now();
-      final updatedRecord = KindnessRecord(
-        id: _state.originalRecord!.id,
-        userId: _state.originalRecord!.userId,
-        giverId: _state.selectedKindnessGiver!.id,
-        content: _state.content.trim(),
-        createdAt: _state.originalRecord!.createdAt,
-        updatedAt: now,
-        giverName: _state.selectedKindnessGiver!.name,
-        giverAvatarUrl: _state.selectedKindnessGiver!.avatarUrl,
-        giverCategory: _state.selectedKindnessGiver!.category,
-        giverGender: _state.selectedKindnessGiver!.gender,
-      );
-
-      final result = await _kindnessRecordRepository.updateKindnessRecord(
-        updatedRecord,
-      );
-
-      if (result) {
-        _updateState(
-          _state.copyWith(
-            isSaving: false,
-            successMessage: '記録を更新しました',
-            shouldNavigateBack: true,
-          ),
-        );
-      } else {
-        _updateState(
-          _state.copyWith(isSaving: false, errorMessage: '更新に失敗しました'),
-        );
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
       }
-    } catch (e) {
-      _updateState(
-        _state.copyWith(
-          isSaving: false,
-          errorMessage: 'エラーが発生しました: ${e.toString()}',
-        ),
+
+      final updatedRecord = KindnessRecord(
+        id: _originalRecord!.id,
+        userId: user.id,
+        giverId: _selectedKindnessGiver!.id,
+        content: _content.trim(),
+        createdAt: _originalRecord!.createdAt,
+        updatedAt: DateTime.now(),
+        giverName: _selectedKindnessGiver!.giverName,
+        giverAvatarUrl: _selectedKindnessGiver!.avatarUrl,
+        giverCategory: _selectedKindnessGiver!.relationshipName ?? '',
+        giverGender: _selectedKindnessGiver!.genderName ?? '',
       );
+
+      await _repository.updateKindnessRecord(updatedRecord);
+
+      _isSaving = false;
+      _successMessage = 'やさしさ記録を更新しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isSaving = false;
+      _errorMessage = 'やさしさ記録の更新に失敗しました: ${e.toString()}';
+      notifyListeners();
     }
   }
 
-  /// メッセージ類をクリアする
+  /// メッセージをクリア
   void clearMessages() {
-    _updateState(
-      _state.copyWith(
-        errorMessage: null,
-        successMessage: null,
-        shouldNavigateBack: false,
-      ),
-    );
+    _errorMessage = null;
+    _successMessage = null;
+    _shouldNavigateBack = false;
+    notifyListeners();
   }
 }

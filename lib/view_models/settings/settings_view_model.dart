@@ -1,45 +1,59 @@
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../states/settings/settings_state.dart';
 
-/// 設定画面のViewModel
+/// 設定のViewModel
 class SettingsViewModel extends ChangeNotifier {
-  SettingsState _state = const SettingsState();
+  // 状態プロパティ
+  bool _isLoading = false;
+  String? _errorMessage;
+  String? _successMessage;
 
-  SettingsState get state => _state;
+  // ゲッター
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
 
-  void _updateState(SettingsState newState) {
-    _state = newState;
+  /// 初期化
+  Future<void> initialize() async {
+    _isLoading = true;
+    _errorMessage = null;
     notifyListeners();
+
+    try {
+      // 設定データの読み込みなど
+      await Future.delayed(Duration(seconds: 1)); // 模擬的な処理
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = '設定の読み込みに失敗しました';
+      notifyListeners();
+    }
   }
 
   /// ログアウト処理
   Future<void> signOut() async {
-    _updateState(
-      _state.copyWith(
-        isLoading: true,
-        errorMessage: null,
-        successMessage: null,
-      ),
-    );
+    _isLoading = true;
+    _errorMessage = null;
+    _successMessage = null;
+    notifyListeners();
 
     try {
       await Supabase.instance.client.auth.signOut();
-      _updateState(
-        _state.copyWith(isLoading: false, successMessage: 'ログアウトしました'),
-      );
+      _isLoading = false;
+      _successMessage = 'ログアウトしました';
+      notifyListeners();
     } catch (e) {
-      _updateState(
-        _state.copyWith(
-          isLoading: false,
-          errorMessage: 'ログアウトに失敗しました: ${e.toString()}',
-        ),
-      );
+      _isLoading = false;
+      _errorMessage = 'ログアウトに失敗しました: ${e.toString()}';
+      notifyListeners();
     }
   }
 
-  /// エラーメッセージをクリア
+  /// メッセージをクリア
   void clearMessages() {
-    _updateState(_state.copyWith(errorMessage: null, successMessage: null));
+    _errorMessage = null;
+    _successMessage = null;
+    notifyListeners();
   }
 }

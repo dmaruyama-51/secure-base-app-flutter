@@ -41,36 +41,35 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
           ),
       child: Consumer<KindnessGiverEditViewModel>(
         builder: (context, viewModel, child) {
-          final state = viewModel.state;
           final theme = Theme.of(context);
 
-          // 成功メッセージと画面遷移の処理
+          // エラーメッセージがあればSnackBarで表示
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.shouldNavigateBack) {
-              viewModel.clearMessages();
-              GoRouter.of(context).pop();
-            }
-
-            if (state.successMessage != null) {
+            if (viewModel.errorMessage != null) {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
+              ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
+              viewModel.clearMessages();
             }
+          });
 
-            if (state.errorMessage != null) {
+          // 成功メッセージがあればSnackBarで表示し、画面を戻す
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.successMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: theme.colorScheme.error,
-                ),
+                SnackBar(content: Text(viewModel.successMessage!)),
               );
+              if (viewModel.shouldNavigateBack) {
+                GoRouter.of(context).pop();
+              }
+              viewModel.clearMessages();
             }
           });
 
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: _buildAppBar(theme),
-            body: _buildBody(state, viewModel, theme),
+            body: _buildBody(viewModel, theme),
             bottomNavigationBar: const BottomNavigation(currentIndex: 1),
           );
         },
@@ -155,7 +154,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
   }
 
-  Widget _buildNameSection(state, viewModel, ThemeData theme) {
+  Widget _buildNameSection(viewModel, ThemeData theme) {
     return _buildCard(
       theme,
       child: Column(
@@ -228,11 +227,11 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
   }
 
-  Widget _buildUpdateButton(state, viewModel, ThemeData theme) {
+  Widget _buildUpdateButton(viewModel, ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: state.isSaving ? null : viewModel.updateKindnessGiver,
+        onPressed: viewModel.isSaving ? null : viewModel.updateKindnessGiver,
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
@@ -241,7 +240,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
           elevation: 0,
         ),
         child:
-            state.isSaving
+            viewModel.isSaving
                 ? SizedBox(
                   height: 18,
                   width: 18,
@@ -273,7 +272,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
   }
 
-  Widget _buildBody(state, viewModel, ThemeData theme) {
+  Widget _buildBody(viewModel, ThemeData theme) {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(
         left: 20.0,
@@ -286,9 +285,9 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
         children: [
           _buildHeader(theme),
           const SizedBox(height: 20),
-          _buildNameSection(state, viewModel, theme),
+          _buildNameSection(viewModel, theme),
           const SizedBox(height: 28),
-          _buildUpdateButton(state, viewModel, theme),
+          _buildUpdateButton(viewModel, theme),
         ],
       ),
     );

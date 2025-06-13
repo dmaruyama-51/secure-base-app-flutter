@@ -20,19 +20,13 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
       create: (_) => KindnessRecordListViewModel()..loadKindnessRecords(),
       child: Consumer<KindnessRecordListViewModel>(
         builder: (context, viewModel, child) {
-          final state = viewModel.state;
-          final theme = Theme.of(context);
-
-          // エラーメッセージの表示
+          // エラーメッセージがあればSnackBarで表示
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: theme.colorScheme.error,
-                ),
-              );
-              viewModel.clearMessages();
+            if (viewModel.errorMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
+              viewModel.clearErrorMessage();
             }
           });
 
@@ -41,7 +35,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
               title: const Text('やさしさ記録'),
               automaticallyImplyLeading: false,
             ),
-            body: _buildBody(state, viewModel),
+            body: _buildBody(viewModel),
             floatingActionButton: FloatingActionButton(
               onPressed: () => _navigateToAdd(),
               child: const Icon(Icons.add),
@@ -53,17 +47,17 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
     );
   }
 
-  Widget _buildBody(state, KindnessRecordListViewModel viewModel) {
-    if (state.isLoading) {
+  Widget _buildBody(KindnessRecordListViewModel viewModel) {
+    if (viewModel.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
 
-    if (state.errorMessage != null) {
+    if (viewModel.errorMessage != null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(state.errorMessage!),
+            Text(viewModel.errorMessage!),
             ElevatedButton(
               onPressed: viewModel.loadKindnessRecords,
               child: const Text('再試行'),
@@ -73,16 +67,16 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
       );
     }
 
-    if (state.kindnessRecords.isEmpty) {
+    if (viewModel.kindnessRecords.isEmpty) {
       return Center(
         child: Text('記録がありません', style: Theme.of(context).textTheme.bodyMedium),
       );
     }
 
     return ListView.builder(
-      itemCount: state.kindnessRecords.length,
+      itemCount: viewModel.kindnessRecords.length,
       itemBuilder: (context, index) {
-        final record = state.kindnessRecords[index];
+        final record = viewModel.kindnessRecords[index];
         return KindnessRecordListItem(
           record: record,
           onTap: () {

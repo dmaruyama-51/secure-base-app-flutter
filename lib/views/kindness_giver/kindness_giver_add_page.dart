@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
-import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../utils/app_colors.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
@@ -36,26 +35,25 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
       create: (_) => KindnessGiverAddViewModel(),
       child: Consumer<KindnessGiverAddViewModel>(
         builder: (context, viewModel, child) {
-          final state = viewModel.state;
           final theme = Theme.of(context);
 
           // エラーメッセージがあればSnackBarで表示
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.errorMessage != null) {
+            if (viewModel.errorMessage != null) {
               ScaffoldMessenger.of(
                 context,
-              ).showSnackBar(SnackBar(content: Text(state.errorMessage!)));
+              ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
               viewModel.clearMessages();
             }
           });
 
           // 成功メッセージがあればSnackBarで表示し、画面を戻す
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.successMessage != null) {
-              ScaffoldMessenger.of(
-                context,
-              ).showSnackBar(SnackBar(content: Text(state.successMessage!)));
-              if (state.shouldNavigateBack) {
+            if (viewModel.successMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(viewModel.successMessage!)),
+              );
+              if (viewModel.shouldNavigateBack) {
                 GoRouter.of(context).pop();
               }
               viewModel.clearMessages();
@@ -65,7 +63,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           return Scaffold(
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: _buildAppBar(theme),
-            body: _buildBody(state, viewModel, theme),
+            body: _buildBody(viewModel, theme),
             bottomNavigationBar: const BottomNavigation(currentIndex: 1),
           );
         },
@@ -154,10 +152,10 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
     );
   }
 
-  Widget _buildNameSection(state, viewModel, ThemeData theme) {
+  Widget _buildNameSection(viewModel, ThemeData theme) {
     // TextEditingControllerの内容を状態と同期
-    if (_nameController.text != state.name) {
-      _nameController.text = state.name;
+    if (_nameController.text != viewModel.name) {
+      _nameController.text = viewModel.name;
     }
 
     return _buildCard(
@@ -193,22 +191,22 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
     );
   }
 
-  Widget _buildGenderSection(state, viewModel, ThemeData theme) {
+  Widget _buildGenderSection(viewModel, ThemeData theme) {
     return _buildCard(
       theme,
       child: GenderSelection(
-        selectedGender: state.selectedGender,
+        selectedGender: viewModel.selectedGender,
         onGenderSelected: viewModel.selectGender,
         theme: theme,
       ),
     );
   }
 
-  Widget _buildRelationSection(state, viewModel, ThemeData theme) {
+  Widget _buildRelationSection(viewModel, ThemeData theme) {
     return _buildCard(
       theme,
       child: RelationSelection(
-        selectedRelation: state.selectedRelation,
+        selectedRelation: viewModel.selectedRelation,
         onRelationSelected: viewModel.selectRelation,
         theme: theme,
       ),
@@ -254,11 +252,11 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
     );
   }
 
-  Widget _buildSaveButton(state, viewModel, ThemeData theme) {
+  Widget _buildSaveButton(viewModel, ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: state.isSaving ? null : viewModel.saveKindnessGiver,
+        onPressed: viewModel.isSaving ? null : viewModel.saveKindnessGiver,
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
@@ -267,7 +265,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           elevation: 0,
         ),
         child:
-            state.isSaving
+            viewModel.isSaving
                 ? SizedBox(
                   height: 18,
                   width: 18,
@@ -299,7 +297,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
     );
   }
 
-  Widget _buildBody(state, viewModel, ThemeData theme) {
+  Widget _buildBody(viewModel, ThemeData theme) {
     return SingleChildScrollView(
       padding: const EdgeInsets.only(
         left: 24.0,
@@ -312,13 +310,13 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
         children: [
           _buildHeader(theme),
           const SizedBox(height: 24),
-          _buildNameSection(state, viewModel, theme),
+          _buildNameSection(viewModel, theme),
           const SizedBox(height: 20),
-          _buildGenderSection(state, viewModel, theme),
+          _buildGenderSection(viewModel, theme),
           const SizedBox(height: 20),
-          _buildRelationSection(state, viewModel, theme),
+          _buildRelationSection(viewModel, theme),
           const SizedBox(height: 32),
-          _buildSaveButton(state, viewModel, theme),
+          _buildSaveButton(viewModel, theme),
         ],
       ),
     );

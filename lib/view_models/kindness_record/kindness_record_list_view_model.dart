@@ -1,38 +1,43 @@
 import 'package:flutter/foundation.dart';
 import '../../repositories/kindness_record_repository.dart';
-import '../../states/kindness_record/kindness_record_list_state.dart';
+import '../../models/kindness_record.dart';
 
 /// やさしさ記録一覧のViewModel
 class KindnessRecordListViewModel extends ChangeNotifier {
-  final KindnessRecordRepository _kindnessRecordRepository;
-  KindnessRecordListState _state = const KindnessRecordListState();
+  final KindnessRecordRepository _repository;
 
-  KindnessRecordListViewModel()
-    : _kindnessRecordRepository = KindnessRecordRepository();
+  // 状態プロパティ
+  List<KindnessRecord> _kindnessRecords = const [];
+  bool _isLoading = false;
+  String? _errorMessage;
 
-  KindnessRecordListState get state => _state;
+  KindnessRecordListViewModel() : _repository = KindnessRecordRepository();
 
-  void _updateState(KindnessRecordListState newState) {
-    _state = newState;
-    notifyListeners();
-  }
+  // ゲッター
+  List<KindnessRecord> get kindnessRecords => _kindnessRecords;
+  bool get isLoading => _isLoading;
+  String? get errorMessage => _errorMessage;
 
-  /// やさしさ記録一覧を取得する
+  /// やさしさ記録一覧を読み込む
   Future<void> loadKindnessRecords() async {
-    _updateState(_state.copyWith(isLoading: true, errorMessage: null));
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final records = await _kindnessRecordRepository.fetchKindnessRecords();
-      _updateState(_state.copyWith(kindnessRecords: records, isLoading: false));
+      _kindnessRecords = await _repository.fetchKindnessRecords();
+      _isLoading = false;
+      notifyListeners();
     } catch (e) {
-      _updateState(
-        _state.copyWith(isLoading: false, errorMessage: 'データの取得に失敗しました'),
-      );
+      _isLoading = false;
+      _errorMessage = 'やさしさ記録の取得に失敗しました';
+      notifyListeners();
     }
   }
 
-  /// エラーメッセージをクリアする
-  void clearMessages() {
-    _updateState(_state.copyWith(errorMessage: null));
+  /// エラーメッセージをクリア
+  void clearErrorMessage() {
+    _errorMessage = null;
+    notifyListeners();
   }
 }

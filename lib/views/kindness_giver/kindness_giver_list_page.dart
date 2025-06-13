@@ -22,16 +22,15 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
       create: (_) => KindnessGiverListViewModel()..loadKindnessGivers(),
       child: Consumer<KindnessGiverListViewModel>(
         builder: (context, viewModel, child) {
-          final state = viewModel.state;
           final theme = Theme.of(context);
 
           // 削除確認ダイアログの表示監視
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (state.showDeleteConfirmation &&
-                state.kindnessGiverToDelete != null) {
+            if (viewModel.showDeleteConfirmation &&
+                viewModel.kindnessGiverToDelete != null) {
               _showDeleteConfirmDialog(
                 context,
-                state.kindnessGiverToDelete!,
+                viewModel.kindnessGiverToDelete!,
                 viewModel,
               );
             }
@@ -52,7 +51,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
                 children: [
                   _buildHeader(theme),
                   const SizedBox(height: 24),
-                  _buildMembersSection(state, viewModel, theme),
+                  _buildMembersSection(viewModel, theme),
                 ],
               ),
             ),
@@ -129,19 +128,18 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   }
 
   Widget _buildMembersSection(
-    state,
     KindnessGiverListViewModel viewModel,
     ThemeData theme,
   ) {
-    if (state.isLoading) {
+    if (viewModel.isLoading) {
       return _buildLoadingCard(theme);
     }
 
-    if (state.errorMessage != null) {
-      return _buildErrorCard(state, viewModel, theme);
+    if (viewModel.errorMessage != null) {
+      return _buildErrorCard(viewModel, theme);
     }
 
-    if (state.kindnessGivers.isEmpty) {
+    if (viewModel.kindnessGivers.isEmpty) {
       return _buildEmptyCard(theme);
     }
 
@@ -171,7 +169,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${state.kindnessGivers.length}人',
+                '${viewModel.kindnessGivers.length}人',
                 style: TextStyle(
                   fontSize: 11,
                   color: theme.colorScheme.primary,
@@ -182,7 +180,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
           ],
         ),
         const SizedBox(height: 12),
-        ...state.kindnessGivers.map(
+        ...viewModel.kindnessGivers.map(
           (kindnessGiver) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: KindnessGiverCard(
@@ -229,7 +227,10 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildErrorCard(state, viewModel, ThemeData theme) {
+  Widget _buildErrorCard(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -261,7 +262,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            state.errorMessage!,
+            viewModel.errorMessage!,
             style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),
@@ -347,7 +348,10 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildFloatingActionButton(viewModel, ThemeData theme) {
+  Widget _buildFloatingActionButton(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -367,7 +371,6 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     );
   }
 
-  /// 削除確認ダイアログを表示（Viewの責務）
   void _showDeleteConfirmDialog(
     BuildContext context,
     KindnessGiver kindnessGiver,
@@ -375,23 +378,22 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   ) {
     showDialog(
       context: context,
-      barrierDismissible: false, // 意図しない閉じを防ぐ
       builder:
           (context) => DeleteConfirmDialog(
-            title: '削除の確認',
-            message: '${kindnessGiver.name}さんを削除しますか？\n\nこの操作は取り消せません。',
-            onConfirm: viewModel.confirmDelete,
+            title: 'メンバーを削除',
+            message: '${kindnessGiver.giverName}さんを削除しますか？',
+            onConfirm: () {
+              viewModel.confirmDelete();
+            },
           ),
     );
   }
 
-  /// 編集ページへの遷移
-  void _navigateToEdit(KindnessGiver kindnessGiver) {
-    GoRouter.of(context).push('/kindness-givers/edit', extra: kindnessGiver);
+  void _navigateToAdd() {
+    context.push('/kindness-giver/add');
   }
 
-  /// 追加ページへの遷移
-  void _navigateToAdd() {
-    GoRouter.of(context).push('/kindness-givers/add');
+  void _navigateToEdit(KindnessGiver kindnessGiver) {
+    context.push('/kindness-giver/edit', extra: kindnessGiver);
   }
 }

@@ -1,49 +1,64 @@
 import 'package:flutter/foundation.dart';
 import '../../repositories/kindness_giver_repository.dart';
-import '../../states/kindness_giver/kindness_giver_add_state.dart';
 import '../../models/kindness_giver.dart';
 
 /// メンバー追加のViewModel（Provider対応版）
 class KindnessGiverAddViewModel extends ChangeNotifier {
   final KindnessGiverRepository _repository;
-  KindnessGiverAddState _state = const KindnessGiverAddState();
+
+  // 状態プロパティ
+  String _name = '';
+  String _selectedGender = '女性';
+  String _selectedRelation = '家族';
+  bool _isSaving = false;
+  String? _errorMessage;
+  String? _successMessage;
+  bool _shouldNavigateBack = false;
 
   KindnessGiverAddViewModel() : _repository = KindnessGiverRepository();
 
-  KindnessGiverAddState get state => _state;
-
-  void _updateState(KindnessGiverAddState newState) {
-    _state = newState;
-    notifyListeners();
-  }
+  // ゲッター
+  String get name => _name;
+  String get selectedGender => _selectedGender;
+  String get selectedRelation => _selectedRelation;
+  bool get isSaving => _isSaving;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
+  bool get shouldNavigateBack => _shouldNavigateBack;
 
   /// 名前を更新
   void updateName(String name) {
-    _updateState(_state.copyWith(name: name));
+    _name = name;
+    notifyListeners();
   }
 
   /// 性別を選択
   void selectGender(String gender) {
-    _updateState(_state.copyWith(selectedGender: gender));
+    _selectedGender = gender;
+    notifyListeners();
   }
 
   /// 関係性を選択
   void selectRelation(String relation) {
-    _updateState(_state.copyWith(selectedRelation: relation));
+    _selectedRelation = relation;
+    notifyListeners();
   }
 
   /// 入力バリデーション
   bool _validateInput() {
-    if (_state.name.trim().isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '名前を入力してください'));
+    if (_name.trim().isEmpty) {
+      _errorMessage = '名前を入力してください';
+      notifyListeners();
       return false;
     }
-    if (_state.selectedGender.isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '性別を選択してください'));
+    if (_selectedGender.isEmpty) {
+      _errorMessage = '性別を選択してください';
+      notifyListeners();
       return false;
     }
-    if (_state.selectedRelation.isEmpty) {
-      _updateState(_state.copyWith(errorMessage: '関係性を選択してください'));
+    if (_selectedRelation.isEmpty) {
+      _errorMessage = '関係性を選択してください';
+      notifyListeners();
       return false;
     }
     return true;
@@ -53,34 +68,34 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   Future<void> saveKindnessGiver() async {
     if (!_validateInput()) return;
 
-    _updateState(_state.copyWith(isSaving: true, errorMessage: null));
+    _isSaving = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
       // マスターデータからIDを取得
-      final genderId = await _repository.getGenderIdByName(
-        _state.selectedGender,
-      );
+      final genderId = await _repository.getGenderIdByName(_selectedGender);
       final relationshipId = await _repository.getRelationshipIdByName(
-        _state.selectedRelation,
+        _selectedRelation,
       );
 
       if (genderId == null) {
-        _updateState(
-          _state.copyWith(isSaving: false, errorMessage: '選択された性別が見つかりません'),
-        );
+        _isSaving = false;
+        _errorMessage = '選択された性別が見つかりません';
+        notifyListeners();
         return;
       }
 
       if (relationshipId == null) {
-        _updateState(
-          _state.copyWith(isSaving: false, errorMessage: '選択された関係性が見つかりません'),
-        );
+        _isSaving = false;
+        _errorMessage = '選択された関係性が見つかりません';
+        notifyListeners();
         return;
       }
 
       final kindnessGiver = KindnessGiver.create(
         userId: '', // Repository内で現在のユーザーIDを設定
-        giverName: _state.name.trim(),
+        giverName: _name.trim(),
         relationshipId: relationshipId,
         genderId: genderId,
       );
@@ -88,36 +103,27 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
       final createdGiver = await _repository.createKindnessGiver(kindnessGiver);
 
       if (createdGiver.id != null) {
-        _updateState(
-          _state.copyWith(
-            isSaving: false,
-            successMessage: 'メンバーを保存しました',
-            shouldNavigateBack: true,
-          ),
-        );
+        _isSaving = false;
+        _successMessage = 'メンバーを保存しました';
+        _shouldNavigateBack = true;
+        notifyListeners();
       } else {
-        _updateState(
-          _state.copyWith(isSaving: false, errorMessage: '保存に失敗しました'),
-        );
+        _isSaving = false;
+        _errorMessage = '保存に失敗しました';
+        notifyListeners();
       }
     } catch (e) {
-      _updateState(
-        _state.copyWith(
-          isSaving: false,
-          errorMessage: 'エラーが発生しました: ${e.toString()}',
-        ),
-      );
+      _isSaving = false;
+      _errorMessage = 'エラーが発生しました: ${e.toString()}';
+      notifyListeners();
     }
   }
 
   /// メッセージをクリア
   void clearMessages() {
-    _updateState(
-      _state.copyWith(
-        errorMessage: null,
-        successMessage: null,
-        shouldNavigateBack: false,
-      ),
-    );
+    _errorMessage = null;
+    _successMessage = null;
+    _shouldNavigateBack = false;
+    notifyListeners();
   }
 }
