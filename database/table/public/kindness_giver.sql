@@ -11,6 +11,15 @@ CREATE TABLE public.kindness_givers (
   CONSTRAINT kindness_givers_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON UPDATE CASCADE ON DELETE SET NULL
 );
 
+comment on table public.kindness_givers is '安全基地メンバー情報テーブル';
+
+comment on column kindness_givers.id is '性別ID';
+comment on column kindness_givers.user_id is 'ユーザーID（users.idと連携）';
+comment on column kindness_givers.created_at is '作成日';
+comment on column kindness_givers.giver_name is 'メンバーの名前';
+comment on column kindness_givers.relationship_id is 'メンバーの関係性ID (relationship_master.idと連携)';
+comment on column kindness_givers.gender_id is 'メンバーの性別ID (gender_master.idと連携)';
+
 -- RLSを有効化
 alter table kindness_givers enable row level security;
 

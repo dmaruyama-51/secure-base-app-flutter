@@ -5,6 +5,12 @@ CREATE TABLE public.gender_master (
   CONSTRAINT gender_master_pkey PRIMARY KEY (id)
 );
 
+comment on table public.gender_master is '性別のマスタテーブル';
+
+comment on column gender_master.id is '性別ID';
+comment on column gender_master.name is '性別名';
+comment on column gender_master.created_at is '作成日';
+
 -- RLSを有効化
 ALTER TABLE gender_master ENABLE ROW LEVEL SECURITY;
 

@@ -5,6 +5,12 @@ CREATE TABLE public.relationship_master (
   CONSTRAINT relationship_master_pkey PRIMARY KEY (id)
 );
 
+comment on table public.relationship_master is '関係性マスタ';
+
+comment on column relationship_master.id is '関係性ID';
+comment on column relationship_master.name is '関係性名';
+comment on column relationship_master.created_at is '作成日';
+
 -- RLSを有効化
 ALTER TABLE relationship_master ENABLE ROW LEVEL SECURITY;
 
