@@ -6,9 +6,6 @@ import '../../repositories/kindness_record_repository.dart';
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
-import '../../providers/kindness_record/kindness_record_providers.dart';
-import '../../providers/tutorial_providers.dart';
 
 class TutorialViewModel extends StateNotifier<TutorialState> {
   final KindnessGiverRepository _kindnessGiverRepository;
@@ -30,14 +27,11 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   // アニメーション関連の定数
   static const int pageAnimationDurationMs = 300;
 
-  TutorialViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required TutorialRepository tutorialRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  }) : _kindnessGiverRepository = kindnessGiverRepository,
-       _tutorialRepository = tutorialRepository,
-       _kindnessRecordRepository = kindnessRecordRepository,
-       super(const TutorialState());
+  TutorialViewModel()
+    : _kindnessGiverRepository = KindnessGiverRepository(),
+      _tutorialRepository = TutorialRepository(),
+      _kindnessRecordRepository = KindnessRecordRepository(),
+      super(const TutorialState());
 
   void nextPage() {
     if (state.currentPage < lastPageIndex) {
@@ -288,14 +282,5 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
 
 final tutorialViewModelProvider =
     StateNotifierProvider<TutorialViewModel, TutorialState>((ref) {
-      final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-      final tutorialRepository = ref.read(tutorialRepositoryProvider);
-      final kindnessRecordRepository = ref.read(
-        kindnessRecordRepositoryProvider,
-      );
-      return TutorialViewModel(
-        kindnessGiverRepository: kindnessGiverRepository,
-        tutorialRepository: tutorialRepository,
-        kindnessRecordRepository: kindnessRecordRepository,
-      );
+      return TutorialViewModel();
     });

@@ -4,8 +4,6 @@ import '../../models/kindness_record.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../repositories/kindness_record_repository.dart';
 import '../../states/kindness_record/kindness_record_edit_state.dart';
-import '../../providers/kindness_record/kindness_record_providers.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
 // StateNotifierベースのKindnessRecordEditViewModel
 class KindnessRecordEditViewModel
@@ -13,13 +11,10 @@ class KindnessRecordEditViewModel
   final KindnessGiverRepository _kindnessGiverRepository;
   final KindnessRecordRepository _kindnessRecordRepository;
 
-  // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessRecordEditViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  }) : _kindnessGiverRepository = kindnessGiverRepository,
-       _kindnessRecordRepository = kindnessRecordRepository,
-       super(const KindnessRecordEditState());
+  KindnessRecordEditViewModel()
+    : _kindnessGiverRepository = KindnessGiverRepository(),
+      _kindnessRecordRepository = KindnessRecordRepository(),
+      super(const KindnessRecordEditState());
 
   // 編集対象の記録を初期化する
   Future<void> initializeRecord(KindnessRecord record) async {
@@ -138,17 +133,9 @@ class KindnessRecordEditViewModel
   }
 }
 
-// ViewModelのProvider（DIで依存関係を注入）
-final kindnessRecordEditViewModelProvider = StateNotifierProvider<
-  KindnessRecordEditViewModel,
-  KindnessRecordEditState
->((ref) {
-  // Repository Providerから依存関係を取得
-  final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-  final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
-
-  return KindnessRecordEditViewModel(
-    kindnessGiverRepository: kindnessGiverRepository,
-    kindnessRecordRepository: kindnessRecordRepository,
-  );
-});
+final kindnessRecordEditViewModelProvider =
+    StateNotifierProvider<KindnessRecordEditViewModel, KindnessRecordEditState>(
+      (ref) {
+        return KindnessRecordEditViewModel();
+      },
+    );

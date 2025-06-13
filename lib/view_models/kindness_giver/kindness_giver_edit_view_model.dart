@@ -2,25 +2,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/kindness_giver.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../states/kindness_giver/kindness_giver_edit_state.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
 /// やさしさをくれる人編集のViewModel（新アーキテクチャ版）
 class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
   final KindnessGiverRepository _repository;
 
-  // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessGiverEditViewModel({
-    required KindnessGiverRepository repository,
-    required KindnessGiver originalKindnessGiver,
-  }) : _repository = repository,
-       super(
-         KindnessGiverEditState(
-           originalKindnessGiver: originalKindnessGiver,
-           name: originalKindnessGiver.giverName,
-           selectedGender: originalKindnessGiver.genderName ?? '女性',
-           selectedRelation: originalKindnessGiver.relationshipName ?? '家族',
-         ),
-       );
+  KindnessGiverEditViewModel({required KindnessGiver originalKindnessGiver})
+    : _repository = KindnessGiverRepository(),
+      super(
+        KindnessGiverEditState(
+          originalKindnessGiver: originalKindnessGiver,
+          name: originalKindnessGiver.giverName,
+          selectedGender: originalKindnessGiver.genderName ?? '女性',
+          selectedRelation: originalKindnessGiver.relationshipName ?? '家族',
+        ),
+      );
 
   /// 名前を更新
   void updateName(String name) {
@@ -128,15 +124,12 @@ class KindnessGiverEditViewModel extends StateNotifier<KindnessGiverEditState> {
   }
 }
 
-// ViewModelのProvider（DIで依存関係を注入）
 final kindnessGiverEditViewModelProvider = StateNotifierProvider.family<
   KindnessGiverEditViewModel,
   KindnessGiverEditState,
   KindnessGiver
 >((ref, originalKindnessGiver) {
-  final repository = ref.read(kindnessGiverRepositoryProvider);
   return KindnessGiverEditViewModel(
-    repository: repository,
     originalKindnessGiver: originalKindnessGiver,
   );
 });

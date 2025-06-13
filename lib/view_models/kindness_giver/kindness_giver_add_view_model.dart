@@ -1,16 +1,14 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../states/kindness_giver/kindness_giver_add_state.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
 import '../../models/kindness_giver.dart';
 
-/// やさしさをくれる人追加のViewModel（新アーキテクチャ版）
+/// メンバー追加のViewModel
 class KindnessGiverAddViewModel extends StateNotifier<KindnessGiverAddState> {
   final KindnessGiverRepository _repository;
 
-  // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessGiverAddViewModel({required KindnessGiverRepository repository})
-    : _repository = repository,
+  KindnessGiverAddViewModel()
+    : _repository = KindnessGiverRepository(),
       super(const KindnessGiverAddState());
 
   /// 名前を更新
@@ -112,11 +110,9 @@ class KindnessGiverAddViewModel extends StateNotifier<KindnessGiverAddState> {
   }
 }
 
-// ViewModelのProvider（DIで依存関係を注入）
 final kindnessGiverAddViewModelProvider =
     StateNotifierProvider<KindnessGiverAddViewModel, KindnessGiverAddState>((
       ref,
     ) {
-      final repository = ref.read(kindnessGiverRepositoryProvider);
-      return KindnessGiverAddViewModel(repository: repository);
+      return KindnessGiverAddViewModel();
     });

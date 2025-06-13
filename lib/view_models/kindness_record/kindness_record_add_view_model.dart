@@ -4,37 +4,27 @@ import '../../models/kindness_record.dart';
 import '../../repositories/kindness_giver_repository.dart';
 import '../../repositories/kindness_record_repository.dart';
 import '../../states/kindness_record/kindness_record_add_state.dart';
-import '../../providers/kindness_record/kindness_record_providers.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
 // StateNotifierベースのKindnessRecordAddViewModel
 class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
   final KindnessGiverRepository _kindnessGiverRepository;
   final KindnessRecordRepository _kindnessRecordRepository;
 
-  // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessRecordAddViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  })  : _kindnessGiverRepository = kindnessGiverRepository,
-        _kindnessRecordRepository = kindnessRecordRepository,
-        super(const KindnessRecordAddState());
+  KindnessRecordAddViewModel()
+    : _kindnessGiverRepository = KindnessGiverRepository(),
+      _kindnessRecordRepository = KindnessRecordRepository(),
+      super(const KindnessRecordAddState());
 
   // メンバー一覧を取得する
   Future<void> loadMembers() async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
-      state = state.copyWith(
-        kindnessGivers: kindnessGivers,
-        isLoading: false,
-      );
+      final kindnessGivers =
+          await _kindnessGiverRepository.fetchKindnessGivers();
+      state = state.copyWith(kindnessGivers: kindnessGivers, isLoading: false);
     } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'メンバー取得に失敗しました',
-      );
+      state = state.copyWith(isLoading: false, errorMessage: 'メンバー取得に失敗しました');
     }
   }
 
@@ -95,7 +85,7 @@ class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
       );
 
       final result = await _kindnessRecordRepository.saveKindnessRecord(record);
-      
+
       if (result) {
         state = state.copyWith(
           isSaving: false,
@@ -103,10 +93,7 @@ class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
           shouldNavigateBack: true,
         );
       } else {
-        state = state.copyWith(
-          isSaving: false,
-          errorMessage: '保存に失敗しました',
-        );
+        state = state.copyWith(isSaving: false, errorMessage: '保存に失敗しました');
       }
     } catch (e) {
       state = state.copyWith(
@@ -126,17 +113,9 @@ class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
   }
 }
 
-// ViewModelのProvider（DIで依存関係を注入）
-final kindnessRecordAddViewModelProvider = 
-    StateNotifierProvider<KindnessRecordAddViewModel, KindnessRecordAddState>(
-  (ref) {
-    // Repository Providerから依存関係を取得
-    final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-    final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
-    
-    return KindnessRecordAddViewModel(
-      kindnessGiverRepository: kindnessGiverRepository,
-      kindnessRecordRepository: kindnessRecordRepository,
-    );
-  },
-);
+final kindnessRecordAddViewModelProvider =
+    StateNotifierProvider<KindnessRecordAddViewModel, KindnessRecordAddState>((
+      ref,
+    ) {
+      return KindnessRecordAddViewModel();
+    });
