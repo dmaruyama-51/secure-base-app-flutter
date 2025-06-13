@@ -395,10 +395,13 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   }
 
   void _navigateToAdd() {
-    context.push('/kindness-giver/add');
+    context.push('/kindness-givers/add');
   }
 
   void _navigateToEdit(KindnessGiver kindnessGiver) {
-    context.push('/kindness-giver/edit', extra: kindnessGiver);
+    context.push(
+      '/kindness-givers/edit/${kindnessGiver.id}',
+      extra: kindnessGiver,
+    );
   }
 }

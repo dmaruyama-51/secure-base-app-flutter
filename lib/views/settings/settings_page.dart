@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Package imports:
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
@@ -49,6 +50,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 SnackBar(content: Text(viewModel.successMessage!)),
               );
               viewModel.clearMessages();
+
+              // ログアウト後にログイン画面に遷移
+              context.go('/login');
             }
           });
 

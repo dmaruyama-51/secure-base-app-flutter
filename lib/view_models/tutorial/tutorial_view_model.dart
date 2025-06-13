@@ -12,7 +12,7 @@ class TutorialViewModel extends ChangeNotifier {
   String _selectedGender = '女性';
   String _selectedRelation = '家族';
   String _kindnessContent = '';
-  String _selectedReflectionFrequency = '週1回';
+  String _selectedReflectionFrequency = '2週に1回';
   bool _isCompleting = false;
   bool _isRecordingKindness = false;
   bool _isSettingReflection = false;
@@ -186,6 +186,20 @@ class TutorialViewModel extends ChangeNotifier {
   /// スキップボタンを表示するかどうか
   bool shouldShowSkipButton() {
     return _currentPage == kindnessRecordPageIndex;
+  }
+
+  /// 次へボタンがローディング状態かどうか
+  bool isNextButtonLoading() {
+    switch (_currentPage) {
+      case memberRegistrationPageIndex:
+        return _isCompleting;
+      case kindnessRecordPageIndex:
+        return _isRecordingKindness;
+      case reflectionSettingPageIndex:
+        return _isSettingReflection || _isCompleting;
+      default:
+        return false;
+    }
   }
 
   /// 次へボタンが無効かどうか

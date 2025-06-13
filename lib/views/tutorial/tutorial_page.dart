@@ -905,7 +905,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 ),
               ),
               child:
-                  viewModel.isNextButtonDisabled()
+                  viewModel.isNextButtonLoading()
                       ? SizedBox(
                         height: 20,
                         width: 20,
