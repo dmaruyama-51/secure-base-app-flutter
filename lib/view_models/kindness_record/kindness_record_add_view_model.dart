@@ -1,20 +1,12 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
-// Package imports:
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 // Project imports:
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
 
 /// やさしさ記録追加のViewModel
 class KindnessRecordAddViewModel extends ChangeNotifier {
-  final KindnessRecordRepository _repository;
-  final KindnessGiverRepository _kindnessGiverRepository;
-
   // 状態プロパティ
   List<KindnessGiver> _kindnessGivers = const [];
   KindnessGiver? _selectedKindnessGiver;
@@ -24,10 +16,6 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
-
-  KindnessRecordAddViewModel()
-    : _repository = KindnessRecordRepository(),
-      _kindnessGiverRepository = KindnessGiverRepository();
 
   // ゲッター
   List<KindnessGiver> get kindnessGivers => _kindnessGivers;
@@ -46,7 +34,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
+      _kindnessGivers = await KindnessRecord.fetchKindnessGiversForRecordAdd();
       if (_kindnessGivers.isNotEmpty) {
         _selectedKindnessGiver = _kindnessGivers.first;
       }
@@ -54,7 +42,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'メンバー一覧の取得に失敗しました';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }
@@ -73,12 +61,6 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
 
   /// やさしさ記録を保存
   Future<void> saveKindnessRecord() async {
-    if (_content.trim().isEmpty) {
-      _errorMessage = 'やさしさの内容を入力してください';
-      notifyListeners();
-      return;
-    }
-
     if (_selectedKindnessGiver == null) {
       _errorMessage = 'メンバーを選択してください';
       notifyListeners();
@@ -90,24 +72,10 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
-
-      final kindnessRecord = KindnessRecord(
-        userId: user.id,
-        giverId: _selectedKindnessGiver!.id,
-        content: _content.trim(),
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        giverName: _selectedKindnessGiver!.giverName,
-        giverAvatarUrl: _selectedKindnessGiver!.avatarUrl,
-        giverCategory: _selectedKindnessGiver!.relationshipName ?? '',
-        giverGender: _selectedKindnessGiver!.genderName ?? '',
+      await KindnessRecord.createKindnessRecord(
+        content: _content,
+        selectedKindnessGiver: _selectedKindnessGiver!,
       );
-
-      await _repository.saveKindnessRecord(kindnessRecord);
 
       _isSaving = false;
       _successMessage = 'やさしさ記録を保存しました';
@@ -115,7 +83,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isSaving = false;
-      _errorMessage = 'やさしさ記録の保存に失敗しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }

@@ -3,18 +3,13 @@ import 'package:flutter/foundation.dart';
 
 // Project imports:
 import '../../models/kindness_record.dart';
-import '../../repositories/kindness_record_repository.dart';
 
 /// やさしさ記録一覧のViewModel
 class KindnessRecordListViewModel extends ChangeNotifier {
-  final KindnessRecordRepository _repository;
-
   // 状態プロパティ
   List<KindnessRecord> _kindnessRecords = const [];
   bool _isLoading = false;
   String? _errorMessage;
-
-  KindnessRecordListViewModel() : _repository = KindnessRecordRepository();
 
   // ゲッター
   List<KindnessRecord> get kindnessRecords => _kindnessRecords;
@@ -28,12 +23,12 @@ class KindnessRecordListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _kindnessRecords = await _repository.fetchKindnessRecords();
+      _kindnessRecords = await KindnessRecord.fetchKindnessRecords();
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'やさしさ記録の取得に失敗しました';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }

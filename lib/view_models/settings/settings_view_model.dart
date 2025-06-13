@@ -1,13 +1,11 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
-// Repository imports:
-import '../../repositories/auth_repository.dart';
+// Project imports:
+import '../../models/settings_model.dart';
 
 /// 設定のViewModel
 class SettingsViewModel extends ChangeNotifier {
-  final AuthRepository _authRepository = AuthRepository();
-
   // 状態プロパティ
   bool _isLoading = false;
   String? _errorMessage;
@@ -25,13 +23,12 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 設定データの読み込みなど
-      await Future.delayed(Duration(seconds: 1)); // 模擬的な処理
+      await Settings.initialize();
       _isLoading = false;
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _errorMessage = '設定の読み込みに失敗しました';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }
@@ -44,13 +41,13 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _authRepository.signOut();
+      await Settings.signOut();
       _isLoading = false;
       _successMessage = 'ログアウトしました';
       notifyListeners();
     } catch (e) {
       _isLoading = false;
-      _errorMessage = 'ログアウトに失敗しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
     }
   }

@@ -1,22 +1,11 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
 
-// Package imports:
-import 'package:supabase_flutter/supabase_flutter.dart';
-
 // Project imports:
-import '../../models/kindness_giver.dart';
-import '../../models/kindness_record.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
-import '../../repositories/tutorial_repository.dart';
+import '../../models/tutorial_model.dart';
 
 /// チュートリアルのViewModel
 class TutorialViewModel extends ChangeNotifier {
-  final KindnessGiverRepository _kindnessGiverRepository;
-  final TutorialRepository _tutorialRepository;
-  final KindnessRecordRepository _kindnessRecordRepository;
-
   // 状態プロパティ
   int _currentPage = 0;
   String _kindnessGiverName = '';
@@ -38,16 +27,12 @@ class TutorialViewModel extends ChangeNotifier {
   static const int kindnessRecordPageIndex = 2;
   static const int reflectionSettingPageIndex = 3;
 
-  // 遅延時間の定数
-  static const int _reflectionSaveDelayMs = 500;
-
   // アニメーション関連の定数
   static const int pageAnimationDurationMs = 300;
 
-  TutorialViewModel()
-    : _kindnessGiverRepository = KindnessGiverRepository(),
-      _tutorialRepository = TutorialRepository(),
-      _kindnessRecordRepository = KindnessRecordRepository();
+  TutorialViewModel() {
+    // Initialize any necessary fields
+  }
 
   // ゲッター
   int get currentPage => _currentPage;
@@ -101,46 +86,23 @@ class TutorialViewModel extends ChangeNotifier {
   }
 
   Future<bool> recordKindness() async {
-    if (_kindnessContent.trim().isEmpty) {
-      return true;
-    }
-
     _isRecordingKindness = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
-
-      final kindnessGivers =
-          await _kindnessGiverRepository.fetchKindnessGivers();
-      if (kindnessGivers.isEmpty) {
-        throw Exception('メンバーが見つかりません');
-      }
-
-      final kindnessGiver = kindnessGivers.first;
-      final kindnessRecord = KindnessRecord(
-        userId: user.id,
-        giverId: kindnessGiver.id,
-        content: _kindnessContent,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        giverName: kindnessGiver.giverName,
-        giverAvatarUrl: kindnessGiver.avatarUrl,
-        giverCategory: kindnessGiver.relationshipName ?? _selectedRelation,
-        giverGender: kindnessGiver.genderName ?? _selectedGender,
+      await Tutorial.recordTutorialKindness(
+        kindnessContent: _kindnessContent,
+        selectedGender: _selectedGender,
+        selectedRelation: _selectedRelation,
       );
 
-      await _kindnessRecordRepository.saveKindnessRecord(kindnessRecord);
       _isRecordingKindness = false;
       notifyListeners();
       return true;
     } catch (e) {
       _isRecordingKindness = false;
-      _errorMessage = '優しさの記録に失敗しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
       return false;
     }
@@ -152,72 +114,39 @@ class TutorialViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
-
-      await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
-      print('リフレクション頻度を保存しました: $_selectedReflectionFrequency');
+      await Tutorial.saveReflectionSettings(
+        selectedReflectionFrequency: _selectedReflectionFrequency,
+      );
 
       _isSettingReflection = false;
       notifyListeners();
       return true;
     } catch (e) {
       _isSettingReflection = false;
-      _errorMessage = 'リフレクション設定の保存に失敗しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
       return false;
     }
   }
 
   Future<bool> completeTutorial() async {
-    if (_kindnessGiverName.trim().isEmpty) {
-      _errorMessage = '名前を入力してください';
-      notifyListeners();
-      return false;
-    }
-
     _isCompleting = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
-
-      final genderId = await _kindnessGiverRepository.getGenderIdByName(
-        _selectedGender,
+      await Tutorial.completeTutorial(
+        kindnessGiverName: _kindnessGiverName,
+        selectedGender: _selectedGender,
+        selectedRelation: _selectedRelation,
       );
-      final relationshipId = await _kindnessGiverRepository
-          .getRelationshipIdByName(_selectedRelation);
-
-      if (genderId == null) {
-        throw Exception('選択された性別が見つかりません: $_selectedGender');
-      }
-
-      if (relationshipId == null) {
-        throw Exception('選択された関係性が見つかりません: $_selectedRelation');
-      }
-
-      final kindnessGiver = KindnessGiver.create(
-        userId: user.id,
-        giverName: _kindnessGiverName,
-        relationshipId: relationshipId,
-        genderId: genderId,
-      );
-
-      await _kindnessGiverRepository.createKindnessGiver(kindnessGiver);
-      await _tutorialRepository.markTutorialCompleted();
 
       _isCompleting = false;
       notifyListeners();
       return true;
     } catch (e) {
       _isCompleting = false;
-      _errorMessage = 'メンバーの登録に失敗しました: ${e.toString()}';
+      _errorMessage = e.toString();
       notifyListeners();
       return false;
     }
@@ -314,15 +243,6 @@ class TutorialViewModel extends ChangeNotifier {
 
   /// 頻度の説明文を取得
   String getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return '毎週、受け取った優しさを振り返ります';
-      case '2週に1回':
-        return '2週間ごとに振り返りの時間をお届けします';
-      case '月に1回':
-        return '月末に1ヶ月分の優しさをまとめて振り返ります';
-      default:
-        return '';
-    }
+    return Tutorial.getFrequencyDescription(frequency);
   }
 }
