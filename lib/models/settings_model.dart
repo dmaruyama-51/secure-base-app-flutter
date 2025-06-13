@@ -6,7 +6,6 @@ class Settings {
   static Future<void> initialize() async {
     try {
       // 設定データの読み込みなど
-      await Future.delayed(Duration(seconds: 1)); // 模擬的な処理
     } catch (e) {
       throw Exception('設定の読み込みに失敗しました: $e');
     }

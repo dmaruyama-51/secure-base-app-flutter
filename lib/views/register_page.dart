@@ -3,11 +3,12 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:go_router/go_router.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
 
 // Project imports:
-import 'package:secure_base/utils/constants.dart';
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
+import '../view_models/auth/auth_view_model.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({Key? key}) : super(key: key);
@@ -21,40 +22,9 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  bool _isLoading = false;
-
   final _formKey = GlobalKey<FormState>();
-
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  Future<void> _signUp() async {
-    final isValid = _formKey.currentState!.validate();
-    if (!isValid) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final email = _emailController.text;
-      final password = _passwordController.text;
-      await supabase.auth.signUp(email: email, password: password);
-      context.go('/tutorial');
-    } on AuthException catch (error) {
-      if (mounted) context.showErrorSnackBar(message: error.message);
-    } catch (error) {
-      if (mounted) context.showErrorSnackBar(message: unexpectedErrorMessage);
-    }
-
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -65,35 +35,58 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ロゴとタイトル
-                  _buildHeader(),
+    return ChangeNotifierProvider(
+      create: (_) => AuthViewModel(),
+      child: Consumer<AuthViewModel>(
+        builder: (context, viewModel, child) {
+          // エラーメッセージの表示
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.errorMessage != null) {
+              context.showErrorSnackBar(message: viewModel.errorMessage!);
+              viewModel.clearNavigation();
+            }
+          });
 
-                  const SizedBox(height: 48),
+          // 成功時のナビゲーション
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.shouldNavigate && viewModel.navigationPath != null) {
+              context.go(viewModel.navigationPath!);
+              viewModel.clearNavigation();
+            }
+          });
 
-                  // 新規登録フォーム
-                  _buildRegisterForm(),
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // ロゴとタイトル
+                        _buildHeader(),
 
-                  const SizedBox(height: 32),
+                        const SizedBox(height: 48),
 
-                  // 区切り線とログインリンク
-                  _buildLoginSection(),
-                ],
+                        // 新規登録フォーム
+                        _buildRegisterForm(viewModel),
+
+                        const SizedBox(height: 32),
+
+                        // 区切り線とログインリンク
+                        _buildLoginSection(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -157,7 +150,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildRegisterForm() {
+  Widget _buildRegisterForm(AuthViewModel viewModel) {
     return Form(
       key: _formKey,
       child: Column(
@@ -198,7 +191,8 @@ class _RegisterPageState extends State<RegisterPage> {
           SizedBox(
             height: 44,
             child: ElevatedButton(
-              onPressed: _isLoading ? null : _signUp,
+              onPressed:
+                  viewModel.isLoading ? null : () => _handleSignUp(viewModel),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: AppColors.textOnPrimary,
@@ -208,7 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
               child:
-                  _isLoading
+                  viewModel.isLoading
                       ? const SizedBox(
                         height: 16,
                         width: 16,
@@ -230,6 +224,18 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _handleSignUp(AuthViewModel viewModel) {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) {
+      return;
+    }
+
+    viewModel.signUp(
+      email: _emailController.text,
+      password: _passwordController.text,
     );
   }
 
