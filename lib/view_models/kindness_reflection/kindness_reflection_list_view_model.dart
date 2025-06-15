@@ -19,6 +19,11 @@ class ReflectionListViewModel extends ChangeNotifier {
   bool get hasMore => _hasMore;
   bool get isEmpty => _reflections.isEmpty && !_isLoading;
 
+  /// リフレクションを「最新」と「過去」にグループ分け（Modelに委譲）
+  Map<String, List<KindnessReflection>> getGroupedReflections() {
+    return KindnessReflection.groupReflections(_reflections);
+  }
+
   /// 初回データ読み込み
   Future<void> loadReflections() async {
     if (_isLoading) return;

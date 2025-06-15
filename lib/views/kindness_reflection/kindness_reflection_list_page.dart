@@ -76,14 +76,11 @@ class ReflectionListPageState extends State<ReflectionListPage> {
 
   PreferredSizeWidget _buildAppBar() {
     return AppBar(
-      title: const Text(
-        'リフレクション',
-        style: TextStyle(fontWeight: FontWeight.w600, color: AppColors.text),
-      ),
       backgroundColor: AppColors.background,
       elevation: 0,
-      centerTitle: true,
       automaticallyImplyLeading: false,
+      centerTitle: false,
+      toolbarHeight: 32.0,
     );
   }
 
@@ -93,33 +90,175 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     }
 
     if (viewModel.isEmpty) {
-      return _buildEmptyState();
+      return SingleChildScrollView(
+        padding: const EdgeInsets.only(
+          left: 20.0,
+          right: 20.0,
+          top: 8.0,
+          bottom: 20.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ヘッダー
+            _buildHeader(),
+            const SizedBox(height: 24),
+            // 空の状態
+            _buildEmptyState(),
+          ],
+        ),
+      );
     }
 
     return RefreshIndicator(
       onRefresh: viewModel.refreshReflections,
       color: AppColors.primary,
-      child: ListView.builder(
+      child: SingleChildScrollView(
         controller: _scrollController,
-        padding: const EdgeInsets.all(16),
-        itemCount: viewModel.reflections.length + (viewModel.hasMore ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= viewModel.reflections.length) {
-            return _buildLoadingItem();
-          }
+        padding: const EdgeInsets.only(
+          left: 20.0,
+          right: 20.0,
+          top: 8.0,
+          bottom: 20.0,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ヘッダー
+            _buildHeader(),
+            const SizedBox(height: 24),
 
-          final reflection = viewModel.reflections[index];
-          return Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: ReflectionListItem(
-              reflection: reflection,
-              onTap: () {
-                // TODO: リフレクション詳細ページに遷移
-                print('Reflection tapped: ${reflection.id}');
-              },
+            // リスト
+            _buildReflectionsList(viewModel),
+
+            // ローディングインジケーター（追加データ読み込み中）
+            if (viewModel.isLoading && viewModel.reflections.isNotEmpty)
+              const Padding(
+                padding: EdgeInsets.all(16.0),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReflectionsList(ReflectionListViewModel viewModel) {
+    final groupedReflections = viewModel.getGroupedReflections();
+    final latestReflections = groupedReflections['latest'] ?? [];
+    final pastReflections = groupedReflections['past'] ?? [];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // 最新のリフレクション
+        if (latestReflections.isNotEmpty) ...[
+          _buildSectionHeader('最新のリフレクション', Icons.star),
+          ...latestReflections.map(
+            (reflection) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ReflectionListItem(
+                reflection: reflection,
+                onTap: () {
+                  // TODO: リフレクション詳細ページに遷移
+                  print('Reflection tapped: ${reflection.id}');
+                },
+              ),
             ),
-          );
-        },
+          ),
+        ],
+
+        // 過去のリフレクション
+        if (pastReflections.isNotEmpty) ...[
+          if (latestReflections.isNotEmpty) const SizedBox(height: 16),
+          _buildSectionHeader('過去のリフレクション', Icons.history),
+          ...pastReflections.map(
+            (reflection) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: ReflectionListItem(
+                reflection: reflection,
+                onTap: () {
+                  // TODO: リフレクション詳細ページに遷移
+                  print('Reflection tapped: ${reflection.id}');
+                },
+              ),
+            ),
+          ),
+        ],
+
+        // ページネーション用のローディング
+        if (viewModel.hasMore) _buildLoadingItem(),
+      ],
+    );
+  }
+
+  Widget _buildSectionHeader(String title, IconData icon) {
+    return Container(
+      margin: const EdgeInsets.only(top: 16, bottom: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary, size: 18),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+              color: AppColors.text,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    final theme = Theme.of(context);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primary.withOpacity(0.05),
+            AppColors.primary.withOpacity(0.02),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.15),
+          width: 1.5,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
+              const SizedBox(width: 8),
+              Text(
+                'リフレクション',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.primary,
+                  fontSize: 14,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '安全基地メンバーから受け取ったやさしさを振り返りましょう',
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: AppColors.textLight,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
       ),
     );
   }
