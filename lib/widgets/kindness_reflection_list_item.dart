@@ -73,14 +73,6 @@ class ReflectionListItem extends StatelessWidget {
                             color: AppColors.text,
                           ),
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '作成日: ${dateFormat.format(reflection.createdAt)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textLight,
-                            fontSize: 11,
-                          ),
-                        ),
                       ],
                     ),
                   ),

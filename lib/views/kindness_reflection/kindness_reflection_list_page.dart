@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Package imports:
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 
 // Project imports:
 import '../../utils/app_colors.dart';
@@ -10,6 +11,7 @@ import '../../utils/constants.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_reflection_list_item.dart';
+import 'kindness_reflection_detail_page.dart';
 
 class ReflectionListPage extends StatefulWidget {
   const ReflectionListPage({Key? key}) : super(key: key);
@@ -160,8 +162,11 @@ class ReflectionListPageState extends State<ReflectionListPage> {
               child: ReflectionListItem(
                 reflection: reflection,
                 onTap: () {
-                  // TODO: リフレクション詳細ページに遷移
-                  print('Reflection tapped: ${reflection.id}');
+                  // リフレクション詳細ページに遷移（URLパラメータ付き）
+                  context.go(
+                    '/reflections/detail/${reflection.id}',
+                    extra: reflection,
+                  );
                 },
               ),
             ),
@@ -178,8 +183,11 @@ class ReflectionListPageState extends State<ReflectionListPage> {
               child: ReflectionListItem(
                 reflection: reflection,
                 onTap: () {
-                  // TODO: リフレクション詳細ページに遷移
-                  print('Reflection tapped: ${reflection.id}');
+                  // リフレクション詳細ページに遷移（URLパラメータ付き）
+                  context.go(
+                    '/reflections/detail/${reflection.id}',
+                    extra: reflection,
+                  );
                 },
               ),
             ),
@@ -251,7 +259,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '安全基地メンバーから受け取ったやさしさを振り返りましょう',
+            '安全基地メンバーからのやさしさのまとめをお届けします',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,
