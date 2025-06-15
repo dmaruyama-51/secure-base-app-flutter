@@ -16,6 +16,7 @@ import '../views/login_page.dart';
 import '../views/register_page.dart';
 import '../views/settings/settings_page.dart';
 import '../views/tutorial/tutorial_page.dart';
+import '../views/kindness_reflection/kindness_reflection_list_page.dart';
 
 /// 認証とチュートリアルのガード処理
 Future<String?> _authAndTutorialGuard(String location) async {
@@ -96,6 +97,11 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
+    ),
+    // リフレクション系のルート（認証必須）
+    GoRoute(
+      path: '/reflections',
+      builder: (context, state) => const ReflectionListPage(),
     ),
   ],
 );
