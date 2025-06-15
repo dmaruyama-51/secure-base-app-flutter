@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
 import '../utils/constants.dart';
+import 'repositories/auth_repository.dart';
 
 /// 認証結果を表すクラス
 class AuthResult {
@@ -22,6 +23,8 @@ class AuthResult {
 
 /// 認証関連のビジネスロジックを管理するModel
 class AuthModel {
+  static final AuthRepository _authRepository = AuthRepository();
+
   /// ログイン処理
   static Future<AuthResult> signIn({
     required String email,
@@ -29,8 +32,8 @@ class AuthModel {
     String? redirectPath,
   }) async {
     try {
-      // Supabase認証
-      await supabase.auth.signInWithPassword(email: email, password: password);
+      // AuthRepositoryを使用してログイン処理
+      await _authRepository.signIn(email: email, password: password);
 
       // 成功時のリダイレクトパスを決定
       final destination = redirectPath ?? '/';
@@ -49,8 +52,8 @@ class AuthModel {
     required String password,
   }) async {
     try {
-      // Supabase認証
-      await supabase.auth.signUp(email: email, password: password);
+      // AuthRepositoryを使用してサインアップ処理
+      await _authRepository.signUp(email: email, password: password);
 
       // 成功時はチュートリアルページにリダイレクト
       return AuthResult.success(redirectPath: '/tutorial');
