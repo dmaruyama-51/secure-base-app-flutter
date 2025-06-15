@@ -73,17 +73,7 @@ class _KindnessGiverCardState extends State<KindnessGiverCard>
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors:
-                        _isPressed
-                            ? [
-                              Colors.white.withOpacity(0.95),
-                              theme.colorScheme.primary.withOpacity(0.02),
-                            ]
-                            : [Colors.white, Colors.white.withOpacity(0.98)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(

@@ -280,44 +280,54 @@ class ReflectionListPageState extends State<ReflectionListPage> {
   }
 
   Widget _buildEmptyState() {
-    return Center(
+    final theme = Theme.of(context);
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 1),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.secondary.withOpacity(0.8),
+          width: 1,
+        ),
+      ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            width: 120,
-            height: 120,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [
-                  AppColors.primaryLight.withOpacity(0.3),
-                  AppColors.secondary.withOpacity(0.1),
-                ],
-              ),
+              color: theme.colorScheme.secondary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(32),
             ),
             child: Icon(
               Icons.auto_awesome,
-              size: 48,
-              color: AppColors.primary.withOpacity(0.7),
+              size: 32,
+              color: AppColors.primary.withOpacity(0.6),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 16),
           Text(
             'まだリフレクションがありません',
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: AppColors.text,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             'リフレクションは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
             textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              height: 1.5,
-            ),
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
           ),
         ],
       ),
