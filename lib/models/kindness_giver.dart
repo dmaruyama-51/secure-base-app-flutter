@@ -113,21 +113,23 @@ class KindnessGiver {
   }) async {
     final repo = repository ?? KindnessGiverRepository();
 
-    // バリデーション
-    _validateBasicInput(giverName, genderName, relationshipName);
-
     // マスターデータからIDを取得
     final genderId = await repo.getGenderIdByName(genderName);
     final relationshipId = await repo.getRelationshipIdByName(relationshipName);
 
-    _validateMasterData(genderName, genderId, relationshipName, relationshipId);
+    if (genderId == null) {
+      throw Exception('選択された性別が見つかりません: $genderName');
+    }
+    if (relationshipId == null) {
+      throw Exception('選択された関係性が見つかりません: $relationshipName');
+    }
 
     // エンティティ作成
     final kindnessGiver = KindnessGiver.create(
       userId: '', // Repository内で現在のユーザーIDを設定
       giverName: giverName.trim(),
-      relationshipId: relationshipId!,
-      genderId: genderId!,
+      relationshipId: relationshipId,
+      genderId: genderId,
     );
 
     // 保存
@@ -150,20 +152,22 @@ class KindnessGiver {
   }) async {
     final repo = repository ?? KindnessGiverRepository();
 
-    // バリデーション
-    _validateBasicInput(giverName, genderName, relationshipName);
-
     // マスターデータからIDを取得
     final genderId = await repo.getGenderIdByName(genderName);
     final relationshipId = await repo.getRelationshipIdByName(relationshipName);
 
-    _validateMasterData(genderName, genderId, relationshipName, relationshipId);
+    if (genderId == null) {
+      throw Exception('選択された性別が見つかりません: $genderName');
+    }
+    if (relationshipId == null) {
+      throw Exception('選択された関係性が見つかりません: $relationshipName');
+    }
 
     // エンティティ更新
     final updatedKindnessGiver = originalKindnessGiver.copyWith(
       giverName: giverName.trim(),
-      genderId: genderId!,
-      relationshipId: relationshipId!,
+      genderId: genderId,
+      relationshipId: relationshipId,
     );
 
     // 保存
@@ -197,38 +201,6 @@ class KindnessGiver {
       }
     } catch (e) {
       throw Exception('やさしさをくれる人の削除に失敗しました: $e');
-    }
-  }
-
-  /// 基本的な入力値のバリデーション
-  static void _validateBasicInput(
-    String giverName,
-    String genderName,
-    String relationshipName,
-  ) {
-    if (giverName.trim().isEmpty) {
-      throw ValidationException('名前を入力してください');
-    }
-    if (genderName.isEmpty) {
-      throw ValidationException('性別を選択してください');
-    }
-    if (relationshipName.isEmpty) {
-      throw ValidationException('関係性を選択してください');
-    }
-  }
-
-  /// マスターデータのバリデーション
-  static void _validateMasterData(
-    String genderName,
-    int? genderId,
-    String relationshipName,
-    int? relationshipId,
-  ) {
-    if (genderId == null) {
-      throw ValidationException('選択された性別が見つかりません: $genderName');
-    }
-    if (relationshipId == null) {
-      throw ValidationException('選択された関係性が見つかりません: $relationshipName');
     }
   }
 }

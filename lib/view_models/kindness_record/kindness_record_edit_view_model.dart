@@ -5,6 +5,16 @@ import 'package:flutter/foundation.dart';
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
 
+/// バリデーションエラー用の例外クラス（KindnessRecord用）
+class KindnessRecordValidationException implements Exception {
+  final String message;
+
+  KindnessRecordValidationException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// やさしさ記録編集のViewModel
 class KindnessRecordEditViewModel extends ChangeNotifier {
   // 状態プロパティ
@@ -71,6 +81,16 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// やさしさ記録の入力バリデーション
+  void _validateKindnessRecordInput() {
+    if (_content.trim().isEmpty) {
+      throw KindnessRecordValidationException('やさしさの内容を入力してください');
+    }
+    if (_selectedKindnessGiver == null) {
+      throw KindnessRecordValidationException('メンバーを選択してください');
+    }
+  }
+
   /// やさしさ記録を更新
   Future<void> updateKindnessRecord() async {
     if (_originalRecord == null) {
@@ -84,10 +104,13 @@ class KindnessRecordEditViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // バリデーション
+      _validateKindnessRecordInput();
+
       await KindnessRecord.updateKindnessRecord(
         originalRecord: _originalRecord!,
         content: _content,
-        selectedKindnessGiver: _selectedKindnessGiver,
+        selectedKindnessGiver: _selectedKindnessGiver!,
       );
 
       _isSaving = false;

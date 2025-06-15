@@ -4,6 +4,16 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import '../../models/tutorial_model.dart';
 
+/// チュートリアル関連のバリデーションエラー用の例外クラス
+class TutorialValidationException implements Exception {
+  final String message;
+
+  TutorialValidationException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// チュートリアルのViewModel
 class TutorialViewModel extends ChangeNotifier {
   // =============================================================================
@@ -66,6 +76,13 @@ class TutorialViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get shouldNavigateNext => _shouldNavigateNext;
   bool get shouldNavigateToMain => _shouldNavigateToMain;
+
+  /// チュートリアル完了時のバリデーション
+  void _validateTutorialCompletion() {
+    if (_kindnessGiverName.trim().isEmpty) {
+      throw TutorialValidationException('名前を入力してください');
+    }
+  }
 
   void nextPage() {
     if (_currentPage < lastPageIndex) {
@@ -156,6 +173,9 @@ class TutorialViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // バリデーション
+      _validateTutorialCompletion();
+
       await Tutorial.completeTutorial(
         kindnessGiverName: _kindnessGiverName,
         selectedGender: _selectedGender,

@@ -4,6 +4,16 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import '../../models/kindness_giver.dart';
 
+/// バリデーションエラー用の例外クラス（KindnessGiver用）
+class KindnessGiverValidationException implements Exception {
+  final String message;
+
+  KindnessGiverValidationException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// メンバー編集のViewModel
 class KindnessGiverEditViewModel extends ChangeNotifier {
   // 状態プロパティ
@@ -34,6 +44,19 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
 
+  /// 基本的な入力値のバリデーション
+  void _validateBasicInput() {
+    if (_name.trim().isEmpty) {
+      throw KindnessGiverValidationException('名前を入力してください');
+    }
+    if (_selectedGender.isEmpty) {
+      throw KindnessGiverValidationException('性別を選択してください');
+    }
+    if (_selectedRelation.isEmpty) {
+      throw KindnessGiverValidationException('関係性を選択してください');
+    }
+  }
+
   /// 名前を更新
   void updateName(String name) {
     _name = name;
@@ -61,6 +84,9 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
+      // バリデーション
+      _validateBasicInput();
+
       await KindnessGiver.updateKindnessGiver(
         originalKindnessGiver: _originalKindnessGiver!,
         giverName: _name,

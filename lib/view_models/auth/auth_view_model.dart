@@ -4,6 +4,16 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import '../../models/auth_model.dart';
 
+/// 認証バリデーションエラー用の例外クラス
+class AuthValidationException implements Exception {
+  final String message;
+
+  AuthValidationException(this.message);
+
+  @override
+  String toString() => message;
+}
+
 /// 認証画面用のViewModel
 class AuthViewModel extends ChangeNotifier {
   // 状態プロパティ
@@ -25,6 +35,29 @@ class AuthViewModel extends ChangeNotifier {
   String? get navigationPath => _navigationPath;
   String? get emailError => _emailError;
   String? get passwordError => _passwordError;
+
+  /// ログイン用バリデーション
+  void _validateSignInInput(String email, String password) {
+    if (email.trim().isEmpty) {
+      throw AuthValidationException('メールアドレスを入力してください');
+    }
+    if (password.trim().isEmpty) {
+      throw AuthValidationException('パスワードを入力してください');
+    }
+  }
+
+  /// サインアップ用バリデーション
+  void _validateSignUpInput(String email, String password) {
+    if (email.trim().isEmpty) {
+      throw AuthValidationException('メールアドレスを入力してください');
+    }
+    if (password.trim().isEmpty) {
+      throw AuthValidationException('パスワードを入力してください');
+    }
+    if (password.length < 6) {
+      throw AuthValidationException('パスワードは6文字以上で入力してください');
+    }
+  }
 
   /// フォームバリデーション
   bool validateForm({required String email, required String password}) {
@@ -65,6 +98,9 @@ class AuthViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
+      // バリデーション
+      _validateSignInInput(email, password);
+
       final result = await AuthModel.signIn(
         email: email,
         password: password,
@@ -79,7 +115,11 @@ class AuthViewModel extends ChangeNotifier {
         _errorMessage = result.errorMessage;
       }
     } catch (e) {
-      _errorMessage = 'ログインに失敗しました';
+      if (e is AuthValidationException) {
+        _errorMessage = e.message;
+      } else {
+        _errorMessage = 'ログインに失敗しました';
+      }
     } finally {
       _setLoading(false);
     }
@@ -91,6 +131,9 @@ class AuthViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
+      // バリデーション
+      _validateSignUpInput(email, password);
+
       final result = await AuthModel.signUp(email: email, password: password);
 
       if (result.isSuccess) {
@@ -101,7 +144,11 @@ class AuthViewModel extends ChangeNotifier {
         _errorMessage = result.errorMessage;
       }
     } catch (e) {
-      _errorMessage = 'アカウントの作成に失敗しました';
+      if (e is AuthValidationException) {
+        _errorMessage = e.message;
+      } else {
+        _errorMessage = 'アカウントの作成に失敗しました';
+      }
     } finally {
       _setLoading(false);
     }

@@ -6,16 +6,6 @@ import 'kindness_giver.dart';
 import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';
 
-/// バリデーションエラー用の例外クラス（KindnessRecord用）
-class KindnessRecordValidationException implements Exception {
-  final String message;
-
-  KindnessRecordValidationException(this.message);
-
-  @override
-  String toString() => message;
-}
-
 class KindnessRecord {
   final int? id;
   final String userId;
@@ -62,25 +52,22 @@ class KindnessRecord {
   /// 新しいやさしさ記録を作成する
   static Future<KindnessRecord> createKindnessRecord({
     required String content,
-    required KindnessGiver? selectedKindnessGiver,
+    required KindnessGiver selectedKindnessGiver,
     KindnessRecordRepository? repository,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
 
-    // バリデーション
-    _validateKindnessRecordInput(content, selectedKindnessGiver);
-
     // 現在のユーザーを取得
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      throw KindnessRecordValidationException('ユーザーが認証されていません');
+      throw Exception('ユーザーが認証されていません');
     }
 
     // レコード作成
     final now = DateTime.now();
     final kindnessRecord = KindnessRecord(
       userId: user.id,
-      giverId: selectedKindnessGiver!.id,
+      giverId: selectedKindnessGiver.id,
       content: content.trim(),
       createdAt: now,
       updatedAt: now,
@@ -102,29 +89,26 @@ class KindnessRecord {
   static Future<KindnessRecord> updateKindnessRecord({
     required KindnessRecord originalRecord,
     required String content,
-    required KindnessGiver? selectedKindnessGiver,
+    required KindnessGiver selectedKindnessGiver,
     KindnessRecordRepository? repository,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
 
-    // バリデーション
-    _validateKindnessRecordInput(content, selectedKindnessGiver);
-
     if (originalRecord.id == null) {
-      throw KindnessRecordValidationException('編集対象のレコードが見つかりません');
+      throw Exception('編集対象のレコードが見つかりません');
     }
 
     // 現在のユーザーを取得
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      throw KindnessRecordValidationException('ユーザーが認証されていません');
+      throw Exception('ユーザーが認証されていません');
     }
 
     // レコード更新
     final updatedRecord = KindnessRecord(
       id: originalRecord.id,
       userId: user.id,
-      giverId: selectedKindnessGiver!.id,
+      giverId: selectedKindnessGiver.id,
       content: content.trim(),
       createdAt: originalRecord.createdAt,
       updatedAt: DateTime.now(),
@@ -198,19 +182,6 @@ class KindnessRecord {
       }
     } catch (e) {
       throw Exception('やさしさ記録の削除に失敗しました: $e');
-    }
-  }
-
-  /// やさしさ記録の入力バリデーション
-  static void _validateKindnessRecordInput(
-    String content,
-    KindnessGiver? selectedKindnessGiver,
-  ) {
-    if (content.trim().isEmpty) {
-      throw KindnessRecordValidationException('やさしさの内容を入力してください');
-    }
-    if (selectedKindnessGiver == null) {
-      throw KindnessRecordValidationException('メンバーを選択してください');
     }
   }
 }

@@ -4,16 +4,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Project imports:
 import '../utils/constants.dart';
 
-/// 認証バリデーションエラー用の例外クラス
-class AuthValidationException implements Exception {
-  final String message;
-
-  AuthValidationException(this.message);
-
-  @override
-  String toString() => message;
-}
-
 /// 認証結果を表すクラス
 class AuthResult {
   final bool isSuccess;
@@ -39,9 +29,6 @@ class AuthModel {
     String? redirectPath,
   }) async {
     try {
-      // 入力バリデーション
-      _validateSignInInput(email, password);
-
       // Supabase認証
       await supabase.auth.signInWithPassword(email: email, password: password);
 
@@ -52,9 +39,6 @@ class AuthModel {
     } on AuthException catch (error) {
       return AuthResult.failure(error.message);
     } catch (error) {
-      if (error is AuthValidationException) {
-        return AuthResult.failure(error.message);
-      }
       return AuthResult.failure(unexpectedErrorMessage);
     }
   }
@@ -65,9 +49,6 @@ class AuthModel {
     required String password,
   }) async {
     try {
-      // 入力バリデーション
-      _validateSignUpInput(email, password);
-
       // Supabase認証
       await supabase.auth.signUp(email: email, password: password);
 
@@ -76,33 +57,7 @@ class AuthModel {
     } on AuthException catch (error) {
       return AuthResult.failure(error.message);
     } catch (error) {
-      if (error is AuthValidationException) {
-        return AuthResult.failure(error.message);
-      }
       return AuthResult.failure(unexpectedErrorMessage);
-    }
-  }
-
-  /// ログイン用入力バリデーション
-  static void _validateSignInInput(String email, String password) {
-    if (email.trim().isEmpty) {
-      throw AuthValidationException('メールアドレスを入力してください');
-    }
-    if (password.trim().isEmpty) {
-      throw AuthValidationException('パスワードを入力してください');
-    }
-  }
-
-  /// サインアップ用入力バリデーション
-  static void _validateSignUpInput(String email, String password) {
-    if (email.trim().isEmpty) {
-      throw AuthValidationException('メールアドレスを入力してください');
-    }
-    if (password.trim().isEmpty) {
-      throw AuthValidationException('パスワードを入力してください');
-    }
-    if (password.length < 6) {
-      throw AuthValidationException('パスワードは6文字以上で入力してください');
     }
   }
 }

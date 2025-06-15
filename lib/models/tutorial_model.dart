@@ -8,16 +8,6 @@ import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';
 import 'repositories/tutorial_repository.dart';
 
-/// チュートリアル関連のバリデーションエラー用の例外クラス
-class TutorialValidationException implements Exception {
-  final String message;
-
-  TutorialValidationException(this.message);
-
-  @override
-  String toString() => message;
-}
-
 /// チュートリアル機能のビジネスロジックを担当するクラス
 class Tutorial {
   // 遅延時間の定数
@@ -32,15 +22,10 @@ class Tutorial {
   }) async {
     final repo = repository ?? KindnessGiverRepository();
 
-    // バリデーション
-    if (kindnessGiverName.trim().isEmpty) {
-      throw TutorialValidationException('名前を入力してください');
-    }
-
     // 現在のユーザーを取得
     final user = Supabase.instance.client.auth.currentUser;
     if (user == null) {
-      throw TutorialValidationException('ユーザーが認証されていません');
+      throw Exception('ユーザーが認証されていません');
     }
 
     try {
@@ -51,19 +36,17 @@ class Tutorial {
       );
 
       if (genderId == null) {
-        throw TutorialValidationException('選択された性別が見つかりません: $selectedGender');
+        throw Exception('選択された性別が見つかりません: $selectedGender');
       }
 
       if (relationshipId == null) {
-        throw TutorialValidationException(
-          '選択された関係性が見つかりません: $selectedRelation',
-        );
+        throw Exception('選択された関係性が見つかりません: $selectedRelation');
       }
 
       // KindnessGiver作成
       final kindnessGiver = KindnessGiver.create(
         userId: user.id,
-        giverName: kindnessGiverName,
+        giverName: kindnessGiverName.trim(),
         relationshipId: relationshipId,
         genderId: genderId,
       );
@@ -93,7 +76,7 @@ class Tutorial {
       // 現在のユーザーを取得
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
-        throw TutorialValidationException('ユーザーが認証されていません');
+        throw Exception('ユーザーが認証されていません');
       }
 
       // 作成されたKindnessGiverを取得
@@ -132,7 +115,7 @@ class Tutorial {
       // 現在のユーザーを取得
       final user = Supabase.instance.client.auth.currentUser;
       if (user == null) {
-        throw TutorialValidationException('ユーザーが認証されていません');
+        throw Exception('ユーザーが認証されていません');
       }
 
       // 保存の遅延（UI効果）
