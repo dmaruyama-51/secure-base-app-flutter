@@ -119,14 +119,6 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
         icon: Icon(Icons.arrow_back, color: AppColors.text),
         onPressed: () => context.pop(),
       ),
-      title: Text(
-        'リフレクションレポート',
-        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-          fontWeight: FontWeight.w600,
-          color: AppColors.text,
-        ),
-      ),
-      centerTitle: true,
     );
   }
 

@@ -305,7 +305,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            '小さなことでも大切な記録になります：\n・笑顔で挨拶してくれた  ・体調を気遣ってくれた\n・話を最後まで聞いてくれた  ・手伝ってくれた',
+            '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.textLight,
               height: 1.4,

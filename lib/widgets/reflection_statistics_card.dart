@@ -74,7 +74,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '素敵な方に囲まれていますね',
+                      '気づいたやさしさの数だけ、毎日が少し豊かになります',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppColors.textLight,
                         fontSize: 11,
