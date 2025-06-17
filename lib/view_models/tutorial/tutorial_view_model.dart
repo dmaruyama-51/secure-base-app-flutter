@@ -1,21 +1,26 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../states/tutorial/tutorial_state.dart';
-import '../../repositories/tutorial_repository.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
-import '../../models/kindness_giver.dart';
-import '../../models/kindness_record.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
-import '../../providers/kindness_record/kindness_record_providers.dart';
-import '../../providers/tutorial_providers.dart';
+// Flutter imports:
+import 'package:flutter/foundation.dart';
 
-class TutorialViewModel extends StateNotifier<TutorialState> {
-  final KindnessGiverRepository _kindnessGiverRepository;
-  final TutorialRepository _tutorialRepository;
-  final KindnessRecordRepository _kindnessRecordRepository;
+// Project imports:
+import '../../models/tutorial_model.dart';
 
-  // チュートリアルページ関連の定数
+/// チュートリアル関連のバリデーションエラー用の例外クラス
+class TutorialValidationException implements Exception {
+  final String message;
+
+  TutorialValidationException(this.message);
+
+  @override
+  String toString() => message;
+}
+
+/// チュートリアルのViewModel
+class TutorialViewModel extends ChangeNotifier {
+  // =============================================================================
+  // 定数定義
+  // =============================================================================
+
+  // チュートリアルページ関連
   static const int totalPages = 4;
   static const int firstPageIndex = 0;
   static const int lastPageIndex = 3;
@@ -24,278 +29,294 @@ class TutorialViewModel extends StateNotifier<TutorialState> {
   static const int kindnessRecordPageIndex = 2;
   static const int reflectionSettingPageIndex = 3;
 
-  // 遅延時間の定数
-  static const int _reflectionSaveDelayMs = 500;
-
-  // アニメーション関連の定数
+  // アニメーション関連
   static const int pageAnimationDurationMs = 300;
 
-  TutorialViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required TutorialRepository tutorialRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  }) : _kindnessGiverRepository = kindnessGiverRepository,
-       _tutorialRepository = tutorialRepository,
-       _kindnessRecordRepository = kindnessRecordRepository,
-       super(const TutorialState());
+  // ボタンテキスト定義
+  static const Map<int, String> _nextButtonTexts = {
+    introductionPageIndex: '次へ',
+    memberRegistrationPageIndex: '次へ',
+    kindnessRecordPageIndex: '記録して次へ',
+    reflectionSettingPageIndex: 'チュートリアル完了',
+  };
+
+  // =============================================================================
+  // 状態プロパティ
+  // =============================================================================
+
+  int _currentPage = 0;
+  String _kindnessGiverName = '';
+  String _selectedGender = '女性';
+  String _selectedRelation = '家族';
+  String _kindnessContent = '';
+  String _selectedReflectionFrequency = '2週に1回';
+  bool _isCompleting = false;
+  bool _isRecordingKindness = false;
+  bool _isSettingReflection = false;
+  String? _errorMessage;
+
+  // ナビゲーション状態
+  bool _shouldNavigateNext = false;
+  bool _shouldNavigateToMain = false;
+
+  TutorialViewModel() {
+    // Initialize any necessary fields
+  }
+
+  // ゲッター
+  int get currentPage => _currentPage;
+  String get kindnessGiverName => _kindnessGiverName;
+  String get selectedGender => _selectedGender;
+  String get selectedRelation => _selectedRelation;
+  String get kindnessContent => _kindnessContent;
+  String get selectedReflectionFrequency => _selectedReflectionFrequency;
+  bool get isCompleting => _isCompleting;
+  bool get isRecordingKindness => _isRecordingKindness;
+  bool get isSettingReflection => _isSettingReflection;
+  String? get errorMessage => _errorMessage;
+  bool get shouldNavigateNext => _shouldNavigateNext;
+  bool get shouldNavigateToMain => _shouldNavigateToMain;
+
+  /// チュートリアル完了時のバリデーション
+  void _validateTutorialCompletion() {
+    if (_kindnessGiverName.trim().isEmpty) {
+      throw TutorialValidationException('名前を入力してください');
+    }
+  }
 
   void nextPage() {
-    if (state.currentPage < lastPageIndex) {
-      state = state.copyWith(currentPage: state.currentPage + 1);
+    if (_currentPage < lastPageIndex) {
+      _currentPage = _currentPage + 1;
+      notifyListeners();
     }
   }
 
   void previousPage() {
-    if (state.currentPage > firstPageIndex) {
-      state = state.copyWith(currentPage: state.currentPage - 1);
+    if (_currentPage > firstPageIndex) {
+      _currentPage = _currentPage - 1;
+      notifyListeners();
     }
   }
 
   void updateName(String name) {
-    state = state.copyWith(kindnessGiverName: name);
+    _kindnessGiverName = name;
+    notifyListeners();
   }
 
   void updateGender(String gender) {
-    state = state.copyWith(selectedGender: gender);
+    _selectedGender = gender;
+    notifyListeners();
   }
 
   void updateRelation(String relation) {
-    state = state.copyWith(selectedRelation: relation);
+    _selectedRelation = relation;
+    notifyListeners();
   }
 
   void updateKindnessContent(String content) {
-    state = state.copyWith(kindnessContent: content);
+    _kindnessContent = content;
+    notifyListeners();
   }
 
   void updateReflectionFrequency(String frequency) {
-    state = state.copyWith(selectedReflectionFrequency: frequency);
+    _selectedReflectionFrequency = frequency;
+    notifyListeners();
   }
 
   Future<bool> recordKindness() async {
-    if (state.kindnessContent.trim().isEmpty) {
-      return true;
-    }
-
-    state = state.copyWith(isRecordingKindness: true, errorMessage: null);
+    _isRecordingKindness = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
-
-      final kindnessGivers =
-          await _kindnessGiverRepository.fetchKindnessGivers();
-      if (kindnessGivers.isEmpty) {
-        throw Exception('メンバーが見つかりません');
-      }
-
-      final kindnessGiver = kindnessGivers.first;
-
-      final kindnessRecord = KindnessRecord(
-        userId: user.id,
-        giverId: kindnessGiver.id,
-        content: state.kindnessContent,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
-        giverName: kindnessGiver.giverName,
-        giverAvatarUrl: kindnessGiver.avatarUrl,
-        giverCategory: kindnessGiver.relationshipName ?? state.selectedRelation,
-        giverGender: kindnessGiver.genderName ?? state.selectedGender,
+      await Tutorial.recordTutorialKindness(
+        kindnessContent: _kindnessContent,
+        selectedGender: _selectedGender,
+        selectedRelation: _selectedRelation,
       );
 
-      await _kindnessRecordRepository.saveKindnessRecord(kindnessRecord);
-
-      state = state.copyWith(isRecordingKindness: false);
+      _isRecordingKindness = false;
+      notifyListeners();
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isRecordingKindness: false,
-        errorMessage: '優しさの記録に失敗しました: ${e.toString()}',
-      );
+      _isRecordingKindness = false;
+      _errorMessage = e.toString();
+      notifyListeners();
       return false;
     }
   }
 
   Future<bool> saveReflectionSettings() async {
-    state = state.copyWith(isSettingReflection: true, errorMessage: null);
+    _isSettingReflection = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
+      await Tutorial.saveReflectionSettings(
+        selectedReflectionFrequency: _selectedReflectionFrequency,
+      );
 
-      await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
-      print('リフレクション頻度を保存しました: ${state.selectedReflectionFrequency}');
-
-      state = state.copyWith(isSettingReflection: false);
+      _isSettingReflection = false;
+      notifyListeners();
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isSettingReflection: false,
-        errorMessage: 'リフレクション設定の保存に失敗しました: ${e.toString()}',
-      );
+      _isSettingReflection = false;
+      _errorMessage = e.toString();
+      notifyListeners();
       return false;
     }
   }
 
   Future<bool> completeTutorial() async {
-    if (state.kindnessGiverName.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '名前を入力してください');
-      return false;
-    }
-
-    state = state.copyWith(isCompleting: true, errorMessage: null);
+    _isCompleting = true;
+    _errorMessage = null;
+    notifyListeners();
 
     try {
-      final user = Supabase.instance.client.auth.currentUser;
-      if (user == null) {
-        throw Exception('ユーザーが認証されていません');
-      }
+      // バリデーション
+      _validateTutorialCompletion();
 
-      // データベースのマスターテーブルから正しいIDを取得
-      final genderId = await _kindnessGiverRepository.getGenderIdByName(
-        state.selectedGender,
-      );
-      final relationshipId = await _kindnessGiverRepository
-          .getRelationshipIdByName(state.selectedRelation);
-
-      if (genderId == null) {
-        throw Exception('選択された性別が見つかりません: ${state.selectedGender}');
-      }
-
-      if (relationshipId == null) {
-        throw Exception('選択された関係性が見つかりません: ${state.selectedRelation}');
-      }
-
-      final kindnessGiver = KindnessGiver.create(
-        userId: user.id,
-        giverName: state.kindnessGiverName,
-        relationshipId: relationshipId,
-        genderId: genderId,
+      await Tutorial.completeTutorial(
+        kindnessGiverName: _kindnessGiverName,
+        selectedGender: _selectedGender,
+        selectedRelation: _selectedRelation,
       );
 
-      await _kindnessGiverRepository.createKindnessGiver(kindnessGiver);
-
-      await _tutorialRepository.markTutorialCompleted();
-
-      state = state.copyWith(isCompleting: false);
+      _isCompleting = false;
+      notifyListeners();
       return true;
     } catch (e) {
-      state = state.copyWith(
-        isCompleting: false,
-        errorMessage: 'メンバーの登録に失敗しました: ${e.toString()}',
-      );
+      _isCompleting = false;
+      _errorMessage = e.toString();
+      notifyListeners();
       return false;
     }
   }
 
-  void clearError() {
-    state = state.copyWith(errorMessage: null);
+  void clearErrorMessage() {
+    _errorMessage = null;
+    notifyListeners();
   }
+
+  /// ナビゲーション状態をクリア
+  void clearNavigationState() {
+    _shouldNavigateNext = false;
+    _shouldNavigateToMain = false;
+    notifyListeners();
+  }
+
+  // =============================================================================
+  // UI制御メソッド
+  // =============================================================================
 
   /// 現在のページに応じたボタンテキストを取得
   String getNextButtonText() {
-    switch (state.currentPage) {
-      case introductionPageIndex:
-        return '次へ';
-      case memberRegistrationPageIndex:
-        return '次へ';
-      case kindnessRecordPageIndex:
-        return '記録して次へ';
-      case reflectionSettingPageIndex:
-        return '設定して始める';
-      default:
-        return '次へ';
-    }
+    return _nextButtonTexts[_currentPage] ?? '次へ';
   }
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
-    return state.currentPage > firstPageIndex &&
-        state.currentPage != kindnessRecordPageIndex;
+    return _currentPage > firstPageIndex;
+  }
+
+  /// 次へボタンを表示するかどうか
+  bool shouldShowNextButton() {
+    return _currentPage <= lastPageIndex;
   }
 
   /// スキップボタンを表示するかどうか
   bool shouldShowSkipButton() {
-    return state.currentPage == kindnessRecordPageIndex;
+    return _currentPage == kindnessRecordPageIndex;
+  }
+
+  /// 次へボタンがローディング状態かどうか
+  bool isNextButtonLoading() {
+    return switch (_currentPage) {
+      memberRegistrationPageIndex => _isCompleting,
+      kindnessRecordPageIndex => _isRecordingKindness,
+      reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
+      _ => false,
+    };
   }
 
   /// 次へボタンが無効かどうか
   bool isNextButtonDisabled() {
-    return state.isCompleting ||
-        state.isRecordingKindness ||
-        state.isSettingReflection;
+    return switch (_currentPage) {
+      memberRegistrationPageIndex =>
+        _kindnessGiverName.trim().isEmpty || _isCompleting,
+      kindnessRecordPageIndex => _isRecordingKindness,
+      reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
+      _ => false,
+    };
   }
 
-  /// リフレクション頻度の説明テキストを取得
-  String getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return 'こまめに振り返りたい方におすすめ';
-      case '2週に1回':
-        return 'バランスよく振り返れる推奨設定';
-      case '月に1回':
-        return '記録する頻度が少ない方におすすめ';
-      default:
-        return '';
-    }
-  }
+  // =============================================================================
+  // アクション実行メソッド
+  // =============================================================================
 
-  /// 次へボタンのアクション実行
-  Future<String?> executeNextAction() async {
-    switch (state.currentPage) {
-      case introductionPageIndex:
-        // 1ページ目：次のページへ
-        nextPage();
-        return 'next_page';
-      case memberRegistrationPageIndex:
-        // 2ページ目：メンバー登録完了後、3ページ目へ
-        final success = await completeTutorial();
-        if (success) {
-          nextPage();
-          return 'next_page';
-        }
-        return null;
-      case kindnessRecordPageIndex:
-        // 3ページ目：優しさ記録後、4ページ目へ
-        final success = await recordKindness();
-        if (success) {
-          nextPage();
-          return 'next_page';
-        }
-        return null;
-      case reflectionSettingPageIndex:
-        // 4ページ目：リフレクション設定後、メイン画面へ
-        final success = await saveReflectionSettings();
-        if (success) {
-          return 'navigate_to_main';
-        }
-        return null;
-      default:
-        return null;
-    }
-  }
-
-  /// スキップアクション実行
+  /// スキップアクションを実行
   void executeSkipAction() {
-    if (state.currentPage == kindnessRecordPageIndex) {
+    if (_currentPage == kindnessRecordPageIndex) {
+      // 優しさ記録をスキップして次のページへ
       nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
     }
+  }
+
+  /// 次へアクションを実行
+  Future<void> executeNextAction() async {
+    switch (_currentPage) {
+      case introductionPageIndex:
+        _executeIntroductionAction();
+        break;
+      case memberRegistrationPageIndex:
+        await _executeMemberRegistrationAction();
+        break;
+      case kindnessRecordPageIndex:
+        await _executeKindnessRecordAction();
+        break;
+      case reflectionSettingPageIndex:
+        await _executeReflectionSettingAction();
+        break;
+    }
+  }
+
+  /// 各ページのアクション実行メソッド
+  void _executeIntroductionAction() {
+    nextPage();
+    _shouldNavigateNext = true;
+    notifyListeners();
+  }
+
+  Future<void> _executeMemberRegistrationAction() async {
+    final success = await completeTutorial();
+    if (success) {
+      nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _executeKindnessRecordAction() async {
+    final success = await recordKindness();
+    if (success) {
+      nextPage();
+      _shouldNavigateNext = true;
+      notifyListeners();
+    }
+  }
+
+  Future<void> _executeReflectionSettingAction() async {
+    final success = await saveReflectionSettings();
+    if (success) {
+      _shouldNavigateToMain = true;
+      notifyListeners();
+    }
+  }
+
+  /// 頻度の説明文を取得
+  String getFrequencyDescription(String frequency) {
+    return Tutorial.getFrequencyDescription(frequency);
   }
 }
-
-final tutorialViewModelProvider =
-    StateNotifierProvider<TutorialViewModel, TutorialState>((ref) {
-      final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-      final tutorialRepository = ref.read(tutorialRepositoryProvider);
-      final kindnessRecordRepository = ref.read(
-        kindnessRecordRepositoryProvider,
-      );
-      return TutorialViewModel(
-        kindnessGiverRepository: kindnessGiverRepository,
-        tutorialRepository: tutorialRepository,
-        kindnessRecordRepository: kindnessRecordRepository,
-      );
-    });

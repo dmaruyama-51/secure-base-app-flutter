@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../models/kindness_giver.dart';
 
 class KindnessGiverListItem extends StatelessWidget {
@@ -31,11 +34,11 @@ class KindnessGiverListItem extends StatelessWidget {
                 : null,
       ),
       title: Text(
-        kindnessGiver.name,
+        kindnessGiver.giverName,
         style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
       ),
       subtitle: Text(
-        kindnessGiver.category,
+        kindnessGiver.relationshipName ?? '',
         style: TextStyle(
           fontSize: 14,
           color: theme.colorScheme.primary.withAlpha(200),

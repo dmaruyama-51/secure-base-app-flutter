@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 
 /// KindnessGiverの情報表示チップ（関係性のみ）

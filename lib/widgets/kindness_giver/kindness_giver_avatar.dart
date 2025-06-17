@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 
 /// KindnessGiverのアバター表示ウィジェット
@@ -108,17 +111,12 @@ class KindnessGiverAvatar extends StatelessWidget {
   ) {
     final String assetPath = _getDefaultAvatarPath(gender, relationship);
 
-    print(
-      '🖼️ Loading avatar: $assetPath for gender: $gender, relationship: $relationship',
-    ); // デバッグログ
-
     return Image.asset(
       assetPath,
       width: size,
       height: size,
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
-        print('❌ Asset load error: $error'); // エラーログ
         // アセット画像も読み込めない場合はアイコンで代替
         return Container(
           width: size,
@@ -143,15 +141,24 @@ class KindnessGiverAvatar extends StatelessWidget {
 
   String _getDefaultAvatarPath(String gender, String relationship) {
     // ペットの場合は関係性で判定
-    if (relationship == 'ペット') {
+    if (relationship == 'ペット' ||
+        relationship == 'pet' ||
+        relationship.toLowerCase() == 'pet') {
       return 'assets/images/default_pet.png';
     }
 
-    // それ以外は性別で判定
-    switch (gender) {
+    // それ以外は性別で判定（様々な形式に対応）
+    final genderLower = gender.toLowerCase();
+    switch (genderLower) {
       case '男性':
+      case 'male':
+      case 'man':
+      case 'm':
         return 'assets/images/default_male.png';
       case '女性':
+      case 'female':
+      case 'woman':
+      case 'f':
         return 'assets/images/default_female.png';
       default:
         return 'assets/images/default_female.png'; // デフォルトとして女性画像を使用
@@ -160,15 +167,24 @@ class KindnessGiverAvatar extends StatelessWidget {
 
   IconData _getAvatarIcon(String gender, String relationship) {
     // ペットの場合は関係性で判定
-    if (relationship == 'ペット') {
+    if (relationship == 'ペット' ||
+        relationship == 'pet' ||
+        relationship.toLowerCase() == 'pet') {
       return Icons.pets;
     }
 
-    // それ以外は性別で判定
-    switch (gender) {
+    // それ以外は性別で判定（様々な形式に対応）
+    final genderLower = gender.toLowerCase();
+    switch (genderLower) {
       case '男性':
+      case 'male':
+      case 'man':
+      case 'm':
         return Icons.male;
       case '女性':
+      case 'female':
+      case 'woman':
+      case 'f':
         return Icons.female;
       default:
         return Icons.person;

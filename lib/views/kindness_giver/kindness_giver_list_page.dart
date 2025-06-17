@@ -1,71 +1,80 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Package imports:
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// Project imports:
+import '../../models/kindness_giver.dart';
+import '../../utils/app_colors.dart';
 import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../utils/app_colors.dart';
 import '../../widgets/kindness_giver/kindness_giver_card.dart';
-import '../../widgets/common/delete_confirm_dialog.dart';
-import '../../models/kindness_giver.dart';
-import 'package:go_router/go_router.dart';
 
-class KindnessGiverListPage extends ConsumerStatefulWidget {
+class KindnessGiverListPage extends StatefulWidget {
   const KindnessGiverListPage({super.key});
 
   @override
-  ConsumerState<KindnessGiverListPage> createState() =>
-      _KindnessGiverListPageState();
+  State<KindnessGiverListPage> createState() => _KindnessGiverListPageState();
 }
 
-class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
-  @override
-  void initState() {
-    super.initState();
-    // 初期化時にデータを読み込む
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref
-          .read(kindnessGiverListViewModelProvider.notifier)
-          .loadKindnessGivers();
-    });
-  }
+class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
+  KindnessGiverListViewModel? _viewModel;
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(kindnessGiverListViewModelProvider);
-    final viewModel = ref.read(kindnessGiverListViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => KindnessGiverListViewModel()..loadKindnessGivers(),
+      child: Consumer<KindnessGiverListViewModel>(
+        builder: (context, viewModel, child) {
+          _viewModel = viewModel; // ViewModelインスタンスを保存
+          final theme = Theme.of(context);
 
-    // 削除確認ダイアログの表示監視
-    ref.listen(kindnessGiverListViewModelProvider, (previous, next) {
-      if (next.showDeleteConfirmation && next.kindnessGiverToDelete != null) {
-        _showDeleteConfirmDialog(
-          context,
-          next.kindnessGiverToDelete!,
-          viewModel,
-        );
-      }
-    });
+          // メッセージ表示処理
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(viewModel.errorMessage!),
+                  backgroundColor: Theme.of(context).colorScheme.error,
+                ),
+              );
+            }
+            if (viewModel.successMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(viewModel.successMessage!),
+                  backgroundColor: Colors.green,
+                ),
+              );
+            }
+          });
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(theme),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          right: 20.0,
-          top: 8.0,
-          bottom: 20.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(theme),
-            const SizedBox(height: 24),
-            _buildMembersSection(state, viewModel, theme),
-          ],
-        ),
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: _buildAppBar(theme),
+            body: SingleChildScrollView(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                top: 8.0,
+                bottom: 20.0,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildHeader(theme),
+                  const SizedBox(height: 24),
+                  _buildMembersSection(viewModel, theme),
+                ],
+              ),
+            ),
+            floatingActionButton: _buildFloatingActionButton(viewModel, theme),
+            bottomNavigationBar: const BottomNavigation(currentIndex: 1),
+          );
+        },
       ),
-      floatingActionButton: _buildFloatingActionButton(viewModel, theme),
-      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
@@ -103,14 +112,10 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.info_outline,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
+              Icon(Icons.people, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                'あなたの安全基地メンバー',
+                '安全基地メンバー',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
@@ -121,7 +126,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '心の支えとなるメンバーを管理できます',
+            '心の安全基地のメンバーを登録・管理できます',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,
@@ -133,16 +138,19 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildMembersSection(state, viewModel, ThemeData theme) {
-    if (state.isLoading) {
+  Widget _buildMembersSection(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
+    if (viewModel.isLoading) {
       return _buildLoadingCard(theme);
     }
 
-    if (state.errorMessage != null) {
-      return _buildErrorCard(state, viewModel, theme);
+    if (viewModel.errorMessage != null) {
+      return _buildErrorCard(viewModel, theme);
     }
 
-    if (state.kindnessGivers.isEmpty) {
+    if (viewModel.kindnessGivers.isEmpty) {
       return _buildEmptyCard(theme);
     }
 
@@ -172,7 +180,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Text(
-                '${state.kindnessGivers.length}人',
+                '${viewModel.kindnessGivers.length}人',
                 style: TextStyle(
                   fontSize: 11,
                   color: theme.colorScheme.primary,
@@ -183,14 +191,12 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           ],
         ),
         const SizedBox(height: 12),
-        ...state.kindnessGivers.map(
+        ...viewModel.kindnessGivers.map(
           (kindnessGiver) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: KindnessGiverCard(
               kindnessGiver: kindnessGiver,
-              onEdit: () => _navigateToEdit(kindnessGiver),
-              onDeleteRequest:
-                  () => viewModel.requestDeleteConfirmation(kindnessGiver),
+              onTap: () => _navigateToEdit(kindnessGiver),
             ),
           ),
         ),
@@ -230,7 +236,10 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildErrorCard(state, viewModel, ThemeData theme) {
+  Widget _buildErrorCard(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -262,7 +271,7 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            state.errorMessage!,
+            viewModel.errorMessage!,
             style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),
@@ -286,61 +295,145 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
   Widget _buildEmptyCard(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(32),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        gradient: LinearGradient(
+          colors: [
+            Colors.white,
+            theme.colorScheme.primary.withOpacity(0.02),
+            Colors.white.withOpacity(0.95),
+          ],
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+        ),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 1),
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 15,
+            offset: const Offset(0, 3),
+            spreadRadius: 2,
+          ),
+          BoxShadow(
+            color: theme.colorScheme.primary.withOpacity(0.03),
+            blurRadius: 25,
+            offset: const Offset(0, 8),
+            spreadRadius: 4,
           ),
         ],
         border: Border.all(
-          color: theme.colorScheme.secondary.withOpacity(0.8),
-          width: 1,
+          color: theme.colorScheme.secondary.withOpacity(0.5),
+          width: 1.5,
         ),
       ),
       child: Column(
         children: [
+          // イラスト的なアバターコンテナ
           Container(
-            width: 64,
-            height: 64,
+            width: 80,
+            height: 80,
             decoration: BoxDecoration(
-              color: theme.colorScheme.secondary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(32),
+              gradient: LinearGradient(
+                colors: [
+                  theme.colorScheme.primary.withOpacity(0.08),
+                  theme.colorScheme.primary.withOpacity(0.05),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(
+                color: theme.colorScheme.primary.withOpacity(0.15),
+                width: 2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
-            child: Icon(
-              Icons.people_outline,
-              size: 32,
-              color: theme.colorScheme.primary.withOpacity(0.6),
+            child: Stack(
+              children: [
+                Center(
+                  child: Icon(
+                    Icons.people_outline,
+                    size: 36,
+                    color: theme.colorScheme.primary.withOpacity(0.7),
+                  ),
+                ),
+                Positioned(
+                  right: 8,
+                  bottom: 8,
+                  child: Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white, width: 2),
+                    ),
+                    child: const Icon(Icons.add, size: 14, color: Colors.white),
+                  ),
+                ),
+              ],
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 20),
           Text(
             'まだメンバーがいません',
             style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
+              fontWeight: FontWeight.w700,
+              fontSize: 18,
+              color: theme.colorScheme.onSurface,
+              letterSpacing: 0.2,
             ),
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Text(
             '右下のボタンから\n最初のメンバーを追加しましょう',
-            style: TextStyle(color: AppColors.textLight, fontSize: 13),
+            style: TextStyle(
+              color: AppColors.textLight,
+              fontSize: 14,
+              height: 1.6,
+              fontWeight: FontWeight.w400,
+            ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _navigateToAdd,
-            icon: const Icon(Icons.add, size: 16),
-            label: const Text('メンバーを追加'),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: theme.colorScheme.primary,
-              foregroundColor: theme.colorScheme.onPrimary,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              textStyle: TextStyle(fontSize: 14),
+          const SizedBox(height: 24),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: [
+                BoxShadow(
+                  color: theme.colorScheme.primary.withOpacity(0.2),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _navigateToAdd,
+              icon: const Icon(Icons.add, size: 18),
+              label: const Text('メンバーを追加'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.primary,
+                foregroundColor: theme.colorScheme.onPrimary,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
+                textStyle: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
             ),
           ),
         ],
@@ -348,7 +441,10 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildFloatingActionButton(viewModel, ThemeData theme) {
+  Widget _buildFloatingActionButton(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
@@ -360,42 +456,36 @@ class _KindnessGiverListPageState extends ConsumerState<KindnessGiverListPage> {
           ),
         ],
       ),
-      child: FloatingActionButton(
-        backgroundColor: theme.colorScheme.primary,
+      child: FloatingActionButton.extended(
         onPressed: _navigateToAdd,
-        child: Icon(Icons.add, color: theme.colorScheme.onPrimary, size: 28),
+        backgroundColor: theme.colorScheme.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text(
+          'メンバーを追加',
+          style: TextStyle(fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }
 
-  /// 削除確認ダイアログを表示（Viewの責務）
-  void _showDeleteConfirmDialog(
-    BuildContext context,
-    KindnessGiver kindnessGiver,
-    KindnessGiverListViewModel viewModel,
-  ) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // 意図しない閉じを防ぐ
-      builder:
-          (context) => DeleteConfirmDialog(
-            title: '削除の確認',
-            message: '${kindnessGiver.name}さんを削除しますか？\n\nこの操作は取り消せません。',
-            onConfirm: viewModel.confirmDelete,
-          ),
-    );
-  }
-
-  /// 編集ページへの遷移
-  void _navigateToEdit(KindnessGiver kindnessGiver) {
-    GoRouter.of(context).push(
-      '/kindness-givers/edit/${kindnessGiver.giverName}',
-      extra: kindnessGiver,
-    );
-  }
-
-  /// 追加ページへの遷移
   void _navigateToAdd() {
-    GoRouter.of(context).push('/kindness-givers/add');
+    context.push('/kindness-givers/add').then((_) {
+      // 追加ページから戻ってきた際にリストを再読み込み
+      if (_viewModel != null) {
+        _viewModel!.refreshKindnessGivers();
+      }
+    });
+  }
+
+  void _navigateToEdit(KindnessGiver kindnessGiver) {
+    context
+        .push('/kindness-givers/edit/${kindnessGiver.id}', extra: kindnessGiver)
+        .then((_) {
+          // 編集ページから戻ってきた際にリストを再読み込み
+          if (_viewModel != null) {
+            _viewModel!.refreshKindnessGivers();
+          }
+        });
   }
 }

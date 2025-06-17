@@ -1,4 +1,7 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:go_router/go_router.dart';
 
 class BottomNavigation extends StatelessWidget {
@@ -14,6 +17,8 @@ class BottomNavigation extends StatelessWidget {
       type: BottomNavigationBarType.fixed,
       selectedItemColor: Colors.brown,
       unselectedItemColor: Colors.grey,
+      selectedLabelStyle: const TextStyle(fontSize: 10),
+      unselectedLabelStyle: const TextStyle(fontSize: 10),
       currentIndex: currentIndex,
       onTap: (index) {
         switch (index) {
@@ -32,13 +37,13 @@ class BottomNavigation extends StatelessWidget {
         }
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-        BottomNavigationBarItem(icon: Icon(Icons.people), label: 'Member'),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
+        BottomNavigationBarItem(icon: Icon(Icons.people), label: 'メンバー'),
         BottomNavigationBarItem(
           icon: Icon(Icons.favorite_border),
-          label: 'Reflection',
+          label: 'リフレクション',
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Setting'),
+        BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
       ],
     );
   }

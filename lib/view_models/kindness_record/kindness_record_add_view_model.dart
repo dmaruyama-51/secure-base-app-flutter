@@ -1,142 +1,115 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+// Flutter imports:
+import 'package:flutter/foundation.dart';
+
+// Project imports:
 import '../../models/kindness_giver.dart';
 import '../../models/kindness_record.dart';
-import '../../repositories/kindness_giver_repository.dart';
-import '../../repositories/kindness_record_repository.dart';
-import '../../states/kindness_record/kindness_record_add_state.dart';
-import '../../providers/kindness_record/kindness_record_providers.dart';
-import '../../providers/kindness_giver/kindness_giver_providers.dart';
 
-// StateNotifierベースのKindnessRecordAddViewModel
-class KindnessRecordAddViewModel extends StateNotifier<KindnessRecordAddState> {
-  final KindnessGiverRepository _kindnessGiverRepository;
-  final KindnessRecordRepository _kindnessRecordRepository;
+/// バリデーションエラー用の例外クラス（KindnessRecord用）
+class KindnessRecordValidationException implements Exception {
+  final String message;
 
-  // DIパターン：コンストラクタでRepositoryを受け取る
-  KindnessRecordAddViewModel({
-    required KindnessGiverRepository kindnessGiverRepository,
-    required KindnessRecordRepository kindnessRecordRepository,
-  })  : _kindnessGiverRepository = kindnessGiverRepository,
-        _kindnessRecordRepository = kindnessRecordRepository,
-        super(const KindnessRecordAddState());
+  KindnessRecordValidationException(this.message);
 
-  // メンバー一覧を取得する
-  Future<void> loadMembers() async {
-    state = state.copyWith(isLoading: true, errorMessage: null);
-
-    try {
-      final kindnessGivers = await _kindnessGiverRepository.fetchKindnessGivers();
-      state = state.copyWith(
-        kindnessGivers: kindnessGivers,
-        isLoading: false,
-      );
-    } catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        errorMessage: 'メンバー取得に失敗しました',
-      );
-    }
-  }
-
-  // 内容を更新する
-  void updateContent(String content) {
-    state = state.copyWith(content: content);
-  }
-
-  // メンバー選択時の処理
-  void selectKindnessGiver(KindnessGiver? kindnessGiver) {
-    state = state.copyWith(selectedKindnessGiver: kindnessGiver);
-  }
-
-  // 入力バリデーション
-  bool _validateInput() {
-    if (state.content.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '内容を入力してください');
-      return false;
-    }
-    if (state.selectedKindnessGiver == null) {
-      state = state.copyWith(errorMessage: '人物を選択してください');
-      return false;
-    }
-    if (state.selectedKindnessGiver!.category.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '選択された人物のカテゴリが設定されていません');
-      return false;
-    }
-    if (state.selectedKindnessGiver!.gender.trim().isEmpty) {
-      state = state.copyWith(errorMessage: '選択された人物の性別が設定されていません');
-      return false;
-    }
-    return true;
-  }
-
-  // やさしさ記録を保存する
-  Future<void> saveKindnessRecord() async {
-    if (!_validateInput()) return;
-
-    state = state.copyWith(
-      isSaving: true,
-      errorMessage: null,
-      successMessage: null,
-    );
-
-    try {
-      final now = DateTime.now();
-      final record = KindnessRecord(
-        // TODO: 実際のユーザーIDを使用する
-        userId: 'temp_user_id',
-        giverId: state.selectedKindnessGiver!.id,
-        content: state.content.trim(),
-        createdAt: now,
-        updatedAt: now,
-        giverName: state.selectedKindnessGiver!.name,
-        giverAvatarUrl: state.selectedKindnessGiver!.avatarUrl,
-        giverCategory: state.selectedKindnessGiver!.category,
-        giverGender: state.selectedKindnessGiver!.gender,
-      );
-
-      final result = await _kindnessRecordRepository.saveKindnessRecord(record);
-      
-      if (result) {
-        state = state.copyWith(
-          isSaving: false,
-          successMessage: '記録を保存しました',
-          shouldNavigateBack: true,
-        );
-      } else {
-        state = state.copyWith(
-          isSaving: false,
-          errorMessage: '保存に失敗しました',
-        );
-      }
-    } catch (e) {
-      state = state.copyWith(
-        isSaving: false,
-        errorMessage: 'エラーが発生しました: ${e.toString()}',
-      );
-    }
-  }
-
-  // メッセージ類をクリアする
-  void clearMessages() {
-    state = state.copyWith(
-      errorMessage: null,
-      successMessage: null,
-      shouldNavigateBack: false,
-    );
-  }
+  @override
+  String toString() => message;
 }
 
-// ViewModelのProvider（DIで依存関係を注入）
-final kindnessRecordAddViewModelProvider = 
-    StateNotifierProvider<KindnessRecordAddViewModel, KindnessRecordAddState>(
-  (ref) {
-    // Repository Providerから依存関係を取得
-    final kindnessGiverRepository = ref.read(kindnessGiverRepositoryProvider);
-    final kindnessRecordRepository = ref.read(kindnessRecordRepositoryProvider);
-    
-    return KindnessRecordAddViewModel(
-      kindnessGiverRepository: kindnessGiverRepository,
-      kindnessRecordRepository: kindnessRecordRepository,
-    );
-  },
-);
+/// やさしさ記録追加のViewModel
+class KindnessRecordAddViewModel extends ChangeNotifier {
+  // 状態プロパティ
+  List<KindnessGiver> _kindnessGivers = const [];
+  KindnessGiver? _selectedKindnessGiver;
+  String _content = '';
+  bool _isLoading = false;
+  bool _isSaving = false;
+  String? _errorMessage;
+  String? _successMessage;
+  bool _shouldNavigateBack = false;
+
+  // ゲッター
+  List<KindnessGiver> get kindnessGivers => _kindnessGivers;
+  KindnessGiver? get selectedKindnessGiver => _selectedKindnessGiver;
+  String get content => _content;
+  bool get isLoading => _isLoading;
+  bool get isSaving => _isSaving;
+  String? get errorMessage => _errorMessage;
+  String? get successMessage => _successMessage;
+  bool get shouldNavigateBack => _shouldNavigateBack;
+
+  /// 初期化
+  Future<void> initialize() async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      _kindnessGivers = await KindnessRecord.fetchKindnessGiversForRecordAdd();
+      if (_kindnessGivers.isNotEmpty) {
+        _selectedKindnessGiver = _kindnessGivers.first;
+      }
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// メンバーを選択
+  void selectKindnessGiver(KindnessGiver kindnessGiver) {
+    _selectedKindnessGiver = kindnessGiver;
+    notifyListeners();
+  }
+
+  /// やさしさの内容を更新
+  void updateContent(String content) {
+    _content = content;
+    notifyListeners();
+  }
+
+  /// やさしさ記録の入力バリデーション
+  void _validateKindnessRecordInput() {
+    if (_content.trim().isEmpty) {
+      throw KindnessRecordValidationException('やさしさの内容を入力してください');
+    }
+    if (_selectedKindnessGiver == null) {
+      throw KindnessRecordValidationException('メンバーを選択してください');
+    }
+  }
+
+  /// やさしさ記録を保存
+  Future<void> saveKindnessRecord() async {
+    _isSaving = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      // バリデーション
+      _validateKindnessRecordInput();
+
+      await KindnessRecord.createKindnessRecord(
+        content: _content,
+        selectedKindnessGiver: _selectedKindnessGiver!,
+      );
+
+      _isSaving = false;
+      _successMessage = 'やさしさ記録を保存しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isSaving = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// メッセージをクリア
+  void clearMessages() {
+    _errorMessage = null;
+    _successMessage = null;
+    _shouldNavigateBack = false;
+    notifyListeners();
+  }
+}

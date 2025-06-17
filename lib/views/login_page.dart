@@ -1,8 +1,14 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
+
+// Package imports:
 import 'package:go_router/go_router.dart';
-import 'package:secure_base/utils/constants.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:provider/provider.dart';
+
+// Project imports:
 import '../utils/app_colors.dart';
+import '../utils/constants.dart';
+import '../view_models/auth/auth_view_model.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -12,39 +18,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class LoginPageState extends State<LoginPage> {
-  bool _isLoading = false;
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-
-  Future<void> _signIn() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await supabase.auth.signInWithPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-
-      if (mounted) {
-        final redirectPath =
-            GoRouter.of(
-              context,
-            ).routeInformationProvider.value.uri.queryParameters['redirect'];
-        final destination = redirectPath ?? '/';
-        context.go(destination);
-      }
-    } on AuthException catch (error) {
-      if (mounted) context.showErrorSnackBar(message: error.message);
-    } catch (_) {
-      if (mounted) context.showErrorSnackBar(message: unexpectedErrorMessage);
-    }
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
-  }
 
   @override
   void dispose() {
@@ -55,35 +30,58 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 400),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 32),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // ロゴとタイトル
-                  _buildHeader(),
+    return ChangeNotifierProvider(
+      create: (_) => AuthViewModel(),
+      child: Consumer<AuthViewModel>(
+        builder: (context, viewModel, child) {
+          // エラーメッセージの表示
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.errorMessage != null) {
+              context.showErrorSnackBar(message: viewModel.errorMessage!);
+              viewModel.clearNavigation();
+            }
+          });
 
-                  const SizedBox(height: 48),
+          // 成功時のナビゲーション
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.shouldNavigate && viewModel.navigationPath != null) {
+              context.go(viewModel.navigationPath!);
+              viewModel.clearNavigation();
+            }
+          });
 
-                  // ログインフォーム
-                  _buildLoginForm(),
+          return Scaffold(
+            backgroundColor: AppColors.background,
+            body: SafeArea(
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 400),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // ロゴとタイトル
+                        _buildHeader(),
 
-                  const SizedBox(height: 32),
+                        const SizedBox(height: 48),
 
-                  // 区切り線とアカウント作成リンク
-                  _buildRegisterSection(),
-                ],
+                        // ログインフォーム
+                        _buildLoginForm(viewModel),
+
+                        const SizedBox(height: 32),
+
+                        // 区切り線とアカウント作成リンク
+                        _buildRegisterSection(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
@@ -147,7 +145,7 @@ class LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildLoginForm(AuthViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -171,7 +169,8 @@ class LoginPageState extends State<LoginPage> {
         SizedBox(
           height: 44,
           child: ElevatedButton(
-            onPressed: _isLoading ? null : _signIn,
+            onPressed:
+                viewModel.isLoading ? null : () => _handleSignIn(viewModel),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: AppColors.textOnPrimary,
@@ -181,7 +180,7 @@ class LoginPageState extends State<LoginPage> {
               ),
             ),
             child:
-                _isLoading
+                viewModel.isLoading
                     ? const SizedBox(
                       height: 16,
                       width: 16,
@@ -202,6 +201,19 @@ class LoginPageState extends State<LoginPage> {
           ),
         ),
       ],
+    );
+  }
+
+  void _handleSignIn(AuthViewModel viewModel) {
+    final redirectPath =
+        GoRouter.of(
+          context,
+        ).routeInformationProvider.value.uri.queryParameters['redirect'];
+
+    viewModel.signIn(
+      email: _emailController.text,
+      password: _passwordController.text,
+      redirectPath: redirectPath,
     );
   }
 

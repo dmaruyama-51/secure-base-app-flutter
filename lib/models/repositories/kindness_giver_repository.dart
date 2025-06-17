@@ -1,7 +1,10 @@
+// Package imports:
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../models/kindness_giver.dart';
-import '../models/gender_master.dart';
-import '../models/relationship_master.dart';
+
+// Project imports:
+import '../entities/gender_master.dart';
+import '../entities/relationship_master.dart';
+import '../kindness_giver.dart';
 
 /// メンバーデータのリポジトリクラス
 class KindnessGiverRepository {

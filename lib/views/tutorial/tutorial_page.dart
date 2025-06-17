@@ -1,21 +1,25 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../view_models/tutorial/tutorial_view_model.dart';
-import '../../states/tutorial/tutorial_state.dart';
-import '../../widgets/kindness_giver/gender_selection.dart';
-import '../../widgets/kindness_giver/relation_selection.dart';
-import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
-import '../../utils/app_colors.dart';
 
-class TutorialPage extends ConsumerStatefulWidget {
+// Package imports:
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// Project imports:
+import '../../utils/app_colors.dart';
+import '../../view_models/tutorial/tutorial_view_model.dart';
+import '../../widgets/kindness_giver/gender_selection.dart';
+import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
+import '../../widgets/kindness_giver/relation_selection.dart';
+
+class TutorialPage extends StatefulWidget {
   const TutorialPage({super.key});
 
   @override
-  ConsumerState<TutorialPage> createState() => _TutorialPageState();
+  State<TutorialPage> createState() => _TutorialPageState();
 }
 
-class _TutorialPageState extends ConsumerState<TutorialPage> {
+class _TutorialPageState extends State<TutorialPage> {
   final PageController _pageController = PageController();
   late TextEditingController _nameController;
   late TextEditingController _kindnessController;
@@ -37,47 +41,70 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(tutorialViewModelProvider);
-    final viewModel = ref.read(tutorialViewModelProvider.notifier);
-    final theme = Theme.of(context);
+    return ChangeNotifierProvider(
+      create: (_) => TutorialViewModel(),
+      child: Consumer<TutorialViewModel>(
+        builder: (context, viewModel, child) {
+          final theme = Theme.of(context);
 
-    // エラーメッセージの表示
-    ref.listen(tutorialViewModelProvider, (previous, next) {
-      if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: theme.colorScheme.error,
-          ),
-        );
-        viewModel.clearError();
-      }
-    });
+          // エラーメッセージの表示
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.errorMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(viewModel.errorMessage!),
+                  backgroundColor: theme.colorScheme.error,
+                ),
+              );
+              viewModel.clearErrorMessage();
+            }
+          });
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // プログレスバー
-            _buildProgressBar(state.currentPage, theme),
-            // メインコンテンツ
-            Expanded(
-              child: PageView(
-                controller: _pageController,
-                physics: const NeverScrollableScrollPhysics(),
+          // ナビゲーション処理
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.shouldNavigateNext) {
+              _pageController.nextPage(
+                duration: Duration(
+                  milliseconds: TutorialViewModel.pageAnimationDurationMs,
+                ),
+                curve: Curves.easeInOut,
+              );
+              viewModel.clearNavigationState();
+            }
+
+            if (viewModel.shouldNavigateToMain && mounted) {
+              context.go('/kindness-records');
+              viewModel.clearNavigationState();
+            }
+          });
+
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            body: SafeArea(
+              child: Column(
                 children: [
-                  _buildWelcomePage(theme),
-                  _buildKindnessGiverRegistrationPage(state, viewModel, theme),
-                  _buildKindnessRecordPage(state, viewModel, theme),
-                  _buildReflectionSettingPage(state, viewModel, theme),
+                  // プログレスバー
+                  _buildProgressBar(viewModel.currentPage, theme),
+                  // メインコンテンツ
+                  Expanded(
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: [
+                        _buildWelcomePage(theme),
+                        _buildKindnessGiverRegistrationPage(viewModel, theme),
+                        _buildKindnessRecordPage(viewModel, theme),
+                        _buildReflectionSettingPage(viewModel, theme),
+                      ],
+                    ),
+                  ),
+                  // ナビゲーションボタン
+                  _buildNavigationButtons(viewModel, theme),
                 ],
               ),
             ),
-            // ナビゲーションボタン
-            _buildNavigationButtons(state, viewModel, theme),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
@@ -200,7 +227,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
   }
 
   Widget _buildKindnessGiverRegistrationPage(
-    TutorialState state,
     TutorialViewModel viewModel,
     ThemeData theme,
   ) {
@@ -215,20 +241,20 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           // アバター表示
           Center(
             child: KindnessGiverAvatar(
-              gender: state.selectedGender,
-              relationship: state.selectedRelation,
+              gender: viewModel.selectedGender,
+              relationship: viewModel.selectedRelation,
               size: 120,
             ),
           ),
           const SizedBox(height: 24),
           // 名前入力
-          _buildNameSection(state, viewModel, theme),
+          _buildNameSection(viewModel, theme),
           const SizedBox(height: 20),
           // 性別選択
-          _buildGenderSection(state, viewModel, theme),
+          _buildGenderSection(viewModel, theme),
           const SizedBox(height: 20),
           // 関係性選択
-          _buildRelationSection(state, viewModel, theme),
+          _buildRelationSection(viewModel, theme),
         ],
       ),
     );
@@ -287,11 +313,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  Widget _buildNameSection(
-    TutorialState state,
-    TutorialViewModel viewModel,
-    ThemeData theme,
-  ) {
+  Widget _buildNameSection(TutorialViewModel viewModel, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -336,17 +358,13 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  Widget _buildGenderSection(
-    TutorialState state,
-    TutorialViewModel viewModel,
-    ThemeData theme,
-  ) {
+  Widget _buildGenderSection(TutorialViewModel viewModel, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
         GenderSelection(
-          selectedGender: state.selectedGender,
+          selectedGender: viewModel.selectedGender,
           onGenderSelected: viewModel.updateGender,
           theme: theme,
         ),
@@ -354,17 +372,13 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  Widget _buildRelationSection(
-    TutorialState state,
-    TutorialViewModel viewModel,
-    ThemeData theme,
-  ) {
+  Widget _buildRelationSection(TutorialViewModel viewModel, ThemeData theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
         RelationSelection(
-          selectedRelation: state.selectedRelation,
+          selectedRelation: viewModel.selectedRelation,
           onRelationSelected: viewModel.updateRelation,
           theme: theme,
         ),
@@ -373,7 +387,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
   }
 
   Widget _buildKindnessRecordPage(
-    TutorialState state,
     TutorialViewModel viewModel,
     ThemeData theme,
   ) {
@@ -383,13 +396,13 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ヘッダー
-          _buildKindnessRecordHeader(state, theme),
+          _buildKindnessRecordHeader(viewModel, theme),
           const SizedBox(height: 24),
           // アバター表示
           Center(
             child: KindnessGiverAvatar(
-              gender: state.selectedGender,
-              relationship: state.selectedRelation,
+              gender: viewModel.selectedGender,
+              relationship: viewModel.selectedRelation,
               size: 100,
             ),
           ),
@@ -397,7 +410,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           // 名前表示
           Center(
             child: Text(
-              state.kindnessGiverName,
+              viewModel.kindnessGiverName,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w600,
                 color: theme.colorScheme.primary,
@@ -406,7 +419,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(height: 32),
           // 優しさ記録入力
-          _buildKindnessContentSection(state, viewModel, theme),
+          _buildKindnessContentSection(viewModel, theme),
           const SizedBox(height: 24),
           // 例文表示
           _buildExampleSection(theme),
@@ -415,7 +428,10 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  Widget _buildKindnessRecordHeader(TutorialState state, ThemeData theme) {
+  Widget _buildKindnessRecordHeader(
+    TutorialViewModel viewModel,
+    ThemeData theme,
+  ) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -452,7 +468,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '最近${state.kindnessGiverName}さんから受け取った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
+            '最近${viewModel.kindnessGiverName}さんから受け取った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -465,7 +481,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
   }
 
   Widget _buildKindnessContentSection(
-    TutorialState state,
     TutorialViewModel viewModel,
     ThemeData theme,
   ) {
@@ -557,7 +572,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
   }
 
   Widget _buildReflectionSettingPage(
-    TutorialState state,
     TutorialViewModel viewModel,
     ThemeData theme,
   ) {
@@ -604,7 +618,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           _buildReflectionDescription(theme),
           const SizedBox(height: 32),
           // 頻度選択
-          _buildFrequencySelection(state, viewModel, theme),
+          _buildFrequencySelection(viewModel, theme),
         ],
       ),
     );
@@ -696,9 +710,8 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
             '定期的な振り返り',
             '忙しい日常でも大切なことを思い出せる',
           ),
-          const SizedBox(height: 12), // 追加
+          const SizedBox(height: 12),
           _buildFeatureItem(
-            // 追加
             theme,
             Icons.volunteer_activism,
             'あたたかい気持ちを育てる',
@@ -755,7 +768,6 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
   }
 
   Widget _buildFrequencySelection(
-    TutorialState state,
     TutorialViewModel viewModel,
     ThemeData theme,
   ) {
@@ -778,7 +790,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 margin: const EdgeInsets.only(bottom: 8),
                 child: RadioListTile<String>(
                   value: frequency,
-                  groupValue: state.selectedReflectionFrequency,
+                  groupValue: viewModel.selectedReflectionFrequency,
                   onChanged: (value) {
                     if (value != null) {
                       viewModel.updateReflectionFrequency(value);
@@ -801,13 +813,13 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
                       color:
-                          state.selectedReflectionFrequency == frequency
+                          viewModel.selectedReflectionFrequency == frequency
                               ? theme.colorScheme.primary
                               : theme.colorScheme.primary.withOpacity(0.2),
                     ),
                   ),
                   tileColor:
-                      state.selectedReflectionFrequency == frequency
+                      viewModel.selectedReflectionFrequency == frequency
                           ? theme.colorScheme.primary.withOpacity(0.05)
                           : theme.colorScheme.surface,
                 ),
@@ -818,11 +830,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
     );
   }
 
-  Widget _buildNavigationButtons(
-    TutorialState state,
-    TutorialViewModel viewModel,
-    ThemeData theme,
-  ) {
+  Widget _buildNavigationButtons(TutorialViewModel viewModel, ThemeData theme) {
     return Container(
       padding: const EdgeInsets.all(20),
       child: Row(
@@ -859,15 +867,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           if (viewModel.shouldShowSkipButton())
             Expanded(
               child: OutlinedButton(
-                onPressed: () {
-                  viewModel.executeSkipAction();
-                  _pageController.nextPage(
-                    duration: Duration(
-                      milliseconds: TutorialViewModel.pageAnimationDurationMs,
-                    ),
-                    curve: Curves.easeInOut,
-                  );
-                },
+                onPressed: () => viewModel.executeSkipAction(),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: AppColors.textLight),
@@ -886,27 +886,14 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
           // 次へ/完了ボタン
           Expanded(
             flex:
-                state.currentPage == TutorialViewModel.introductionPageIndex
+                viewModel.currentPage == TutorialViewModel.introductionPageIndex
                     ? 1
                     : 2,
             child: FilledButton(
               onPressed:
                   viewModel.isNextButtonDisabled()
                       ? null
-                      : () async {
-                        final result = await viewModel.executeNextAction();
-                        if (result == 'next_page') {
-                          _pageController.nextPage(
-                            duration: Duration(
-                              milliseconds:
-                                  TutorialViewModel.pageAnimationDurationMs,
-                            ),
-                            curve: Curves.easeInOut,
-                          );
-                        } else if (result == 'navigate_to_main' && mounted) {
-                          context.go('/kindness-records');
-                        }
-                      },
+                      : () => viewModel.executeNextAction(),
               style: FilledButton.styleFrom(
                 backgroundColor: theme.colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
@@ -915,7 +902,7 @@ class _TutorialPageState extends ConsumerState<TutorialPage> {
                 ),
               ),
               child:
-                  viewModel.isNextButtonDisabled()
+                  viewModel.isNextButtonLoading()
                       ? SizedBox(
                         height: 20,
                         width: 20,

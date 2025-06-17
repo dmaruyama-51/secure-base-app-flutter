@@ -1,25 +1,26 @@
+// Flutter imports:
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import '../../models/kindness_giver.dart';
-import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
-import '../../view_models/kindness_giver/kindness_giver_list_view_model.dart';
-import '../../widgets/common/bottom_navigation.dart';
-import '../../utils/app_colors.dart';
-import '../../widgets/kindness_giver/gender_selection.dart';
-import '../../widgets/kindness_giver/relation_selection.dart';
 
-class KindnessGiverEditPage extends ConsumerStatefulWidget {
+// Package imports:
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+
+// Project imports:
+import '../../models/kindness_giver.dart';
+import '../../utils/app_colors.dart';
+import '../../view_models/kindness_giver/kindness_giver_edit_view_model.dart';
+import '../../widgets/common/bottom_navigation.dart';
+
+class KindnessGiverEditPage extends StatefulWidget {
   final KindnessGiver kindnessGiver;
 
   const KindnessGiverEditPage({super.key, required this.kindnessGiver});
 
   @override
-  ConsumerState<KindnessGiverEditPage> createState() =>
-      _KindnessGiverEditPageState();
+  State<KindnessGiverEditPage> createState() => _KindnessGiverEditPageState();
 }
 
-class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
+class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
   late TextEditingController _nameController;
 
   @override
@@ -38,65 +39,46 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(
-      kindnessGiverEditViewModelProvider(widget.kindnessGiver),
-    );
-    final viewModel = ref.read(
-      kindnessGiverEditViewModelProvider(widget.kindnessGiver).notifier,
-    );
-    final theme = Theme.of(context);
-
-    // 成功メッセージと画面遷移の処理
-    ref.listen(kindnessGiverEditViewModelProvider(widget.kindnessGiver), (
-      previous,
-      next,
-    ) {
-      if (next.shouldNavigateBack) {
-        viewModel.clearMessages();
-        ref
-            .read(kindnessGiverListViewModelProvider.notifier)
-            .loadKindnessGivers();
-        GoRouter.of(context).pop();
-      }
-
-      if (next.successMessage != null) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text(next.successMessage!)));
-      }
-
-      if (next.errorMessage != null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(next.errorMessage!),
-            backgroundColor: theme.colorScheme.error,
+    return ChangeNotifierProvider(
+      create:
+          (_) => KindnessGiverEditViewModel(
+            originalKindnessGiver: widget.kindnessGiver,
           ),
-        );
-      }
-    });
+      child: Consumer<KindnessGiverEditViewModel>(
+        builder: (context, viewModel, child) {
+          final theme = Theme.of(context);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: _buildAppBar(theme),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.only(
-          left: 20.0,
-          right: 20.0,
-          top: 8.0,
-          bottom: 20.0,
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(theme),
-            const SizedBox(height: 20),
-            _buildNameSection(state, viewModel, theme),
-            const SizedBox(height: 28),
-            _buildUpdateButton(state, viewModel, theme),
-          ],
-        ),
+          // エラーメッセージがあればSnackBarで表示
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.errorMessage != null) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text(viewModel.errorMessage!)));
+              viewModel.clearMessages();
+            }
+          });
+
+          // 成功メッセージがあればSnackBarで表示し、画面を戻す
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.successMessage != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(viewModel.successMessage!)),
+              );
+              if (viewModel.shouldNavigateBack) {
+                GoRouter.of(context).pop();
+              }
+              viewModel.clearMessages();
+            }
+          });
+
+          return Scaffold(
+            backgroundColor: theme.scaffoldBackgroundColor,
+            appBar: _buildAppBar(theme),
+            body: _buildBody(viewModel, theme),
+            bottomNavigationBar: const BottomNavigation(currentIndex: 1),
+          );
+        },
       ),
-      bottomNavigationBar: const BottomNavigation(currentIndex: 1),
     );
   }
 
@@ -105,6 +87,7 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
       backgroundColor: theme.scaffoldBackgroundColor,
       elevation: 0,
       centerTitle: false,
+      toolbarHeight: 48.0,
       leading: IconButton(
         icon: Container(
           padding: const EdgeInsets.all(8),
@@ -120,64 +103,17 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
         ),
         onPressed: () => GoRouter.of(context).pop(),
       ),
-    );
-  }
-
-  Widget _buildHeader(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            theme.colorScheme.primary.withOpacity(0.05),
-            theme.colorScheme.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+      title: Text(
+        'メンバーを編集',
+        style: theme.textTheme.titleMedium?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: theme.colorScheme.onSurface,
         ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(
-                Icons.info_outline,
-                size: 18,
-                color: theme.colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                'メンバー情報を編集',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '${widget.kindnessGiver.giverName}さんの情報を更新できます',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ],
       ),
     );
   }
 
-  Widget _buildNameSection(state, viewModel, ThemeData theme) {
+  Widget _buildNameSection(viewModel, ThemeData theme) {
     return _buildCard(
       theme,
       child: Column(
@@ -250,26 +186,44 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
     );
   }
 
-  Widget _buildUpdateButton(state, viewModel, ThemeData theme) {
-    return SizedBox(
-      width: double.infinity,
+  Widget _buildActionButtons(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Row(
+      children: [
+        Expanded(child: _buildUpdateButton(viewModel, theme)),
+        const SizedBox(width: 12),
+        Expanded(child: _buildDeleteButton(viewModel, theme)),
+      ],
+    );
+  }
+
+  Widget _buildUpdateButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
       child: ElevatedButton(
-        onPressed: state.isSaving ? null : viewModel.updateKindnessGiver,
+        onPressed:
+            viewModel.isSaving || viewModel.isDeleting
+                ? null
+                : viewModel.updateKindnessGiver,
         style: ElevatedButton.styleFrom(
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
-          padding: const EdgeInsets.symmetric(vertical: 12),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
           elevation: 0,
         ),
         child:
-            state.isSaving
+            viewModel.isSaving
                 ? SizedBox(
-                  height: 18,
-                  width: 18,
+                  width: 20,
+                  height: 20,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
                     color: theme.colorScheme.onPrimary,
+                    strokeWidth: 2,
                   ),
                 )
                 : Row(
@@ -277,20 +231,125 @@ class _KindnessGiverEditPageState extends ConsumerState<KindnessGiverEditPage> {
                   children: [
                     Icon(
                       Icons.update_outlined,
-                      size: 18,
+                      size: 16,
                       color: theme.colorScheme.onPrimary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 6),
                     Text(
-                      'メンバー情報を更新',
+                      '更新',
                       style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
                         color: theme.colorScheme.onPrimary,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
+      ),
+    );
+  }
+
+  Widget _buildDeleteButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.grey[600],
+          side: BorderSide(color: Colors.grey[300]!, width: 1.5),
+          backgroundColor: Colors.grey[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed:
+            viewModel.isDeleting || viewModel.isSaving
+                ? null
+                : () => _showDeleteConfirmDialog(viewModel, theme),
+        child:
+            viewModel.isDeleting
+                ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.grey[600],
+                    strokeWidth: 2,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.delete_outline,
+                      size: 16,
+                      color: Colors.grey[600],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '削除',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
+  }
+
+  Future<void> _showDeleteConfirmDialog(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('削除確認'),
+            content: Text(
+              '${widget.kindnessGiver.giverName}さんを削除しますか？\n削除すると元に戻すことはできません。',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  '削除',
+                  style: TextStyle(
+                    color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      viewModel.deleteKindnessGiver();
+    }
+  }
+
+  Widget _buildBody(viewModel, ThemeData theme) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.only(
+        left: 20.0,
+        right: 20.0,
+        top: 8.0,
+        bottom: 20.0,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildNameSection(viewModel, theme),
+          const SizedBox(height: 28),
+          _buildActionButtons(viewModel, theme),
+        ],
       ),
     );
   }

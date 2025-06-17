@@ -23,31 +23,12 @@
 
 ## アーキテクチャ 
 
-アプリケーションのアーキテクチャの詳細については、[アーキテクチャドキュメント](docs/architecture.md)を参照。
+アプリケーションのアーキテクチャは MVVM パターンを採用します。
 
+| レイヤー | ディレクトリ | 責務 |
+|---------|------------|------|
+| Model | `models/` | データモデルの定義とビジネスロジック |
+| View | `views/` | UIの表示とユーザーインタラクションの処理 |
+| ViewModel | `view_models/` | ViewとModelの橋渡し, 状態管理 |
 
-## ディレクトリ構成
-
-```
-lib/
-├── models/                 # データモデル（Entity層）
-│   ├── kindness_record.dart
-│   └── kindness_giver.dart
-├── repositories/           # データ取得・永続化（Repository層）
-│   ├── kindness_record_repository.dart
-│   └── kindness_giver_repository.dart
-├── providers/              # 依存性注入（DI層）
-│   ├── kindness_record/
-│   │   └── kindness_record_providers.dart
-│   └── kindness_giver/
-│       └── kindness_giver_providers.dart
-├── states/                 # 状態クラス（State層）
-│   └── kindness_record/
-│       └── kindness_record_add_state.dart
-├── view_models/           # 状態管理・ビジネスロジック（ViewModel層）
-│   └── kindness_record/
-│       └── kindness_record_add_view_model.dart
-└── views/                 # UI（View層）
-    └── kindness_record/
-        └── kindness_record_add_page.dart
-```
+※ 注意事項: Repository（`repositories/`）は可読性向上のためにデータアクセスの箇所を Model から分離しているだけで、DIは行いません。

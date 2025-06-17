@@ -1,3 +1,6 @@
+// Project imports:
+import 'repositories/kindness_giver_repository.dart';
+
 class KindnessGiver {
   final int? id;
   final String userId;
@@ -22,11 +25,6 @@ class KindnessGiver {
     this.relationshipName,
     this.genderName,
   });
-
-  // 後方互換性のためのgetter（kindness_record用）
-  String get name => giverName;
-  String get category => relationshipName ?? '';
-  String get gender => genderName ?? '';
 
   factory KindnessGiver.fromJson(Map<String, dynamic> json) {
     return KindnessGiver(
@@ -92,5 +90,107 @@ class KindnessGiver {
       relationshipName: relationshipName ?? this.relationshipName,
       genderName: genderName ?? this.genderName,
     );
+  }
+
+  // ===== ビジネスロジック（静的メソッド） =====
+
+  /// メンバー新規作成
+  static Future<KindnessGiver> createKindnessGiver({
+    required String giverName,
+    required String genderName,
+    required String relationshipName,
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+
+    // マスターデータからIDを取得
+    final genderId = await repo.getGenderIdByName(genderName);
+    final relationshipId = await repo.getRelationshipIdByName(relationshipName);
+
+    if (genderId == null) {
+      throw Exception('選択された性別が見つかりません: $genderName');
+    }
+    if (relationshipId == null) {
+      throw Exception('選択された関係性が見つかりません: $relationshipName');
+    }
+
+    // エンティティ作成
+    final kindnessGiver = KindnessGiver.create(
+      userId: '', // Repository内で現在のユーザーIDを設定
+      giverName: giverName.trim(),
+      relationshipId: relationshipId,
+      genderId: genderId,
+    );
+
+    // 保存
+    final createdGiver = await repo.createKindnessGiver(kindnessGiver);
+
+    if (createdGiver.id == null) {
+      throw Exception('やさしさをくれる人の保存に失敗しました');
+    }
+
+    return createdGiver;
+  }
+
+  /// メンバー情報更新
+  static Future<KindnessGiver> updateKindnessGiver({
+    required KindnessGiver originalKindnessGiver,
+    required String giverName,
+    required String genderName,
+    required String relationshipName,
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+
+    // マスターデータからIDを取得
+    final genderId = await repo.getGenderIdByName(genderName);
+    final relationshipId = await repo.getRelationshipIdByName(relationshipName);
+
+    if (genderId == null) {
+      throw Exception('選択された性別が見つかりません: $genderName');
+    }
+    if (relationshipId == null) {
+      throw Exception('選択された関係性が見つかりません: $relationshipName');
+    }
+
+    // エンティティ更新
+    final updatedKindnessGiver = originalKindnessGiver.copyWith(
+      giverName: giverName.trim(),
+      genderId: genderId,
+      relationshipId: relationshipId,
+    );
+
+    // 保存
+    await repo.updateKindnessGiver(updatedKindnessGiver);
+
+    return updatedKindnessGiver;
+  }
+
+  /// メンバー一覧取得
+  static Future<List<KindnessGiver>> fetchKindnessGivers({
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      return await repo.fetchKindnessGivers();
+    } catch (e) {
+      throw Exception('やさしさをくれる人の一覧取得に失敗しました: $e');
+    }
+  }
+
+  /// メンバー削除
+  static Future<void> deleteKindnessGiver(
+    int id, {
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      final success = await repo.deleteKindnessGiver(id);
+      if (!success) {
+        throw Exception('削除処理が失敗しました');
+      }
+    } catch (e) {
+      throw Exception('やさしさをくれる人の削除に失敗しました: $e');
+    }
   }
 }
