@@ -107,10 +107,13 @@ class Tutorial {
     }
   }
 
-  /// リフレクション設定を保存する
-  static Future<void> saveReflectionSettings({
+  /// リフレクション設定を完了する（設定保存 + チュートリアル完了マーク）
+  static Future<void> completeReflectionSettings({
     required String selectedReflectionFrequency,
+    TutorialRepository? repository,
   }) async {
+    final repo = repository ?? TutorialRepository();
+
     try {
       // 現在のユーザーを取得
       final user = Supabase.instance.client.auth.currentUser;
@@ -121,8 +124,32 @@ class Tutorial {
       // 保存の遅延（UI効果）
       await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
 
-      // 実際の保存処理はここに実装
-      print('リフレクション頻度を保存しました: $selectedReflectionFrequency');
+      // 1. リフレクション頻度をDBに保存
+      await repo.saveReflectionFrequency(selectedReflectionFrequency);
+
+      // 2. チュートリアル完了をマーク
+      await repo.markTutorialCompleted();
+    } catch (e) {
+      throw Exception('リフレクション設定の完了に失敗しました: $e');
+    }
+  }
+
+  /// リフレクション設定を保存する
+  static Future<void> saveReflectionSettings({
+    required String selectedReflectionFrequency,
+    TutorialRepository? repository,
+  }) async {
+    final repo = repository ?? TutorialRepository();
+
+    try {
+      // 現在のユーザーを取得
+      final user = Supabase.instance.client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      // リフレクション頻度をDBに保存
+      await repo.saveReflectionFrequency(selectedReflectionFrequency);
     } catch (e) {
       throw Exception('リフレクション設定の保存に失敗しました: $e');
     }

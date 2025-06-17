@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 
 // Project imports:
 import '../../models/tutorial_model.dart';
+import '../../models/repositories/tutorial_repository.dart';
 
 /// チュートリアル関連のバリデーションエラー用の例外クラス
 class TutorialValidationException implements Exception {
@@ -146,13 +147,13 @@ class TutorialViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> saveReflectionSettings() async {
+  Future<bool> completeReflectionSettings() async {
     _isSettingReflection = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await Tutorial.saveReflectionSettings(
+      await Tutorial.completeReflectionSettings(
         selectedReflectionFrequency: _selectedReflectionFrequency,
       );
 
@@ -308,8 +309,10 @@ class TutorialViewModel extends ChangeNotifier {
   }
 
   Future<void> _executeReflectionSettingAction() async {
-    final success = await saveReflectionSettings();
+    // リフレクション設定を完了（設定保存 + チュートリアル完了マーク）
+    final success = await completeReflectionSettings();
     if (success) {
+      // プレゼンテーションロジック：メイン画面にナビゲーション
       _shouldNavigateToMain = true;
       notifyListeners();
     }
