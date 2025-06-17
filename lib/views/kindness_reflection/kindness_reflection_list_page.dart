@@ -155,7 +155,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
       children: [
         // 最新のリフレクション
         if (latestReflections.isNotEmpty) ...[
-          _buildSectionHeader('最新のリフレクション', Icons.star),
+          _buildSectionHeader('最新', Icons.star),
           ...latestReflections.map(
             (reflection) => Padding(
               padding: const EdgeInsets.only(bottom: 12),
@@ -176,7 +176,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
         // 過去のリフレクション
         if (pastReflections.isNotEmpty) ...[
           if (latestReflections.isNotEmpty) const SizedBox(height: 16),
-          _buildSectionHeader('過去のリフレクション', Icons.history),
+          _buildSectionHeader('過去', Icons.history),
           ...pastReflections.map(
             (reflection) => Padding(
               padding: const EdgeInsets.only(bottom: 12),

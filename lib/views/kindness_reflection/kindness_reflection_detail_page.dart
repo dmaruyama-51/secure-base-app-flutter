@@ -142,12 +142,12 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ヘッダー
-              _buildHeader(),
+              // ヘッダー（常に表示）
+              _buildHeader(viewModel),
               const SizedBox(height: 24),
 
               // 統計情報
-              if (viewModel.statistics != null) ...[
+              if (viewModel.hasData && viewModel.statistics != null) ...[
                 ReflectionStatisticsCard(statistics: viewModel.statistics!),
                 const SizedBox(height: 24),
               ],
@@ -165,12 +165,12 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(ReflectionDetailViewModel viewModel) {
     final theme = Theme.of(context);
     final dateFormat = DateFormat('yyyy/MM/dd');
 
-    // null安全なアクセス
-    final reflection = widget.reflection;
+    // ViewModelのcurrentReflectionを使用
+    final reflection = viewModel.currentReflection;
     final title = reflection?.reflectionTitle ?? 'リフレクション';
     final startDate = reflection?.reflectionStartDate;
     final endDate = reflection?.reflectionEndDate;
@@ -387,49 +387,104 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            // 画像を円形コンテナでラップし、境界をにじませる効果を追加
             Container(
-              width: 120,
-              height: 120,
+              width: 160,
+              height: 160,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: RadialGradient(
                   colors: [
-                    AppColors.primaryLight.withOpacity(0.3),
-                    AppColors.secondary.withOpacity(0.1),
+                    AppColors.primaryLight.withOpacity(0.4),
+                    AppColors.secondary.withOpacity(0.2),
                   ],
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
               ),
-              child: Icon(
-                Icons.sentiment_satisfied_alt,
-                size: 48,
-                color: AppColors.primary.withOpacity(0.7),
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Image.asset(
+                  'assets/images/img_restart.png',
+                  fit: BoxFit.contain,
+                ),
               ),
             ),
-            const SizedBox(height: 24),
+
+            const SizedBox(height: 32),
+
+            // ポジティブなメインメッセージ
             Text(
-              'この期間に記録はありませんでした',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
+              '小さなやさしさを\n探しにいきませんか？',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w700,
                 color: AppColors.text,
               ),
             ),
-            const SizedBox(height: 16),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: AppColors.primary.withOpacity(0.3),
-                  width: 1,
-                ),
+
+            const SizedBox(height: 12),
+
+            // 共感的なサブメッセージ
+            Text(
+              '今回はまだ記録がありませんが、\n小さな出来事ほど大切な思い出になります。\n少しずつでいいので、ぜひ書き残してみてください。',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.textLight,
+                height: 1.6,
               ),
-              child: Text(
-                '次の期間はやさしさのアンテナを立ててみましょう 🌱',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.primary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
+            ),
+
+            const SizedBox(height: 32),
+
+            // やさしさ記録ボタン
+            Container(
+              height: 48,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.3),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                ),
+                onPressed: () {
+                  context.push('/kindness-records/add');
+                },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.add, size: 18, color: Colors.white),
+                    const SizedBox(width: 8),
+                    Text(
+                      '記録する',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),

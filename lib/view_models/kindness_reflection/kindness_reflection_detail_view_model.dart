@@ -62,9 +62,16 @@ class ReflectionDetailViewModel extends ChangeNotifier {
 
       // IDが指定されている場合はリフレクションを取得
       if (reflection == null && reflectionId != null) {
-        // TODO: 実際のAPIを実装する場合はここでIDからリフレクションを取得
-        // 現在はエラーとして処理
-        throw Exception('IDからのリフレクション取得機能は未実装です');
+        // IDからリフレクションを取得
+        final reflectionFromId = await KindnessReflection.getReflectionById(
+          int.parse(reflectionId!),
+        );
+
+        if (reflectionFromId == null) {
+          throw Exception('指定されたIDのリフレクションが見つかりません');
+        }
+
+        _loadedReflection = reflectionFromId;
       }
 
       await _loadReflectionData();
