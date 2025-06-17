@@ -156,11 +156,11 @@ class Tutorial {
   static String getFrequencyDescription(String frequency) {
     switch (frequency) {
       case '週に1回':
-        return '毎週、受け取った優しさを振り返ります';
+        return 'こまめに記録する方におすすめ';
       case '2週に1回':
-        return '2週間ごとに振り返りの時間をお届けします';
+        return 'バランスのよい推奨設定';
       case '月に1回':
-        return '月末に1ヶ月分の優しさをまとめて振り返ります';
+        return '記録する頻度が少ない方におすすめ';
       default:
         return '';
     }

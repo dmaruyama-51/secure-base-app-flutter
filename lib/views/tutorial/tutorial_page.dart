@@ -560,7 +560,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '• 「ありがとう」と言ってくれた\n• 体調を気遣ってくれた\n• 一緒に笑ってくれた\n• 話を聞いてくれた\n• 手伝ってくれた',
+            '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと',
             style: theme.textTheme.bodySmall?.copyWith(
               color: AppColors.textLight,
               height: 1.4,
