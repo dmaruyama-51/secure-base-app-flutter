@@ -12,41 +12,92 @@ class ReflectionListViewModel extends ChangeNotifier {
   int _currentOffset = 0;
   static const int _pageSize = 20;
 
+  // 次回配信日計算用の新しいプロパティ
+  DateTime? _nextDeliveryDate;
+  String? _nextDeliveryDateError;
+  bool _isCalculatingNextDelivery = false;
+
   // ゲッター
   List<KindnessReflection> get reflections => _reflections;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   bool get hasMore => _hasMore;
   bool get isEmpty => _reflections.isEmpty && !_isLoading;
+  DateTime? get nextDeliveryDate => _nextDeliveryDate;
+  String? get nextDeliveryDateError => _nextDeliveryDateError;
+  bool get isCalculatingNextDelivery => _isCalculatingNextDelivery;
 
-  /// リフレクションを「最新」と「過去」にグループ分け（Modelに委譲）
+  /// リフレクションを「最新」と「過去」にグループ分け
+  /// リフレクションが1つしかない場合は、それを最新として扱う
   Map<String, List<KindnessReflection>> getGroupedReflections() {
-    return KindnessReflection.groupReflections(_reflections);
+    final now = DateTime.now();
+    final sevenDaysAgo = DateTime(now.year, now.month, now.day - 7);
+
+    final latestReflections = <KindnessReflection>[];
+    final pastReflections = <KindnessReflection>[];
+
+    // リフレクションが1つしかない場合は、それを最新として扱う
+    if (_reflections.length == 1) {
+      latestReflections.add(_reflections.first);
+    } else {
+      // 複数ある場合は通常通り7日以内かどうかで分ける
+      for (final reflection in _reflections) {
+        if (reflection.createdAt.isAfter(sevenDaysAgo)) {
+          latestReflections.add(reflection);
+        } else {
+          pastReflections.add(reflection);
+        }
+      }
+    }
+
+    return {'latest': latestReflections, 'past': pastReflections};
+  }
+
+  /// 次回リフレクション配信日を計算する
+  Future<void> calculateNextDeliveryDate() async {
+    _isCalculatingNextDelivery = true;
+    _nextDeliveryDateError = null;
+    notifyListeners();
+
+    try {
+      // モデルのビジネスロジックを使用
+      _nextDeliveryDate = await KindnessReflection.calculateNextDeliveryDate(
+        existingReflections: _reflections,
+      );
+    } catch (e) {
+      _nextDeliveryDateError = 'お届け日の計算に失敗しました: $e';
+      _nextDeliveryDate = null;
+    } finally {
+      _isCalculatingNextDelivery = false;
+      notifyListeners();
+    }
   }
 
   /// 初回データ読み込み
   Future<void> loadReflections() async {
     if (_isLoading) return;
 
-    _isLoading = true;
-    _errorMessage = null;
+    _setLoading(true);
+    _clearError();
     _currentOffset = 0;
-    notifyListeners();
+    _hasMore = true;
 
     try {
       final newReflections = await KindnessReflection.fetchReflections(
         limit: _pageSize,
-        offset: _currentOffset,
+        offset: 0,
       );
 
       _reflections = newReflections;
-      _currentOffset = newReflections.length.toInt();
       _hasMore = newReflections.length == _pageSize;
+      _currentOffset = newReflections.length;
+
+      // リフレクション読み込み後に次回配信日を計算
+      await calculateNextDeliveryDate();
     } catch (e) {
-      _errorMessage = e.toString();
+      _setError('リフレクションの取得に失敗しました: $e');
     } finally {
-      _isLoading = false;
-      notifyListeners();
+      _setLoading(false);
     }
   }
 
@@ -74,17 +125,48 @@ class ReflectionListViewModel extends ChangeNotifier {
     }
   }
 
-  /// データを再読み込み
+  /// リフレッシュ（Pull to Refresh用）
   Future<void> refreshReflections() async {
-    _reflections.clear();
     _currentOffset = 0;
     _hasMore = true;
-    await loadReflections();
+    _clearError();
+
+    try {
+      final newReflections = await KindnessReflection.fetchReflections(
+        limit: _pageSize,
+        offset: 0,
+      );
+
+      _reflections = newReflections;
+      _hasMore = newReflections.length == _pageSize;
+      _currentOffset = newReflections.length;
+
+      // リフレッシュ後に次回配信日を再計算
+      await calculateNextDeliveryDate();
+
+      notifyListeners();
+    } catch (e) {
+      _setError('リフレクションの更新に失敗しました: $e');
+    }
   }
 
   /// エラーメッセージをクリア
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  void _setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  void _clearError() {
+    _errorMessage = null;
+  }
+
+  void _setError(String message) {
+    _errorMessage = message;
     notifyListeners();
   }
 }

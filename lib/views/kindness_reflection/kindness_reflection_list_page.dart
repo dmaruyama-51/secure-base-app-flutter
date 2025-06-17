@@ -222,53 +222,127 @@ class ReflectionListPageState extends State<ReflectionListPage> {
 
   Widget _buildHeader() {
     final theme = Theme.of(context);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            AppColors.primary.withOpacity(0.05),
-            AppColors.primary.withOpacity(0.02),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.15),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
-              const SizedBox(width: 8),
-              Text(
-                'リフレクション',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-          Text(
-            '安全基地メンバーからのやさしさのまとめをお届けします',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
-              fontSize: 12,
-              fontWeight: FontWeight.w400,
+    return Consumer<ReflectionListViewModel>(
+      builder: (context, viewModel, child) {
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                AppColors.primary.withOpacity(0.05),
+                AppColors.primary.withOpacity(0.02),
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.primary.withOpacity(0.15),
+              width: 1.5,
             ),
           ),
-        ],
-      ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
+                  const SizedBox(width: 8),
+                  Text(
+                    'リフレクション',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                '安全基地メンバーからのやさしさのまとめをお届けします',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textLight,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              // 次回配信日の表示
+              if (viewModel.nextDeliveryDate != null ||
+                  viewModel.isCalculatingNextDelivery ||
+                  viewModel.nextDeliveryDateError != null) ...[
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.schedule, size: 14, color: AppColors.primary),
+                      const SizedBox(width: 4),
+                      if (viewModel.isCalculatingNextDelivery)
+                        const SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 1.5,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              AppColors.primary,
+                            ),
+                          ),
+                        )
+                      else if (viewModel.nextDeliveryDateError != null)
+                        Text(
+                          '配信日計算エラー',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: Colors.orange,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        )
+                      else if (viewModel.nextDeliveryDate != null)
+                        Text(
+                          '次回お届け: ${_formatDeliveryDate(viewModel.nextDeliveryDate!)}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.primary,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
+  }
+
+  /// 配信日をフォーマットする
+  String _formatDeliveryDate(DateTime date) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final targetDate = DateTime(date.year, date.month, date.day);
+    final difference = targetDate.difference(today).inDays;
+
+    if (difference == 0) {
+      return '今日';
+    } else if (difference == 1) {
+      return '明日';
+    } else if (difference > 0) {
+      return '${difference}日後 (${date.month}/${date.day})';
+    } else {
+      return '${date.month}/${date.day}';
+    }
   }
 
   Widget _buildLoadingState() {

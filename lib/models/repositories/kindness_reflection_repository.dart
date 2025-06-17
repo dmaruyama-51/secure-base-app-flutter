@@ -52,4 +52,46 @@ class KindnessReflectionRepository {
       throw Exception('リフレクションの取得に失敗しました: $e');
     }
   }
+
+  /// 現在のユーザーのリフレクション期間設定を取得
+  Future<int> getReflectionPeriod() async {
+    try {
+      final user = _supabase.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      // kindness_reflectionsとreflection_type_masterをJOINして取得
+      final response =
+          await _supabase
+              .from('kindness_reflections')
+              .select('''
+            reflection_type_id,
+            reflection_type_master:reflection_type_id (
+              reflection_period,
+              reflection_type_name
+            )
+          ''')
+              .eq('user_id', user.id)
+              .order('created_at', ascending: false)
+              .limit(1)
+              .maybeSingle();
+
+      if (response == null) {
+        // リフレクションがない場合はデフォルト（週に1回=7日）
+        return 7;
+      }
+
+      final masterInfo = response['reflection_type_master'];
+      if (masterInfo == null) {
+        return 7;
+      }
+
+      final period = masterInfo['reflection_period'] as int?;
+      return period ?? 7;
+    } catch (e) {
+      // エラー時はデフォルト値を返す
+      return 7;
+    }
+  }
 }

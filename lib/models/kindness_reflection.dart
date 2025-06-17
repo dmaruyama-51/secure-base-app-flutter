@@ -1,5 +1,6 @@
 // Project imports:
 import 'repositories/kindness_reflection_repository.dart';
+import 'repositories/user_repository.dart';
 
 class KindnessReflection {
   final int? id;
@@ -13,6 +14,7 @@ class KindnessReflection {
   // リポジトリのインスタンス
   static final KindnessReflectionRepository _repository =
       KindnessReflectionRepository();
+  static final UserRepository _userRepository = UserRepository();
 
   KindnessReflection({
     this.id,
@@ -58,34 +60,6 @@ class KindnessReflection {
     };
   }
 
-  /// リフレクションを「最新」と「過去」にグループ分け
-  /// リフレクションが1つしかない場合は、それを最新として扱う
-  static Map<String, List<KindnessReflection>> groupReflections(
-    List<KindnessReflection> reflections,
-  ) {
-    final now = DateTime.now();
-    final sevenDaysAgo = DateTime(now.year, now.month, now.day - 7);
-
-    final latestReflections = <KindnessReflection>[];
-    final pastReflections = <KindnessReflection>[];
-
-    // リフレクションが1つしかない場合は、それを最新として扱う
-    if (reflections.length == 1) {
-      latestReflections.add(reflections.first);
-    } else {
-      // 複数ある場合は通常通り7日以内かどうかで分ける
-      for (final reflection in reflections) {
-        if (reflection.createdAt.isAfter(sevenDaysAgo)) {
-          latestReflections.add(reflection);
-        } else {
-          pastReflections.add(reflection);
-        }
-      }
-    }
-
-    return {'latest': latestReflections, 'past': pastReflections};
-  }
-
   /// 現在のユーザーのリフレクション一覧を取得
   static Future<List<KindnessReflection>> fetchReflections({
     int limit = 50,
@@ -97,5 +71,35 @@ class KindnessReflection {
   /// 特定のリフレクションを取得
   static Future<KindnessReflection?> getReflectionById(int id) async {
     return await _repository.getReflectionById(id);
+  }
+
+  /// 次回リフレクション配信日を計算する
+  static Future<DateTime> calculateNextDeliveryDate({
+    List<KindnessReflection>? existingReflections,
+    KindnessReflectionRepository? reflectionRepository,
+    UserRepository? userRepository,
+  }) async {
+    final reflectionRepo = reflectionRepository ?? _repository;
+    final userRepo = userRepository ?? _userRepository;
+
+    try {
+      // リフレクション期間を取得
+      final reflectionPeriod = await reflectionRepo.getReflectionPeriod();
+
+      DateTime baseDate;
+
+      // 既存のリフレクションがある場合は最新のcreated_atを基準にする
+      if (existingReflections != null && existingReflections.isNotEmpty) {
+        baseDate = existingReflections.first.createdAt;
+      } else {
+        // リフレクションがない場合はユーザーのサインアップ日を基準にする
+        baseDate = await userRepo.getUserCreatedAt();
+      }
+
+      // 基準日に期間を足して次回配信日を計算
+      return baseDate.add(Duration(days: reflectionPeriod));
+    } catch (e) {
+      throw Exception('次回配信日の計算に失敗しました: $e');
+    }
   }
 }
