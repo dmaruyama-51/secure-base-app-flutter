@@ -27,4 +27,41 @@ class AuthRepository {
 
   /// 認証状態の変更を監視
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
+
+  /// メールアドレス変更
+  Future<void> changeUserEmail(String newEmail) async {
+    try {
+      final user = _client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      await _client.auth.updateUser(UserAttributes(email: newEmail));
+    } catch (e) {
+      throw Exception('メールアドレスの変更に失敗しました: $e');
+    }
+  }
+
+  /// パスワード変更
+  Future<void> changeUserPassword(String newPassword) async {
+    try {
+      final user = _client.auth.currentUser;
+      if (user == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      await _client.auth.updateUser(UserAttributes(password: newPassword));
+    } catch (e) {
+      throw Exception('パスワードの変更に失敗しました: $e');
+    }
+  }
+
+  /// パスワードリセットメール送信
+  Future<void> resetPassword(String email) async {
+    try {
+      await _client.auth.resetPasswordForEmail(email);
+    } catch (e) {
+      throw Exception('パスワードリセットメールの送信に失敗しました: $e');
+    }
+  }
 }

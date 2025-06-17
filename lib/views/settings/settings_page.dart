@@ -8,6 +8,9 @@ import 'package:provider/provider.dart';
 // Project imports:
 import '../../view_models/settings/settings_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
+import '../../widgets/settings/settings_section.dart';
+import '../../widgets/settings/settings_dialog.dart';
+import '../../utils/app_colors.dart';
 
 /// 設定画面
 class SettingsPage extends StatefulWidget {
@@ -34,7 +37,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _initialized = true;
           }
 
-          // エラーメッセージと成功メッセージの監視
+          // メッセージ表示
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (viewModel.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -51,15 +54,29 @@ class _SettingsPageState extends State<SettingsPage> {
               );
               viewModel.clearMessages();
 
-              // ログアウト後にログイン画面に遷移
-              context.go('/login');
+              // 認証情報変更の場合のみログイン画面に遷移
+              if (viewModel.successMessage!.contains('メールアドレス') ||
+                  viewModel.successMessage!.contains('パスワード')) {
+                context.go('/login');
+              }
             }
           });
 
           return Scaffold(
             backgroundColor: theme.colorScheme.surface,
             appBar: _buildAppBar(theme),
-            body: _buildBody(viewModel, theme),
+            body: Stack(
+              children: [
+                _buildBody(viewModel, theme),
+                // ダイアログ表示
+                if (viewModel.showEmailDialog)
+                  EmailChangeDialog(viewModel: viewModel),
+                if (viewModel.showPasswordDialog)
+                  PasswordChangeDialog(viewModel: viewModel),
+                if (viewModel.showReflectionDialog)
+                  ReflectionSettingsDialog(viewModel: viewModel),
+              ],
+            ),
             bottomNavigationBar: const BottomNavigation(currentIndex: 3),
           );
         },
@@ -88,15 +105,76 @@ class _SettingsPageState extends State<SettingsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // アカウント設定セクション
-            _buildAccountSettingsSection(viewModel, theme),
+            SettingsSection(
+              title: 'アカウント設定',
+              icon: Icons.person_outline,
+              children: [
+                SettingsItem(
+                  icon: Icons.email_outlined,
+                  title: 'メールアドレス変更',
+                  subtitle: 'ログイン用のメールアドレスを変更',
+                  onTap: viewModel.showEmailChangeDialog,
+                ),
+                const SettingsDivider(),
+                SettingsItem(
+                  icon: Icons.lock_outline,
+                  title: 'パスワード変更',
+                  subtitle: 'ログイン用のパスワードを変更',
+                  onTap: viewModel.showPasswordChangeDialog,
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // アプリ設定セクション
-            _buildAppSettingsSection(theme),
+            SettingsSection(
+              title: 'アプリ設定',
+              icon: Icons.tune,
+              children: [
+                Consumer<SettingsViewModel>(
+                  builder:
+                      (context, viewModel, child) => SettingsItem(
+                        icon: Icons.notifications_outlined,
+                        title: 'リフレクション設定',
+                        subtitle: 'リフレクションの頻度を管理',
+                        onTap: viewModel.showReflectionSettingsDialog,
+                      ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // 情報・サポートセクション
-            _buildInfoSupportSection(theme),
+            SettingsSection(
+              title: '情報・サポート',
+              icon: Icons.help_outline,
+              children: [
+                SettingsItem(
+                  icon: Icons.info_outline,
+                  title: 'アプリについて',
+                  subtitle: 'バージョン情報・開発者情報',
+                  onTap: _showAboutDialog,
+                ),
+                const SettingsDivider(),
+                SettingsItem(
+                  icon: Icons.bug_report_outlined,
+                  title: 'フィードバック',
+                  subtitle: 'ご意見・バグ報告',
+                  onTap: () {
+                    // TODO: フィードバック機能
+                  },
+                ),
+                const SettingsDivider(),
+                SettingsItem(
+                  icon: Icons.privacy_tip_outlined,
+                  title: 'プライバシーポリシー',
+                  subtitle: '個人情報の取り扱いについて',
+                  onTap: () {
+                    // TODO: プライバシーポリシー表示
+                  },
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // ログアウトセクション
@@ -108,315 +186,74 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildAccountSettingsSection(
-    SettingsViewModel viewModel,
-    ThemeData theme,
-  ) {
-    return _buildSection(
-      title: 'アカウント設定',
-      icon: Icons.person_outline,
-      theme: theme,
-      children: [
-        _buildSettingItem(
-          icon: Icons.email_outlined,
-          title: 'メールアドレス変更',
-          subtitle: 'ログイン用のメールアドレスを変更',
-          onTap: () => viewModel.showEmailChangeDialog(),
-          theme: theme,
-        ),
-        _buildDivider(theme),
-        _buildSettingItem(
-          icon: Icons.lock_outline,
-          title: 'パスワード変更',
-          subtitle: 'ログイン用のパスワードを変更',
-          onTap: () => viewModel.showPasswordChangeDialog(),
-          theme: theme,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAppSettingsSection(ThemeData theme) {
-    return _buildSection(
-      title: 'アプリ設定',
-      icon: Icons.tune,
-      theme: theme,
-      children: [
-        _buildSettingItem(
-          icon: Icons.notifications_outlined,
-          title: '通知設定',
-          subtitle: 'リフレクションの通知を管理',
-          onTap: () {
-            // TODO: 通知設定画面に遷移
-          },
-          theme: theme,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildInfoSupportSection(ThemeData theme) {
-    return _buildSection(
-      title: '情報・サポート',
-      icon: Icons.help_outline,
-      theme: theme,
-      children: [
-        _buildSettingItem(
-          icon: Icons.info_outline,
-          title: 'アプリについて',
-          subtitle: 'バージョン情報・開発者情報',
-          onTap: () {
-            _showAboutDialog();
-          },
-          theme: theme,
-        ),
-        _buildDivider(theme),
-        _buildSettingItem(
-          icon: Icons.bug_report_outlined,
-          title: 'フィードバック',
-          subtitle: 'ご意見・バグ報告',
-          onTap: () {
-            // TODO: フィードバック機能
-          },
-          theme: theme,
-        ),
-        _buildDivider(theme),
-        _buildSettingItem(
-          icon: Icons.privacy_tip_outlined,
-          title: 'プライバシーポリシー',
-          subtitle: '個人情報の取り扱いについて',
-          onTap: () {
-            // TODO: プライバシーポリシー表示
-          },
-          theme: theme,
-        ),
-      ],
-    );
-  }
-
   Widget _buildLogoutSection(SettingsViewModel viewModel, ThemeData theme) {
-    return _buildSection(
-      title: 'アカウント管理',
-      icon: Icons.account_circle_outlined,
-      theme: theme,
+    return SettingsSection(
+      title: 'アカウント',
+      icon: Icons.logout,
       children: [
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: InkWell(
-            onTap:
-                viewModel.isLoading ? null : () => _showLogoutDialog(viewModel),
-            borderRadius: BorderRadius.circular(12),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: theme.colorScheme.error.withOpacity(0.1),
-                  width: 1,
+        InkWell(
+          onTap: () => _showLogoutDialog(viewModel),
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.error.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.logout,
+                    size: 20,
+                    color: theme.colorScheme.error,
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.error.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Icon(
-                      Icons.logout,
-                      size: 20,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'ログアウト',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: theme.colorScheme.error,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'アプリからログアウトします',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurface.withOpacity(0.65),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (viewModel.isLoading)
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
                       color: theme.colorScheme.error,
                     ),
+                  )
+                else
+                  Icon(
+                    Icons.chevron_right,
+                    color: theme.colorScheme.onSurface.withOpacity(0.4),
+                    size: 20,
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'ログアウト',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            color: theme.colorScheme.error,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          'アカウントからログアウトします',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(
-                              0.65,
-                            ),
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (viewModel.isLoading)
-                    SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: theme.colorScheme.error,
-                      ),
-                    )
-                  else
-                    Icon(
-                      Icons.chevron_right,
-                      color: theme.colorScheme.onSurface.withOpacity(0.4),
-                      size: 20,
-                    ),
-                ],
-              ),
+              ],
             ),
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSection({
-    required String title,
-    required IconData icon,
-    required ThemeData theme,
-    required List<Widget> children,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 8, bottom: 16),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
-                ),
-                child: Icon(icon, size: 18, color: theme.colorScheme.primary),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-        ),
-        _buildSettingCard(theme: theme, child: Column(children: children)),
-      ],
-    );
-  }
-
-  Widget _buildSettingCard({required ThemeData theme, required Widget child}) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.colorScheme.primary.withOpacity(0.08),
-          width: 1,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-          BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 6,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _buildSettingItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    required ThemeData theme,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: Icon(icon, size: 20, color: theme.colorScheme.primary),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 14,
-                      color: theme.colorScheme.onSurface,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.65),
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: theme.colorScheme.onSurface.withOpacity(0.4),
-              size: 20,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDivider(ThemeData theme) {
-    return Container(
-      height: 1,
-      margin: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.transparent,
-            theme.colorScheme.primary.withOpacity(0.08),
-            Colors.transparent,
-          ],
-        ),
-      ),
     );
   }
 

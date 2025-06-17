@@ -4,9 +4,9 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import '../../models/settings_model.dart';
 
-/// 設定のViewModel
+/// 設定のViewModel（プレゼンテーションロジックと状態管理に特化）
 class SettingsViewModel extends ChangeNotifier {
-  // 状態プロパティ
+  // UI状態プロパティ
   bool _isLoading = false;
   String? _errorMessage;
   String? _successMessage;
@@ -14,25 +14,35 @@ class SettingsViewModel extends ChangeNotifier {
   // ダイアログ状態
   bool _showEmailDialog = false;
   bool _showPasswordDialog = false;
+  bool _showReflectionDialog = false;
+
+  // 入力値の状態
   String _currentEmail = '';
   String _newEmail = '';
   String _currentPassword = '';
   String _newPassword = '';
   String _confirmPassword = '';
 
-  // ゲッター
+  // リフレクション設定の状態
+  String _selectedReflectionFrequency = '2週に1回';
+  bool _isLoadingReflectionSettings = false;
+
+  // ゲッター（UI状態の公開）
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get showEmailDialog => _showEmailDialog;
   bool get showPasswordDialog => _showPasswordDialog;
+  bool get showReflectionDialog => _showReflectionDialog;
   String get currentEmail => _currentEmail;
   String get newEmail => _newEmail;
   String get currentPassword => _currentPassword;
   String get newPassword => _newPassword;
   String get confirmPassword => _confirmPassword;
+  String get selectedReflectionFrequency => _selectedReflectionFrequency;
+  bool get isLoadingReflectionSettings => _isLoadingReflectionSettings;
 
-  /// メールアドレス変更ダイアログを表示
+  // ダイアログ表示メソッド
   void showEmailChangeDialog() {
     _showEmailDialog = true;
     _currentEmail = '';
@@ -40,7 +50,6 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// パスワード変更ダイアログを表示
   void showPasswordChangeDialog() {
     _showPasswordDialog = true;
     _currentPassword = '';
@@ -49,14 +58,36 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// ダイアログを閉じる
+  Future<void> showReflectionSettingsDialog() async {
+    _showReflectionDialog = true;
+    _isLoadingReflectionSettings = true;
+    notifyListeners();
+
+    try {
+      // 現在の設定を読み込み（Modelのビジネスロジックを使用）
+      final settings = await Settings.getCurrentSettings();
+      if (settings['reflection_type_id'] != null) {
+        final reflectionTypeId = settings['reflection_type_id'] as int;
+        _selectedReflectionFrequency = Settings.getFrequencyFromId(
+          reflectionTypeId,
+        );
+      }
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _isLoadingReflectionSettings = false;
+      notifyListeners();
+    }
+  }
+
   void closeDialogs() {
     _showEmailDialog = false;
     _showPasswordDialog = false;
+    _showReflectionDialog = false;
     notifyListeners();
   }
 
-  /// メールアドレス入力を更新
+  // 入力値更新メソッド
   void updateCurrentEmail(String email) {
     _currentEmail = email;
     notifyListeners();
@@ -67,7 +98,6 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// パスワード入力を更新
   void updateCurrentPassword(String password) {
     _currentPassword = password;
     notifyListeners();
@@ -83,99 +113,108 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// メールアドレス変更処理
+  void updateReflectionFrequency(String frequency) {
+    _selectedReflectionFrequency = frequency;
+    notifyListeners();
+  }
+
   Future<void> changeEmail() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _clearMessages();
 
     try {
-      // TODO: 実際のメールアドレス変更処理を実装
-      await Future.delayed(const Duration(seconds: 1));
-      _isLoading = false;
-      _successMessage = 'メールアドレスの変更機能は実装予定です';
+      await Settings.changeEmail(_currentEmail, _newEmail);
+      _successMessage = 'メールアドレスを変更しました';
       _showEmailDialog = false;
-      notifyListeners();
     } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'メールアドレスの変更に失敗しました';
-      notifyListeners();
+      _errorMessage = e.toString();
+    } finally {
+      _setLoading(false);
     }
   }
 
-  /// パスワード変更処理
   Future<void> changePassword() async {
-    // バリデーション
-    if (_newPassword != _confirmPassword) {
-      _errorMessage = 'パスワードが一致しません';
-      notifyListeners();
-      return;
-    }
+    _setLoading(true);
+    _clearMessages();
 
-    if (_newPassword.length < 6) {
-      _errorMessage = 'パスワードは6文字以上で入力してください';
-      notifyListeners();
-      return;
+    try {
+      await Settings.changePassword(
+        _currentPassword,
+        _newPassword,
+        _confirmPassword,
+      );
+      _successMessage = 'パスワードを変更しました';
+      _showPasswordDialog = false;
+    } catch (e) {
+      _errorMessage = e.toString();
+    } finally {
+      _setLoading(false);
     }
+  }
 
-    _isLoading = true;
-    _errorMessage = null;
+  Future<void> saveReflectionSettings() async {
+    _isLoadingReflectionSettings = true;
+    _clearMessages();
     notifyListeners();
 
     try {
-      // TODO: 実際のパスワード変更処理を実装
-      await Future.delayed(const Duration(seconds: 1));
-      _isLoading = false;
-      _successMessage = 'パスワードの変更機能は実装予定です';
-      _showPasswordDialog = false;
-      notifyListeners();
+      await Settings.saveReflectionSettings(_selectedReflectionFrequency);
+      _successMessage = 'リフレクション設定を保存しました';
+      _showReflectionDialog = false;
     } catch (e) {
-      _isLoading = false;
-      _errorMessage = 'パスワードの変更に失敗しました';
+      _errorMessage = e.toString();
+    } finally {
+      _isLoadingReflectionSettings = false;
       notifyListeners();
     }
   }
 
-  /// 初期化
   Future<void> initialize() async {
-    _isLoading = true;
-    _errorMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _clearMessages();
 
     try {
       await Settings.initialize();
-      _isLoading = false;
-      notifyListeners();
     } catch (e) {
-      _isLoading = false;
       _errorMessage = e.toString();
-      notifyListeners();
+    } finally {
+      _setLoading(false);
     }
   }
 
-  /// ログアウト処理
   Future<void> signOut() async {
-    _isLoading = true;
-    _errorMessage = null;
-    _successMessage = null;
-    notifyListeners();
+    _setLoading(true);
+    _clearMessages();
 
     try {
       await Settings.signOut();
-      _isLoading = false;
       _successMessage = 'ログアウトしました';
-      notifyListeners();
     } catch (e) {
-      _isLoading = false;
       _errorMessage = e.toString();
-      notifyListeners();
+    } finally {
+      _setLoading(false);
     }
   }
 
-  /// メッセージをクリア
+  // プレゼンテーション用メソッド（Modelのビジネスロジックを使用）
+  String getFrequencyDescription(String frequency) {
+    return Settings.getFrequencyDescription(frequency);
+  }
+
+  // ヘルパーメソッド
   void clearMessages() {
     _errorMessage = null;
     _successMessage = null;
     notifyListeners();
+  }
+
+  void _setLoading(bool loading) {
+    _isLoading = loading;
+    notifyListeners();
+  }
+
+  void _clearMessages() {
+    _errorMessage = null;
+    _successMessage = null;
   }
 }
