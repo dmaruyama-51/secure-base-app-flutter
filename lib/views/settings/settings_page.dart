@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
 import '../../view_models/settings/settings_view_model.dart';
@@ -182,9 +183,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.privacy_tip_outlined,
                   title: 'プライバシーポリシー',
                   subtitle: '個人情報の取り扱いについて',
-                  onTap: () {
-                    // TODO: プライバシーポリシー表示
-                  },
+                  onTap: viewModel.openPrivacyPolicy,
                 ),
               ],
             ),

@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
 import '../../models/settings_model.dart';
@@ -216,5 +217,23 @@ class SettingsViewModel extends ChangeNotifier {
   void _clearMessages() {
     _errorMessage = null;
     _successMessage = null;
+  }
+
+  Future<void> openPrivacyPolicy() async {
+    final uri = Uri.parse(
+      'https://www.notion.so/21693295f40f8012af28c9488fe6a69c?source=copy_link',
+    );
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        _errorMessage = 'リンクを開けませんでした';
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'エラーが発生しました';
+      notifyListeners();
+    }
   }
 }
