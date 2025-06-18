@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Project imports:
 import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
+import '../models/kindness_reflection.dart';
 import '../models/repositories/tutorial_repository.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
@@ -16,6 +17,8 @@ import '../views/login_page.dart';
 import '../views/register_page.dart';
 import '../views/settings/settings_page.dart';
 import '../views/tutorial/tutorial_page.dart';
+import '../views/kindness_reflection/kindness_reflection_list_page.dart';
+import '../views/kindness_reflection/kindness_reflection_detail_page.dart';
 
 /// 認証とチュートリアルのガード処理
 Future<String?> _authAndTutorialGuard(String location) async {
@@ -63,39 +66,62 @@ final GoRouter appRouter = GoRouter(
     GoRoute(
       path: '/kindness-givers',
       builder: (context, state) => const KindnessGiverListPage(),
-    ),
-    GoRoute(
-      path: '/kindness-givers/add',
-      builder: (context, state) => const KindnessGiverAddPage(),
-    ),
-    GoRoute(
-      path: '/kindness-givers/edit/:id',
-      builder: (context, state) {
-        final kindnessGiver = state.extra as KindnessGiver;
-        return KindnessGiverEditPage(kindnessGiver: kindnessGiver);
-      },
+      routes: [
+        GoRoute(
+          path: 'add',
+          builder: (context, state) => const KindnessGiverAddPage(),
+        ),
+        GoRoute(
+          path: 'edit/:id',
+          builder: (context, state) {
+            final kindnessGiver = state.extra as KindnessGiver;
+            return KindnessGiverEditPage(kindnessGiver: kindnessGiver);
+          },
+        ),
+      ],
     ),
     // kindness-record系のルート（認証必須）
     GoRoute(
       path: '/kindness-records',
       builder: (context, state) => const KindnessRecordListPage(),
-    ),
-    GoRoute(
-      path: '/kindness-records/add',
-      builder: (context, state) => const KindnessRecordAddPage(),
-    ),
-    GoRoute(
-      path: '/kindness-records/edit/:id',
-      builder: (context, state) {
-        return KindnessRecordEditPage(
-          kindnessRecord: state.extra as KindnessRecord,
-        );
-      },
+      routes: [
+        GoRoute(
+          path: 'add',
+          builder: (context, state) => const KindnessRecordAddPage(),
+        ),
+        GoRoute(
+          path: 'edit/:id',
+          builder: (context, state) {
+            return KindnessRecordEditPage(
+              kindnessRecord: state.extra as KindnessRecord,
+            );
+          },
+        ),
+      ],
     ),
     // 設定画面（認証必須）
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsPage(),
+    ),
+    // リフレクション系のルート（認証必須）
+    GoRoute(
+      path: '/reflections',
+      builder: (context, state) => const ReflectionListPage(),
+      routes: [
+        // リフレクション詳細ページのサブルート
+        GoRoute(
+          path: 'detail/:id',
+          builder: (context, state) {
+            final reflection = state.extra as KindnessReflection?;
+            final id = state.pathParameters['id'];
+            return ReflectionDetailPage(
+              reflection: reflection,
+              reflectionId: id,
+            );
+          },
+        ),
+      ],
     ),
   ],
 );

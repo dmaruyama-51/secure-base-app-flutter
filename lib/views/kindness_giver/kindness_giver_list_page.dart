@@ -295,146 +295,51 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
   Widget _buildEmptyCard(ThemeData theme) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            Colors.white,
-            theme.colorScheme.primary.withOpacity(0.02),
-            Colors.white.withOpacity(0.95),
-          ],
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-        ),
-        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 3),
-            spreadRadius: 2,
-          ),
-          BoxShadow(
-            color: theme.colorScheme.primary.withOpacity(0.03),
-            blurRadius: 25,
-            offset: const Offset(0, 8),
-            spreadRadius: 4,
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 1),
           ),
         ],
         border: Border.all(
-          color: theme.colorScheme.secondary.withOpacity(0.5),
-          width: 1.5,
+          color: theme.colorScheme.secondary.withOpacity(0.8),
+          width: 1,
         ),
       ),
       child: Column(
         children: [
           // イラスト的なアバターコンテナ
           Container(
-            width: 80,
-            height: 80,
+            width: 64,
+            height: 64,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  theme.colorScheme.primary.withOpacity(0.08),
-                  theme.colorScheme.primary.withOpacity(0.05),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(40),
-              border: Border.all(
-                color: theme.colorScheme.primary.withOpacity(0.15),
-                width: 2,
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: theme.colorScheme.secondary.withOpacity(0.3),
+              borderRadius: BorderRadius.circular(32),
             ),
-            child: Stack(
-              children: [
-                Center(
-                  child: Icon(
-                    Icons.people_outline,
-                    size: 36,
-                    color: theme.colorScheme.primary.withOpacity(0.7),
-                  ),
-                ),
-                Positioned(
-                  right: 8,
-                  bottom: 8,
-                  child: Container(
-                    width: 24,
-                    height: 24,
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.white, width: 2),
-                    ),
-                    child: const Icon(Icons.add, size: 14, color: Colors.white),
-                  ),
-                ),
-              ],
+            child: Icon(
+              Icons.people_outline,
+              size: 32,
+              color: theme.colorScheme.primary.withOpacity(0.6),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Text(
             'まだメンバーがいません',
             style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w700,
-              fontSize: 18,
-              color: theme.colorScheme.onSurface,
-              letterSpacing: 0.2,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 6),
           Text(
             '右下のボタンから\n最初のメンバーを追加しましょう',
-            style: TextStyle(
-              color: AppColors.textLight,
-              fontSize: 14,
-              height: 1.6,
-              fontWeight: FontWeight.w400,
-            ),
+            style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 24),
-          Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: theme.colorScheme.primary.withOpacity(0.2),
-                  blurRadius: 8,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: ElevatedButton.icon(
-              onPressed: _navigateToAdd,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('メンバーを追加'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: theme.colorScheme.primary,
-                foregroundColor: theme.colorScheme.onPrimary,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 14,
-                ),
-                textStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.3,
-                ),
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
           ),
         ],
       ),

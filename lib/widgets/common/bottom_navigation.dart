@@ -29,7 +29,7 @@ class BottomNavigation extends StatelessWidget {
             context.go('/kindness-givers');
             break;
           case 2:
-            context.go('/'); // Reflectionページ用（未実装）
+            context.go('/reflections'); // リフレクションページに遷移
             break;
           case 3:
             context.go('/settings'); // 設定画面に遷移
@@ -40,7 +40,7 @@ class BottomNavigation extends StatelessWidget {
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
         BottomNavigationBarItem(icon: Icon(Icons.people), label: 'メンバー'),
         BottomNavigationBarItem(
-          icon: Icon(Icons.favorite_border),
+          icon: Icon(Icons.auto_awesome),
           label: 'リフレクション',
         ),
         BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
