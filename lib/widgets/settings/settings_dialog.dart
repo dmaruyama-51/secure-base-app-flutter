@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import '../../view_models/settings/settings_view_model.dart';
-import '../../utils/app_colors.dart';
 import 'settings_form_field.dart';
 
 /// 基本的な設定ダイアログのベースクラス

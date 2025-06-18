@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 // Project imports:
 import '../../models/kindness_record.dart';
 import '../../models/kindness_reflection.dart';
-import '../../models/repositories/kindness_record_repository.dart';
 
 /// リフレクション詳細画面の統計情報
 class ReflectionStatistics {
@@ -27,7 +26,6 @@ class ReflectionStatistics {
 class ReflectionDetailViewModel extends ChangeNotifier {
   final KindnessReflection? reflection;
   final String? reflectionId;
-  final KindnessRecordRepository _repository = KindnessRecordRepository();
 
   // 状態プロパティ
   List<KindnessRecord> _records = [];
