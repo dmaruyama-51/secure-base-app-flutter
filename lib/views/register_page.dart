@@ -137,7 +137,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         // サブタイトル（デフォルトフォント使用）
         const Text(
-          'Kindlyの利用をはじめましょう',
+          'Kindlyへようこそ！',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 16,
@@ -171,6 +171,10 @@ class _RegisterPageState extends State<RegisterPage> {
           errorText: viewModel.passwordError,
           onChanged: (_) => viewModel.clearValidationErrors(),
         ),
+        const SizedBox(height: 20),
+
+        // 利用規約同意
+        _buildTermsSection(viewModel),
         const SizedBox(height: 24),
 
         // 登録ボタン
@@ -200,7 +204,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                     )
                     : const Text(
-                      'アカウントを作成',
+                      '同意して登録',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
@@ -212,10 +216,90 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  Widget _buildTermsSection(AuthViewModel viewModel) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // チェックボックス - 周囲のデザインに合わせて調整
+            Checkbox(
+              value: viewModel.isTermsAccepted,
+              onChanged: (value) {
+                viewModel.setTermsAccepted(value ?? false);
+              },
+              activeColor: AppColors.primary,
+              checkColor: Colors.white,
+              side: BorderSide(
+                color: AppColors.textLight.withOpacity(0.4),
+                width: 1.5,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(4),
+              ),
+              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+            ),
+            const SizedBox(width: 12),
+            // 利用規約テキスト
+            Expanded(
+              child: GestureDetector(
+                onTap: () {
+                  viewModel.setTermsAccepted(!viewModel.isTermsAccepted);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text.rich(
+                    TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Kindlyの',
+                          style: TextStyle(fontSize: 14, color: AppColors.text),
+                        ),
+                        WidgetSpan(
+                          child: GestureDetector(
+                            onTap: () => viewModel.openTermsUrl(),
+                            child: const Text(
+                              '利用規約',
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: AppColors.primary,
+                                decoration: TextDecoration.underline,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const TextSpan(
+                          text: 'に同意します',
+                          style: TextStyle(fontSize: 14, color: AppColors.text),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        if (viewModel.termsError != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 4, left: 36),
+            child: Text(
+              viewModel.termsError!,
+              style: const TextStyle(fontSize: 12, color: Colors.red),
+            ),
+          ),
+      ],
+    );
+  }
+
   void _handleSignUp(AuthViewModel viewModel) {
     final isValid = viewModel.validateForm(
       email: _emailController.text,
       password: _passwordController.text,
+      checkTerms: true,
     );
     if (!isValid) {
       return;

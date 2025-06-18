@@ -1,5 +1,6 @@
 // Flutter imports:
 import 'package:flutter/foundation.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
 import '../../models/auth_model.dart';
@@ -16,6 +17,18 @@ class AuthValidationException implements Exception {
 
 /// 認証画面用のViewModel
 class AuthViewModel extends ChangeNotifier {
+  // =============================================================================
+  // 定数定義
+  // =============================================================================
+
+  // 利用規約URL
+  static const String _termsUrl =
+      'https://www.notion.so/21693295f40f80928f3cc5647c8d7f82';
+
+  // =============================================================================
+  // 状態プロパティ
+  // =============================================================================
+
   // 状態プロパティ
   bool _isLoading = false;
   String? _errorMessage;
@@ -27,6 +40,10 @@ class AuthViewModel extends ChangeNotifier {
   String? _emailError;
   String? _passwordError;
 
+  // 利用規約同意用
+  bool _isTermsAccepted = false;
+  String? _termsError;
+
   // ゲッター
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -35,6 +52,8 @@ class AuthViewModel extends ChangeNotifier {
   String? get navigationPath => _navigationPath;
   String? get emailError => _emailError;
   String? get passwordError => _passwordError;
+  bool get isTermsAccepted => _isTermsAccepted;
+  String? get termsError => _termsError;
 
   /// ログイン用バリデーション
   void _validateSignInInput(String email, String password) {
@@ -47,7 +66,7 @@ class AuthViewModel extends ChangeNotifier {
   }
 
   /// サインアップ用バリデーション
-  void _validateSignUpInput(String email, String password) {
+  void _validateSignUpInput(String email, String password, bool termsAccepted) {
     if (email.trim().isEmpty) {
       throw AuthValidationException('メールアドレスを入力してください');
     }
@@ -57,12 +76,20 @@ class AuthViewModel extends ChangeNotifier {
     if (password.length < 6) {
       throw AuthValidationException('パスワードは6文字以上で入力してください');
     }
+    if (!termsAccepted) {
+      throw AuthValidationException('利用規約への同意が必要です');
+    }
   }
 
-  /// フォームバリデーション
-  bool validateForm({required String email, required String password}) {
+  /// フォームバリデーション（利用規約同意を含む）
+  bool validateForm({
+    required String email,
+    required String password,
+    bool checkTerms = false,
+  }) {
     _emailError = null;
     _passwordError = null;
+    _termsError = null;
 
     if (email.trim().isEmpty) {
       _emailError = '必須';
@@ -74,7 +101,14 @@ class AuthViewModel extends ChangeNotifier {
       _passwordError = '6文字以上';
     }
 
-    final isValid = _emailError == null && _passwordError == null;
+    if (checkTerms && !_isTermsAccepted) {
+      _termsError = '利用規約への同意が必要です';
+    }
+
+    final isValid =
+        _emailError == null &&
+        _passwordError == null &&
+        (!checkTerms || _termsError == null);
     if (!isValid) {
       notifyListeners();
     }
@@ -85,6 +119,14 @@ class AuthViewModel extends ChangeNotifier {
   void clearValidationErrors() {
     _emailError = null;
     _passwordError = null;
+    _termsError = null;
+    notifyListeners();
+  }
+
+  /// 利用規約同意状態を設定
+  void setTermsAccepted(bool accepted) {
+    _isTermsAccepted = accepted;
+    _termsError = null; // チェックボックスが変更されたらエラーをクリア
     notifyListeners();
   }
 
@@ -131,8 +173,8 @@ class AuthViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      // バリデーション
-      _validateSignUpInput(email, password);
+      // バリデーション（利用規約同意を含む）
+      _validateSignUpInput(email, password, _isTermsAccepted);
 
       final result = await AuthModel.signUp(email: email, password: password);
 
@@ -175,5 +217,20 @@ class AuthViewModel extends ChangeNotifier {
     _successMessage = null;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  /// 利用規約のURLを開く
+  Future<bool> openTermsUrl() async {
+    try {
+      final uri = Uri.parse(_termsUrl);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      return false;
+    }
   }
 }
