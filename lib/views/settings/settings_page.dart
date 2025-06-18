@@ -149,7 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       (context, viewModel, child) => SettingsItem(
                         icon: Icons.notifications_outlined,
                         title: 'リフレクション設定',
-                        subtitle: 'リフレクションの頻度を管理',
+                        subtitle: 'リフレクションの頻度を変更',
                         onTap: viewModel.showReflectionSettingsDialog,
                       ),
                 ),
@@ -187,6 +187,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(height: 24),
 
             // ログアウトセクション
+            const SizedBox(height: 16),
             _buildLogoutSection(viewModel, theme),
             const SizedBox(height: 40),
           ],
@@ -196,49 +197,65 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildLogoutSection(SettingsViewModel viewModel, ThemeData theme) {
-    return SettingsSection(
-      title: 'アカウント',
-      icon: Icons.logout,
-      children: [
-        InkWell(
-          onTap: () => _showLogoutDialog(viewModel),
-          borderRadius: BorderRadius.circular(12),
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.error.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    Icons.logout,
-                    size: 20,
-                    color: theme.colorScheme.error,
-                  ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.08),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => _showLogoutDialog(viewModel),
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.error.withOpacity(0.08),
+                  borderRadius: BorderRadius.circular(10),
                 ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Text(
-                    'ログアウト',
-                    style: theme.textTheme.bodyLarge?.copyWith(
-                      color: theme.colorScheme.error,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                Icon(
-                  Icons.chevron_right,
-                  color: theme.colorScheme.error.withOpacity(0.6),
+                child: Icon(
+                  Icons.logout,
                   size: 20,
+                  color: theme.colorScheme.error,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Text(
+                  'ログアウト',
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    color: theme.colorScheme.error,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Icon(
+                Icons.chevron_right,
+                color: theme.colorScheme.error,
+                size: 20,
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
