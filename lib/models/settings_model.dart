@@ -106,7 +106,7 @@ class Settings {
     }
   }
 
-  /// メールアドレス変更処理（AuthRepositoryを使用）
+  /// メールアドレス変更処理
   static Future<void> changeEmail(
     String currentEmail,
     String newEmail, {
@@ -125,6 +125,16 @@ class Settings {
       throw Exception(newEmailError);
     }
 
+    // 現在のメールアドレスが正しいか確認
+    if (!authRepo.verifyCurrentEmail(currentEmail)) {
+      throw Exception('現在のメールアドレスが正しくありません');
+    }
+
+    // 新しいメールアドレスが現在のものと同じでないかチェック
+    if (currentEmail.toLowerCase() == newEmail.toLowerCase()) {
+      throw Exception('新しいメールアドレスは現在のものと異なる必要があります');
+    }
+
     try {
       await authRepo.changeUserEmail(newEmail);
     } catch (e) {
@@ -132,7 +142,7 @@ class Settings {
     }
   }
 
-  /// パスワード変更処理（AuthRepositoryを使用）
+  /// パスワード変更処理
   static Future<void> changePassword(
     String currentPassword,
     String newPassword,
@@ -145,6 +155,24 @@ class Settings {
     final validationError = validatePassword(newPassword, confirmPassword);
     if (validationError != null) {
       throw Exception(validationError);
+    }
+
+    // 現在のパスワードが空でないかチェック
+    if (currentPassword.trim().isEmpty) {
+      throw Exception('現在のパスワードを入力してください');
+    }
+
+    // 新しいパスワードが現在のものと同じでないかチェック
+    if (currentPassword == newPassword) {
+      throw Exception('新しいパスワードは現在のものと異なる必要があります');
+    }
+
+    // 現在のパスワードが正しいか確認
+    final isCurrentPasswordValid = await authRepo.verifyCurrentPassword(
+      currentPassword,
+    );
+    if (!isCurrentPasswordValid) {
+      throw Exception('現在のパスワードが正しくありません');
     }
 
     try {

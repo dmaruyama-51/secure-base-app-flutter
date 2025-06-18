@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 
 // Project imports:
 import '../../models/tutorial_model.dart';
-import '../../models/repositories/tutorial_repository.dart';
 
 /// チュートリアル関連のバリデーションエラー用の例外クラス
 class TutorialValidationException implements Exception {

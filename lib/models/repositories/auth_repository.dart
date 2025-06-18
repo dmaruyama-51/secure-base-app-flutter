@@ -28,6 +28,42 @@ class AuthRepository {
   /// 認証状態の変更を監視
   Stream<AuthState> get authStateChanges => _client.auth.onAuthStateChange;
 
+  /// 現在のパスワードを確認
+  Future<bool> verifyCurrentPassword(String currentPassword) async {
+    try {
+      final user = _client.auth.currentUser;
+      if (user == null || user.email == null) {
+        throw Exception('ユーザーが認証されていません');
+      }
+
+      // 現在のパスワードを確認するため、一時的にサインインを試行
+      await _client.auth.signInWithPassword(
+        email: user.email!,
+        password: currentPassword,
+      );
+      return true;
+    } on AuthException catch (e) {
+      // パスワードが間違っている場合
+      if (e.message.contains('Invalid login credentials') ||
+          e.message.contains('invalid_credentials')) {
+        return false;
+      }
+      throw Exception('パスワード確認中にエラーが発生しました: ${e.message}');
+    } catch (e) {
+      throw Exception('パスワード確認中にエラーが発生しました: $e');
+    }
+  }
+
+  /// 現在のメールアドレスを確認
+  bool verifyCurrentEmail(String currentEmail) {
+    final user = _client.auth.currentUser;
+    if (user == null) {
+      throw Exception('ユーザーが認証されていません');
+    }
+
+    return user.email?.toLowerCase() == currentEmail.toLowerCase();
+  }
+
   /// メールアドレス変更
   Future<void> changeUserEmail(String newEmail) async {
     try {

@@ -137,7 +137,6 @@ class ReflectionDetailViewModel extends ChangeNotifier {
             recordDate.isBefore(endDate.add(const Duration(days: 1)));
       }).toList();
     } catch (e) {
-      print('Error fetching records: $e'); // デバッグ用
       throw Exception('レコードの取得に失敗しました');
     }
   }

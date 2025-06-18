@@ -66,7 +66,7 @@ class SettingsFormField extends StatelessWidget {
                   width: 2,
                 ),
               ),
-              fillColor: theme.colorScheme.surface.withOpacity(0.5),
+              fillColor: Colors.white,
               filled: true,
               contentPadding: const EdgeInsets.symmetric(
                 horizontal: 16,

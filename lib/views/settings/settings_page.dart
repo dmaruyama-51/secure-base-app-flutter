@@ -10,7 +10,6 @@ import '../../view_models/settings/settings_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/settings/settings_section.dart';
 import '../../widgets/settings/settings_dialog.dart';
-import '../../utils/app_colors.dart';
 
 /// 設定画面
 class SettingsPage extends StatefulWidget {
@@ -49,15 +48,29 @@ class _SettingsPageState extends State<SettingsPage> {
               viewModel.clearMessages();
             }
             if (viewModel.successMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(viewModel.successMessage!)),
-              );
-              viewModel.clearMessages();
-
-              // 認証情報変更の場合のみログイン画面に遷移
-              if (viewModel.successMessage!.contains('メールアドレス') ||
-                  viewModel.successMessage!.contains('パスワード')) {
-                context.go('/login');
+              // 認証情報変更（メールアドレス・パスワード）の場合は自動ログアウト
+              if (viewModel.successMessage!.contains('パスワード') ||
+                  viewModel.successMessage!.contains('メールアドレス')) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(viewModel.successMessage!),
+                    backgroundColor: theme.colorScheme.primary,
+                    duration: const Duration(seconds: 2),
+                  ),
+                );
+                viewModel.clearMessages();
+                // 2秒後にログアウト
+                Future.delayed(const Duration(seconds: 2), () {
+                  if (mounted) {
+                    context.go('/login');
+                  }
+                });
+              } else {
+                // その他の変更は通常のスナックバーを表示
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text(viewModel.successMessage!)),
+                );
+                viewModel.clearMessages();
               }
             }
           });
@@ -212,43 +225,19 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'ログアウト',
-                        style: theme.textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14,
-                          color: theme.colorScheme.error,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'アプリからログアウトします',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.65),
-                          fontSize: 12,
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    'ログアウト',
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: theme.colorScheme.error,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-                if (viewModel.isLoading)
-                  SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.colorScheme.error,
-                    ),
-                  )
-                else
-                  Icon(
-                    Icons.chevron_right,
-                    color: theme.colorScheme.onSurface.withOpacity(0.4),
-                    size: 20,
-                  ),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.colorScheme.error.withOpacity(0.6),
+                  size: 20,
+                ),
               ],
             ),
           ),
@@ -262,42 +251,35 @@ class _SettingsPageState extends State<SettingsPage> {
 
     showDialog(
       context: context,
-      builder:
-          (context) => AlertDialog(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            title: Row(
-              children: [
-                Icon(Icons.logout, color: theme.colorScheme.error, size: 24),
-                const SizedBox(width: 8),
-                const Text('ログアウト'),
-              ],
-            ),
-            content: const Text('ログアウトしますか？\n次回利用時に再度ログインが必要になります。'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text(
-                  'キャンセル',
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
-                  ),
-                ),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  viewModel.signOut();
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.colorScheme.error,
-                  foregroundColor: theme.colorScheme.onError,
-                ),
-                child: const Text('ログアウト'),
-              ),
-            ],
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
           ),
+          title: const Text('ログアウト'),
+          content: const Text('本当にログアウトしますか？'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('キャンセル'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await viewModel.signOut();
+                if (mounted) {
+                  context.go('/login');
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.error,
+                foregroundColor: theme.colorScheme.onError,
+              ),
+              child: const Text('ログアウト'),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -346,7 +328,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  '© 2024 Secure Base Team',
+                  '© 2025 Team Secure-Base',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),

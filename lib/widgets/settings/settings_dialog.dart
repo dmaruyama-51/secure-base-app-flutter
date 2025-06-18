@@ -6,7 +6,7 @@ import '../../view_models/settings/settings_view_model.dart';
 import '../../utils/app_colors.dart';
 import 'settings_form_field.dart';
 
-/// ベース設定ダイアログ
+/// 基本的な設定ダイアログのベースクラス
 class BaseSettingsDialog extends StatelessWidget {
   const BaseSettingsDialog({
     super.key,
@@ -25,13 +25,14 @@ class BaseSettingsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return Material(
-      color: Colors.black54,
-      child: Center(
+    return Scaffold(
+      backgroundColor: Colors.black.withOpacity(0.5),
+      body: Center(
         child: Container(
-          margin: const EdgeInsets.all(20),
+          margin: const EdgeInsets.symmetric(horizontal: 24),
+          constraints: const BoxConstraints(maxWidth: 420),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -106,6 +107,8 @@ class EmailChangeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BaseSettingsDialog(
       title: 'メールアドレス変更',
       icon: Icons.email_outlined,
@@ -115,6 +118,34 @@ class EmailChangeDialog extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // 自動ログアウトの説明
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'メールアドレス変更後、セキュリティのため自動的にログアウトされます',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
             SettingsFormField(
               value: viewModel.currentEmail,
               onChanged: viewModel.updateCurrentEmail,
@@ -150,6 +181,8 @@ class PasswordChangeDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return BaseSettingsDialog(
       title: 'パスワード変更',
       icon: Icons.lock_outline,
@@ -158,6 +191,34 @@ class PasswordChangeDialog extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
+            // 自動ログアウトの説明
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.colorScheme.primary.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.info_outline,
+                    size: 16,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'パスワード変更後、セキュリティのため自動的にログアウトされます',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.primary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+
             SettingsFormField(
               value: viewModel.currentPassword,
               onChanged: viewModel.updateCurrentPassword,
@@ -198,106 +259,133 @@ class ReflectionSettingsDialog extends StatelessWidget {
 
   final SettingsViewModel viewModel;
 
-  static const List<String> _reflectionFrequencies = ['週に1回', '2週に1回', '月に1回'];
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final options = ['週に1回', '2週に1回', '月に1回'];
 
     return BaseSettingsDialog(
       title: 'リフレクション設定',
       icon: Icons.notifications_outlined,
       onClose: viewModel.closeDialogs,
-      child:
-          viewModel.isLoadingReflectionSettings
-              ? const Padding(
-                padding: EdgeInsets.all(40),
-                child: CircularProgressIndicator(),
-              )
-              : Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '設定した頻度で、受け取った優しさを振り返る機会をお届けします。',
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textLight,
-                        height: 1.5,
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'リフレクションの頻度',
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'リフレクションの頻度を選択してください',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.8),
+              ),
+            ),
+            const SizedBox(height: 20),
 
-                    // 正しい頻度選択肢のみを表示
-                    ..._reflectionFrequencies
-                        .map(
-                          (frequency) => Container(
-                            margin: const EdgeInsets.only(bottom: 8),
+            if (viewModel.isLoadingReflectionSettings)
+              const Center(child: CircularProgressIndicator())
+            else
+              Column(
+                children:
+                    options.map((option) {
+                      final isSelected =
+                          viewModel.selectedReflectionFrequency == option;
+                      return Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        child: InkWell(
+                          onTap:
+                              () => viewModel.updateReflectionFrequency(option),
+                          borderRadius: BorderRadius.circular(12),
+                          child: Container(
+                            padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color:
-                                    viewModel.selectedReflectionFrequency ==
-                                            frequency
-                                        ? theme.colorScheme.primary
-                                        : theme.colorScheme.primary.withOpacity(
-                                          0.2,
-                                        ),
-                              ),
-                            ),
-                            child: RadioListTile<String>(
-                              value: frequency,
-                              groupValue: viewModel.selectedReflectionFrequency,
-                              onChanged: (value) {
-                                if (value != null) {
-                                  viewModel.updateReflectionFrequency(value);
-                                }
-                              },
-                              title: Text(
-                                frequency,
-                                style: theme.textTheme.bodyMedium?.copyWith(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                              subtitle: Text(
-                                viewModel.getFrequencyDescription(frequency),
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: AppColors.textLight,
-                                ),
-                              ),
-                              activeColor: theme.colorScheme.primary,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              tileColor:
-                                  viewModel.selectedReflectionFrequency ==
-                                          frequency
+                              color:
+                                  isSelected
                                       ? theme.colorScheme.primary.withOpacity(
-                                        0.05,
+                                        0.1,
                                       )
                                       : theme.colorScheme.surface,
+                              border: Border.all(
+                                color:
+                                    isSelected
+                                        ? theme.colorScheme.primary
+                                        : theme.colorScheme.outline.withOpacity(
+                                          0.3,
+                                        ),
+                                width: isSelected ? 2 : 1,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Radio<String>(
+                                  value: option,
+                                  groupValue:
+                                      viewModel.selectedReflectionFrequency,
+                                  onChanged: (value) {
+                                    if (value != null) {
+                                      viewModel.updateReflectionFrequency(
+                                        value,
+                                      );
+                                    }
+                                  },
+                                  activeColor: theme.colorScheme.primary,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        option,
+                                        style: theme.textTheme.bodyLarge
+                                            ?.copyWith(
+                                              fontWeight:
+                                                  isSelected
+                                                      ? FontWeight.w600
+                                                      : FontWeight.normal,
+                                              color:
+                                                  isSelected
+                                                      ? theme
+                                                          .colorScheme
+                                                          .primary
+                                                      : theme
+                                                          .colorScheme
+                                                          .onSurface,
+                                            ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        viewModel.getFrequencyDescription(
+                                          option,
+                                        ),
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: theme.colorScheme.onSurface
+                                                  .withOpacity(0.6),
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        )
-                        .toList(),
-                    const SizedBox(height: 32),
-                    SettingsActionButtons(
-                      onCancel: viewModel.closeDialogs,
-                      onConfirm: viewModel.saveReflectionSettings,
-                      confirmText: '保存',
-                      isLoading: viewModel.isLoadingReflectionSettings,
-                    ),
-                  ],
-                ),
+                        ),
+                      );
+                    }).toList(),
               ),
+
+            const SizedBox(height: 32),
+            SettingsActionButtons(
+              onCancel: viewModel.closeDialogs,
+              onConfirm: viewModel.saveReflectionSettings,
+              confirmText: '保存',
+              isLoading: viewModel.isLoadingReflectionSettings,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
