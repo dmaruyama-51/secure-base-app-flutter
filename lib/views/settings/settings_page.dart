@@ -147,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Consumer<SettingsViewModel>(
                   builder:
                       (context, viewModel, child) => SettingsItem(
-                        icon: Icons.notifications_outlined,
+                        icon: Icons.auto_awesome,
                         title: 'リフレクション設定',
                         subtitle: 'リフレクションの頻度を変更',
                         onTap: viewModel.showReflectionSettingsDialog,
