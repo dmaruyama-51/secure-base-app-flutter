@@ -236,4 +236,20 @@ class SettingsViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  Future<void> openFeedbackForm() async {
+    final uri = Uri.parse('https://forms.gle/fFH7A5BeKaEvX7ur6');
+
+    try {
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } else {
+        _errorMessage = 'フィードバックフォームを開けませんでした';
+        notifyListeners();
+      }
+    } catch (e) {
+      _errorMessage = 'エラーが発生しました';
+      notifyListeners();
+    }
+  }
 }

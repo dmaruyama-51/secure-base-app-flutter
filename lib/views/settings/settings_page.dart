@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 // Package imports:
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
 import '../../view_models/settings/settings_view_model.dart';
@@ -174,9 +173,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: Icons.bug_report_outlined,
                   title: 'フィードバック',
                   subtitle: 'ご意見・バグ報告',
-                  onTap: () {
-                    // TODO: フィードバック機能
-                  },
+                  onTap: viewModel.openFeedbackForm,
                 ),
                 const SettingsDivider(),
                 SettingsItem(
