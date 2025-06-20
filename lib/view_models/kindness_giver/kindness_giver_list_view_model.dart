@@ -11,6 +11,7 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String? _successMessage;
+  bool _showArchivedOnly = false;
 
   // コールバック管理
   VoidCallback? _onRefreshCallback;
@@ -20,6 +21,32 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
+  bool get showArchivedOnly => _showArchivedOnly;
+
+  /// アーカイブ表示の切り替え
+  void toggleShowArchived() {
+    _showArchivedOnly = !_showArchivedOnly;
+    notifyListeners();
+    loadKindnessGivers();
+  }
+
+  /// アクティブメンバーのみ表示に切り替え
+  void showActiveOnly() {
+    if (_showArchivedOnly) {
+      _showArchivedOnly = false;
+      notifyListeners();
+      loadKindnessGivers();
+    }
+  }
+
+  /// アーカイブメンバーのみ表示に切り替え
+  void setShowArchivedOnly() {
+    if (!_showArchivedOnly) {
+      _showArchivedOnly = true;
+      notifyListeners();
+      loadKindnessGivers();
+    }
+  }
 
   /// リフレッシュコールバックを設定
   void setRefreshCallback(VoidCallback? callback) {
@@ -38,7 +65,11 @@ class KindnessGiverListViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      _kindnessGivers = await KindnessGiver.fetchKindnessGivers();
+      if (_showArchivedOnly) {
+        _kindnessGivers = await KindnessGiver.fetchArchivedKindnessGivers();
+      } else {
+        _kindnessGivers = await KindnessGiver.fetchActiveKindnessGivers();
+      }
       _isLoading = false;
       notifyListeners();
     } catch (e) {

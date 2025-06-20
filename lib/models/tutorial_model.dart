@@ -13,7 +13,7 @@ class Tutorial {
   // 遅延時間の定数
   static const int _reflectionSaveDelayMs = 500;
 
-  /// チュートリアルでやさしさをくれる人を作成する
+  /// チュートリアルでメンバーを作成する
   static Future<KindnessGiver> createTutorialKindnessGiver({
     required String kindnessGiverName,
     required String selectedGender,
