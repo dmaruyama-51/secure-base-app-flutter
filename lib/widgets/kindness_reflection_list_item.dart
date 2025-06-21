@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // Project imports:
-import '../models/kindness_reflection_model.dart';
+import '../models/kindness_reflection.dart';
 import '../utils/app_colors.dart';
 
 class ReflectionListItem extends StatelessWidget {

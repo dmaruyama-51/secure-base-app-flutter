@@ -2,7 +2,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
-import '../kindness_record_model.dart';
+import '../kindness_record.dart';
 
 class KindnessRecordRepository {
   Future<List<KindnessRecord>> fetchKindnessRecords({

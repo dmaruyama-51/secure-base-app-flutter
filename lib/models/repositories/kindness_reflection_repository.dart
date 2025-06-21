@@ -2,7 +2,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
-import '../kindness_reflection_model.dart';
+import '../kindness_reflection.dart';
 import '../entities/reflection_type_master.dart';
 
 class KindnessReflectionRepository {

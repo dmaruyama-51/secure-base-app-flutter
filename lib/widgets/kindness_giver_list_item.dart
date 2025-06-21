@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
-import '../models/kindness_giver_model.dart';
+import '../models/kindness_giver.dart';
 
 class KindnessGiverListItem extends StatelessWidget {
   final KindnessGiver kindnessGiver;

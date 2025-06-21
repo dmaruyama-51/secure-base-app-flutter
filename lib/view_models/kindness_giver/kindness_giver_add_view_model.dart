@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_giver_model.dart';
+import '../../models/kindness_giver.dart';
 
 /// バリデーションエラー用の例外クラス（KindnessGiver用）
 class KindnessGiverValidationException implements Exception {

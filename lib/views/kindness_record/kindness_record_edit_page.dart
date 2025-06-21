@@ -6,7 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
-import '../../models/kindness_record_model.dart';
+import '../../models/kindness_record.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_edit_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';

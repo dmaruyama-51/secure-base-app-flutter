@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_giver_model.dart';
+import '../../models/kindness_giver.dart';
 
 /// メンバー一覧のViewModel
 class KindnessGiverListViewModel extends ChangeNotifier {

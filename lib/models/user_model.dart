@@ -1,6 +1,6 @@
 // Project imports:
 import 'repositories/user_repository.dart';
-import 'kindness_reflection_model.dart';
+import 'kindness_reflection.dart';
 
 /// ユーザー設定に関するビジネスロジック
 class UserModel {

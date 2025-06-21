@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // Project imports:
-import '../models/kindness_record_model.dart';
+import '../models/kindness_record.dart';
 import '../utils/app_colors.dart';
 import 'kindness_giver/kindness_giver_avatar.dart';
 
