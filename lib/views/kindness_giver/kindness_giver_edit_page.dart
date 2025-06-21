@@ -190,11 +190,31 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     KindnessGiverEditViewModel viewModel,
     ThemeData theme,
   ) {
-    return Row(
+    final bool isArchived =
+        viewModel.originalKindnessGiver?.isArchived ?? false;
+
+    return Column(
       children: [
-        Expanded(child: _buildUpdateButton(viewModel, theme)),
-        const SizedBox(width: 12),
-        Expanded(child: _buildDeleteButton(viewModel, theme)),
+        // 上段：更新ボタン
+        SizedBox(
+          width: double.infinity,
+          height: 48,
+          child: _buildUpdateButton(viewModel, theme),
+        ),
+        const SizedBox(height: 12),
+        // 下段：アーカイブ・削除ボタン
+        Row(
+          children: [
+            Expanded(
+              child:
+                  isArchived
+                      ? _buildUnarchiveButton(viewModel, theme)
+                      : _buildArchiveButton(viewModel, theme),
+            ),
+            const SizedBox(width: 12),
+            Expanded(child: _buildDeleteButton(viewModel, theme)),
+          ],
+        ),
       ],
     );
   }
@@ -241,6 +261,106 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
                         color: theme.colorScheme.onPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
+  }
+
+  Widget _buildArchiveButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.orange[700],
+          side: BorderSide(color: Colors.orange[300]!, width: 1.5),
+          backgroundColor: Colors.orange[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed:
+            viewModel.isArchiving || viewModel.isSaving || viewModel.isDeleting
+                ? null
+                : () => _showArchiveConfirmDialog(viewModel, theme),
+        child:
+            viewModel.isArchiving
+                ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.orange[700],
+                    strokeWidth: 2,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.archive_outlined,
+                      size: 16,
+                      color: Colors.orange[700],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      'アーカイブ',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.orange[700],
+                      ),
+                    ),
+                  ],
+                ),
+      ),
+    );
+  }
+
+  Widget _buildUnarchiveButton(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      height: 48,
+      child: OutlinedButton(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.green[700],
+          side: BorderSide(color: Colors.green[300]!, width: 1.5),
+          backgroundColor: Colors.green[50],
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        onPressed:
+            viewModel.isArchiving || viewModel.isSaving || viewModel.isDeleting
+                ? null
+                : () => _showUnarchiveConfirmDialog(viewModel, theme),
+        child:
+            viewModel.isArchiving
+                ? SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    color: Colors.green[700],
+                    strokeWidth: 2,
+                  ),
+                )
+                : Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.unarchive_outlined,
+                      size: 16,
+                      color: Colors.green[700],
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      '復元',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.green[700],
                       ),
                     ),
                   ],
@@ -332,6 +452,78 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
 
     if (confirmed == true) {
       viewModel.deleteKindnessGiver();
+    }
+  }
+
+  Future<void> _showArchiveConfirmDialog(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('アーカイブ確認'),
+            content: Text(
+              '${widget.kindnessGiver.giverName}さんをアーカイブしますか？\nアーカイブすると一覧に表示されなくなりますが、いつでも復元できます。',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  'アーカイブ',
+                  style: TextStyle(
+                    color: Colors.orange[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      viewModel.archiveKindnessGiver();
+    }
+  }
+
+  Future<void> _showUnarchiveConfirmDialog(
+    KindnessGiverEditViewModel viewModel,
+    ThemeData theme,
+  ) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('復元確認'),
+            content: Text(
+              '${widget.kindnessGiver.giverName}さんを復元しますか？\n復元すると再び一覧に表示されるようになります。',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('キャンセル'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text(
+                  '復元',
+                  style: TextStyle(
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+    );
+
+    if (confirmed == true) {
+      viewModel.unarchiveKindnessGiver();
     }
   }
 
