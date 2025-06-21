@@ -26,6 +26,53 @@ class KindnessReflection {
     required this.userId,
   });
 
+  /// 頻度文字列からIDに変換
+  static Future<int> getReflectionTypeId(String frequency) async {
+    try {
+      final id = await _repository.getReflectionTypeIdByName(frequency);
+      return id ?? 2; // デフォルトは「2週に1回」のID
+    } catch (e) {
+      // エラー時はデフォルト値を返す
+      return 2;
+    }
+  }
+
+  /// IDから頻度文字列に変換
+  static Future<String> getFrequencyFromId(int id) async {
+    try {
+      final name = await _repository.getReflectionTypeNameById(id);
+      return name ?? '2週に1回'; // デフォルト
+    } catch (e) {
+      // エラー時はデフォルト値を返す
+      return '2週に1回';
+    }
+  }
+
+  /// 頻度の説明文を取得
+  static String getFrequencyDescription(String frequency) {
+    switch (frequency) {
+      case '週に1回':
+        return 'こまめに記録する方におすすめ';
+      case '2週に1回':
+        return 'バランスのよい推奨設定';
+      case '月に1回':
+        return '記録する頻度が少ない方におすすめ';
+      default:
+        return '';
+    }
+  }
+
+  /// 利用可能なリフレクション頻度の選択肢を取得（DBから動的取得）
+  static Future<List<String>> getAvailableFrequencies() async {
+    try {
+      final reflectionTypes = await _repository.getAllReflectionTypes();
+      return reflectionTypes.map((type) => type.reflectionTypeName).toList();
+    } catch (e) {
+      // エラー時はデフォルト値を返す
+      return ['週に1回', '2週に1回', '月に1回'];
+    }
+  }
+
   /// Supabaseの検索結果からKindnessReflectionオブジェクトを作成
   factory KindnessReflection.fromMap(Map<String, dynamic> map) {
     return KindnessReflection(

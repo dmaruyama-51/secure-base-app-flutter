@@ -55,11 +55,41 @@ class AuthViewModel extends ChangeNotifier {
   bool get isTermsAccepted => _isTermsAccepted;
   String? get termsError => _termsError;
 
+  // =============================================================================
+  // バリデーションメソッド（ViewModelの責任）
+  // =============================================================================
+
+  /// メールアドレスバリデーション
+  String? _validateEmail(String email) {
+    if (email.trim().isEmpty) {
+      return 'メールアドレスを入力してください';
+    }
+    // 簡単なメールアドレス形式チェック
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      return '正しいメールアドレス形式で入力してください';
+    }
+    return null;
+  }
+
+  /// パスワードバリデーション
+  String? _validatePassword(String password) {
+    if (password.trim().isEmpty) {
+      return 'パスワードを入力してください';
+    }
+    if (password.length < 6) {
+      return 'パスワードは6文字以上で入力してください';
+    }
+    return null;
+  }
+
   /// ログイン用バリデーション
   void _validateSignInInput(String email, String password) {
-    if (email.trim().isEmpty) {
-      throw AuthValidationException('メールアドレスを入力してください');
+    final emailError = _validateEmail(email);
+    if (emailError != null) {
+      throw AuthValidationException(emailError);
     }
+
     if (password.trim().isEmpty) {
       throw AuthValidationException('パスワードを入力してください');
     }
@@ -67,15 +97,16 @@ class AuthViewModel extends ChangeNotifier {
 
   /// サインアップ用バリデーション
   void _validateSignUpInput(String email, String password, bool termsAccepted) {
-    if (email.trim().isEmpty) {
-      throw AuthValidationException('メールアドレスを入力してください');
+    final emailError = _validateEmail(email);
+    if (emailError != null) {
+      throw AuthValidationException(emailError);
     }
-    if (password.trim().isEmpty) {
-      throw AuthValidationException('パスワードを入力してください');
+
+    final passwordError = _validatePassword(password);
+    if (passwordError != null) {
+      throw AuthValidationException(passwordError);
     }
-    if (password.length < 6) {
-      throw AuthValidationException('パスワードは6文字以上で入力してください');
-    }
+
     if (!termsAccepted) {
       throw AuthValidationException('利用規約への同意が必要です');
     }
@@ -91,15 +122,8 @@ class AuthViewModel extends ChangeNotifier {
     _passwordError = null;
     _termsError = null;
 
-    if (email.trim().isEmpty) {
-      _emailError = '必須';
-    }
-
-    if (password.trim().isEmpty) {
-      _passwordError = '必須';
-    } else if (password.length < 6) {
-      _passwordError = '6文字以上';
-    }
+    _emailError = _validateEmail(email);
+    _passwordError = _validatePassword(password);
 
     if (checkTerms && !_isTermsAccepted) {
       _termsError = '利用規約への同意が必要です';
@@ -130,6 +154,10 @@ class AuthViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  // =============================================================================
+  // 認証処理メソッド
+  // =============================================================================
+
   /// ログイン処理
   Future<void> signIn({
     required String email,
@@ -143,24 +171,17 @@ class AuthViewModel extends ChangeNotifier {
       // バリデーション
       _validateSignInInput(email, password);
 
-      final result = await AuthModel.signIn(
-        email: email,
-        password: password,
-        redirectPath: redirectPath,
-      );
+      // 新しいAuthModelを使用
+      await AuthModel.signInWithEmailAndPassword(email, password);
 
-      if (result.isSuccess) {
-        _successMessage = 'ログインしました';
-        _shouldNavigate = true;
-        _navigationPath = result.redirectPath;
-      } else {
-        _errorMessage = result.errorMessage;
-      }
+      _successMessage = 'ログインしました';
+      _shouldNavigate = true;
+      _navigationPath = redirectPath ?? '/';
     } catch (e) {
       if (e is AuthValidationException) {
         _errorMessage = e.message;
       } else {
-        _errorMessage = 'ログインに失敗しました';
+        _errorMessage = e.toString();
       }
     } finally {
       _setLoading(false);
@@ -176,25 +197,26 @@ class AuthViewModel extends ChangeNotifier {
       // バリデーション（利用規約同意を含む）
       _validateSignUpInput(email, password, _isTermsAccepted);
 
-      final result = await AuthModel.signUp(email: email, password: password);
+      // 新しいAuthModelを使用
+      await AuthModel.signUpWithEmailAndPassword(email, password);
 
-      if (result.isSuccess) {
-        _successMessage = 'アカウントを作成しました';
-        _shouldNavigate = true;
-        _navigationPath = result.redirectPath;
-      } else {
-        _errorMessage = result.errorMessage;
-      }
+      _successMessage = 'アカウントを作成しました';
+      _shouldNavigate = true;
+      _navigationPath = '/tutorial';
     } catch (e) {
       if (e is AuthValidationException) {
         _errorMessage = e.message;
       } else {
-        _errorMessage = 'アカウントの作成に失敗しました';
+        _errorMessage = e.toString();
       }
     } finally {
       _setLoading(false);
     }
   }
+
+  // =============================================================================
+  // ヘルパーメソッド
+  // =============================================================================
 
   /// ローディング状態を設定
   void _setLoading(bool loading) {

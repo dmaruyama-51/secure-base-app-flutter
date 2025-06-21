@@ -3,9 +3,60 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
 import '../kindness_reflection.dart';
+import '../entities/reflection_type_master.dart';
 
 class KindnessReflectionRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
+
+  /// 全てのリフレクション種別マスターデータを取得
+  Future<List<ReflectionTypeMaster>> getAllReflectionTypes() async {
+    try {
+      final response = await _supabase
+          .from('reflection_type_master')
+          .select()
+          .order('id', ascending: true);
+
+      return response
+          .map<ReflectionTypeMaster>(
+            (item) => ReflectionTypeMaster.fromJson(item),
+          )
+          .toList();
+    } catch (e) {
+      throw Exception('リフレクション種別マスターデータの取得に失敗しました: $e');
+    }
+  }
+
+  /// リフレクション種別IDから名前を取得
+  Future<String?> getReflectionTypeNameById(int id) async {
+    try {
+      final response =
+          await _supabase
+              .from('reflection_type_master')
+              .select('reflection_type_name')
+              .eq('id', id)
+              .maybeSingle();
+
+      return response?['reflection_type_name'] as String?;
+    } catch (e) {
+      throw Exception('リフレクション種別名の取得に失敗しました: $e');
+    }
+  }
+
+  /// リフレクション種別名からIDを取得
+  Future<int?> getReflectionTypeIdByName(String name) async {
+    try {
+      final response =
+          await _supabase
+              .from('reflection_type_master')
+              .select('id')
+              .eq('reflection_type_name', name)
+              .maybeSingle();
+
+      return response?['id'] as int?;
+    } catch (e) {
+      throw Exception('リフレクション種別IDの取得に失敗しました: $e');
+    }
+  }
 
   /// 現在のユーザーのリフレクション一覧を取得
   Future<List<KindnessReflection>> fetchReflections({

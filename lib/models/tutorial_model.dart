@@ -1,17 +1,34 @@
 // Package imports:
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
 import 'kindness_giver.dart';
 import 'kindness_record.dart';
+import 'kindness_reflection.dart';
+import 'user_model.dart';
 import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';
-import 'repositories/tutorial_repository.dart';
 
 /// チュートリアル機能のビジネスロジックを担当するクラス
 class Tutorial {
   // 遅延時間の定数
   static const int _reflectionSaveDelayMs = 500;
+
+  // SharedPreferences用のキー
+  static const String _hasCompletedTutorialKey = 'has_completed_tutorial';
+
+  /// チュートリアルが完了しているかを確認
+  static Future<bool> hasCompletedTutorial() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_hasCompletedTutorialKey) ?? false;
+  }
+
+  /// チュートリアル完了をマーク
+  static Future<void> _markTutorialCompleted() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_hasCompletedTutorialKey, true);
+  }
 
   /// チュートリアルでやさしさをくれる人を作成する
   static Future<KindnessGiver> createTutorialKindnessGiver({
@@ -110,10 +127,7 @@ class Tutorial {
   /// リフレクション設定を完了する（設定保存 + チュートリアル完了マーク）
   static Future<void> completeReflectionSettings({
     required String selectedReflectionFrequency,
-    TutorialRepository? repository,
   }) async {
-    final repo = repository ?? TutorialRepository();
-
     try {
       // 現在のユーザーを取得
       final user = Supabase.instance.client.auth.currentUser;
@@ -124,11 +138,11 @@ class Tutorial {
       // 保存の遅延（UI効果）
       await Future.delayed(Duration(milliseconds: _reflectionSaveDelayMs));
 
-      // 1. リフレクション頻度をDBに保存
-      await repo.saveReflectionFrequency(selectedReflectionFrequency);
+      // 1. UserModelを使用してリフレクション頻度をDBに保存
+      await UserModel.updateReflectionFrequency(selectedReflectionFrequency);
 
       // 2. チュートリアル完了をマーク
-      await repo.markTutorialCompleted();
+      await _markTutorialCompleted();
     } catch (e) {
       throw Exception('リフレクション設定の完了に失敗しました: $e');
     }
@@ -137,10 +151,7 @@ class Tutorial {
   /// リフレクション設定を保存する
   static Future<void> saveReflectionSettings({
     required String selectedReflectionFrequency,
-    TutorialRepository? repository,
   }) async {
-    final repo = repository ?? TutorialRepository();
-
     try {
       // 現在のユーザーを取得
       final user = Supabase.instance.client.auth.currentUser;
@@ -148,8 +159,8 @@ class Tutorial {
         throw Exception('ユーザーが認証されていません');
       }
 
-      // リフレクション頻度をDBに保存
-      await repo.saveReflectionFrequency(selectedReflectionFrequency);
+      // UserModelを使用してリフレクション頻度をDBに保存
+      await UserModel.updateReflectionFrequency(selectedReflectionFrequency);
     } catch (e) {
       throw Exception('リフレクション設定の保存に失敗しました: $e');
     }
@@ -160,10 +171,7 @@ class Tutorial {
     required String kindnessGiverName,
     required String selectedGender,
     required String selectedRelation,
-    TutorialRepository? repository,
   }) async {
-    final repo = repository ?? TutorialRepository();
-
     try {
       // KindnessGiver作成
       await createTutorialKindnessGiver(
@@ -173,23 +181,14 @@ class Tutorial {
       );
 
       // チュートリアル完了マーク
-      await repo.markTutorialCompleted();
+      await _markTutorialCompleted();
     } catch (e) {
       throw Exception('チュートリアルの完了処理に失敗しました: $e');
     }
   }
 
-  /// 頻度の説明文を取得
+  /// 頻度の説明文を取得（KindnessReflectionに委譲）
   static String getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return 'こまめに記録する方におすすめ';
-      case '2週に1回':
-        return 'バランスのよい推奨設定';
-      case '月に1回':
-        return '記録する頻度が少ない方におすすめ';
-      default:
-        return '';
-    }
+    return KindnessReflection.getFrequencyDescription(frequency);
   }
 }

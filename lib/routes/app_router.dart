@@ -6,7 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
 import '../models/kindness_reflection.dart';
-import '../models/repositories/tutorial_repository.dart';
+import '../models/tutorial_model.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
 import '../views/kindness_giver/kindness_giver_list_page.dart';
@@ -35,8 +35,7 @@ Future<String?> _authAndTutorialGuard(String location) async {
   }
 
   // 認証済みの場合、チュートリアル完了状況をチェック
-  final tutorialRepository = TutorialRepository();
-  final hasCompletedTutorial = await tutorialRepository.hasCompletedTutorial();
+  final hasCompletedTutorial = await Tutorial.hasCompletedTutorial();
 
   // チュートリアル未完了かつチュートリアルページでない場合、チュートリアルにリダイレクト
   if (!hasCompletedTutorial && location != '/tutorial') {
