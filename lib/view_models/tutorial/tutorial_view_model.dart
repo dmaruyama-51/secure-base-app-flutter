@@ -318,7 +318,7 @@ class TutorialViewModel extends ChangeNotifier {
   }
 
   /// 頻度の説明文を取得
-  String getFrequencyDescription(String frequency) {
-    return Tutorial.getFrequencyDescription(frequency);
+  Future<String> getFrequencyDescription(String frequency) async {
+    return await Tutorial.getFrequencyDescription(frequency);
   }
 }

@@ -187,8 +187,8 @@ class Tutorial {
     }
   }
 
-  /// 頻度の説明文を取得（KindnessReflectionに委譲）
-  static String getFrequencyDescription(String frequency) {
-    return KindnessReflection.getFrequencyDescription(frequency);
+  /// 頻度の説明文を取得
+  static Future<String> getFrequencyDescription(String frequency) async {
+    return await KindnessReflection.getFrequencyDescription(frequency);
   }
 }

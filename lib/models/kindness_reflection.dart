@@ -49,16 +49,15 @@ class KindnessReflection {
   }
 
   /// 頻度の説明文を取得
-  static String getFrequencyDescription(String frequency) {
-    switch (frequency) {
-      case '週に1回':
-        return 'こまめに記録する方におすすめ';
-      case '2週に1回':
-        return 'バランスのよい推奨設定';
-      case '月に1回':
-        return '記録する頻度が少ない方におすすめ';
-      default:
-        return '';
+  static Future<String> getFrequencyDescription(String frequency) async {
+    try {
+      final description = await _repository.getReflectionTypeDescriptionByName(
+        frequency,
+      );
+      return description ?? '';
+    } catch (e) {
+      // エラー時は空文字を返す
+      return '';
     }
   }
 

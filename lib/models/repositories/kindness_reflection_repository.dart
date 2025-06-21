@@ -58,6 +58,38 @@ class KindnessReflectionRepository {
     }
   }
 
+  /// リフレクション種別名から説明文を取得
+  Future<String?> getReflectionTypeDescriptionByName(String name) async {
+    try {
+      final response =
+          await _supabase
+              .from('reflection_type_master')
+              .select('description')
+              .eq('reflection_type_name', name)
+              .maybeSingle();
+
+      return response?['description'] as String?;
+    } catch (e) {
+      throw Exception('リフレクション種別説明文の取得に失敗しました: $e');
+    }
+  }
+
+  /// リフレクション種別IDから説明文を取得
+  Future<String?> getReflectionTypeDescriptionById(int id) async {
+    try {
+      final response =
+          await _supabase
+              .from('reflection_type_master')
+              .select('description')
+              .eq('id', id)
+              .maybeSingle();
+
+      return response?['description'] as String?;
+    } catch (e) {
+      throw Exception('リフレクション種別説明文の取得に失敗しました: $e');
+    }
+  }
+
   /// 現在のユーザーのリフレクション一覧を取得
   Future<List<KindnessReflection>> fetchReflections({
     int limit = 50,

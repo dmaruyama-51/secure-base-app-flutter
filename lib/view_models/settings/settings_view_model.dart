@@ -250,8 +250,8 @@ class SettingsViewModel extends ChangeNotifier {
   }
 
   // プレゼンテーション用メソッド（KindnessReflectionのビジネスロジックを使用）
-  String getFrequencyDescription(String frequency) {
-    return KindnessReflection.getFrequencyDescription(frequency);
+  Future<String> getFrequencyDescription(String frequency) async {
+    return await KindnessReflection.getFrequencyDescription(frequency);
   }
 
   // ヘルパーメソッド

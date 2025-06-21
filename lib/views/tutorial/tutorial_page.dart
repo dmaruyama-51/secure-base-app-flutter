@@ -807,11 +807,16 @@ class _TutorialPageState extends State<TutorialPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  subtitle: Text(
-                    viewModel.getFrequencyDescription(frequency),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textLight,
-                    ),
+                  subtitle: FutureBuilder<String>(
+                    future: viewModel.getFrequencyDescription(frequency),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? '',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.textLight,
+                        ),
+                      );
+                    },
                   ),
                   activeColor: theme.colorScheme.primary,
                   shape: RoundedRectangleBorder(

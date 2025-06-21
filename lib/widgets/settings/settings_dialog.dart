@@ -354,15 +354,21 @@ class ReflectionSettingsDialog extends StatelessWidget {
                                             ),
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        viewModel.getFrequencyDescription(
-                                          option,
-                                        ),
-                                        style: theme.textTheme.bodySmall
-                                            ?.copyWith(
-                                              color: theme.colorScheme.onSurface
-                                                  .withOpacity(0.6),
-                                            ),
+                                      FutureBuilder<String>(
+                                        future: viewModel
+                                            .getFrequencyDescription(option),
+                                        builder: (context, snapshot) {
+                                          return Text(
+                                            snapshot.data ?? '',
+                                            style: theme.textTheme.bodySmall
+                                                ?.copyWith(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface
+                                                      .withOpacity(0.6),
+                                                ),
+                                          );
+                                        },
                                       ),
                                     ],
                                   ),
