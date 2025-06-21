@@ -1,3 +1,13 @@
+/* 
+日次 kindness_reflections 作成バッチ 
+
+ユーザーごとに「バッチ処理実施日 = 基準日 + reflection_period」の場合にレコードを作成します。
+- 基準日は1つもkindness_reflectionレコードががない場合はユーザーの作成日
+- 1つ以上 kindness_reflection がある場合, 最新の kindness_reflection の作成日とします。
+
+reflection_period は reflection_type_master テーブルの reflection_period を参照し, 7（1週間), 14（2週間), 30（1ヶ月）のいずれかです。
+*/
+
 create or replace function run_daily_reflection_batch()
 returns void 
 language plpgsql
