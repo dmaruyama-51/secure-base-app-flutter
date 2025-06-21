@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
-import '../../models/kindness_giver.dart';
+import '../../models/kindness_giver_model.dart';
 
 /// KindnessGiverの情報表示チップ（関係性のみ）
 class KindnessGiverInfoChip extends StatelessWidget {

@@ -5,7 +5,7 @@ import 'package:url_launcher/url_launcher.dart';
 // Project imports:
 import '../../models/user_model.dart';
 import '../../models/auth_model.dart';
-import '../../models/kindness_reflection.dart';
+import '../../models/kindness_reflection_model.dart';
 
 /// 設定のViewModel（プレゼンテーションロジックと状態管理に特化）
 class SettingsViewModel extends ChangeNotifier {

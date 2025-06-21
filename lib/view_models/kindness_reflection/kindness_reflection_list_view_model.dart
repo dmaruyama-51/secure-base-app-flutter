@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_reflection.dart';
+import '../../models/kindness_reflection_model.dart';
 
 class ReflectionListViewModel extends ChangeNotifier {
   List<KindnessReflection> _reflections = [];

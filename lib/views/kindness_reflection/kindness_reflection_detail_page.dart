@@ -7,7 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 // Project imports:
-import '../../models/kindness_reflection.dart';
+import '../../models/kindness_reflection_model.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
 import '../../widgets/kindness_record_list_item.dart';

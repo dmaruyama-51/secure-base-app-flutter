@@ -2,8 +2,8 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_giver.dart';
-import '../../models/kindness_record.dart';
+import '../../models/kindness_giver_model.dart';
+import '../../models/kindness_record_model.dart';
 
 /// バリデーションエラー用の例外クラス（KindnessRecord用）
 class KindnessRecordValidationException implements Exception {

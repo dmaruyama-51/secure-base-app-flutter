@@ -3,9 +3,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
-import 'kindness_giver.dart';
-import 'kindness_record.dart';
-import 'kindness_reflection.dart';
+import 'kindness_giver_model.dart';
+import 'kindness_record_model.dart';
+import 'kindness_reflection_model.dart';
 import 'user_model.dart';
 import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';

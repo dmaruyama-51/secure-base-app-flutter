@@ -2,8 +2,8 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_record.dart';
-import '../../models/kindness_reflection.dart';
+import '../../models/kindness_record_model.dart';
+import '../../models/kindness_reflection_model.dart';
 
 /// リフレクション詳細画面の統計情報
 class ReflectionStatistics {

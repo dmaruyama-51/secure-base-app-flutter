@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 // Project imports:
-import '../models/kindness_giver.dart';
-import '../models/kindness_record.dart';
-import '../models/kindness_reflection.dart';
+import '../models/kindness_giver_model.dart';
+import '../models/kindness_record_model.dart';
+import '../models/kindness_reflection_model.dart';
 import '../models/tutorial_model.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';

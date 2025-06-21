@@ -2,7 +2,7 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/kindness_record.dart';
+import '../../models/kindness_record_model.dart';
 
 /// やさしさ記録一覧のViewModel
 class KindnessRecordListViewModel extends ChangeNotifier {
