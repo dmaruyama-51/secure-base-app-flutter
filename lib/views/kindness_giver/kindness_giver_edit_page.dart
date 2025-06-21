@@ -193,6 +193,16 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     final bool isArchived =
         viewModel.originalKindnessGiver?.isArchived ?? false;
 
+    if (isArchived) {
+      // アーカイブされたメンバーの場合は復元ボタンのみ表示
+      return SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: _buildUnarchiveButton(viewModel, theme),
+      );
+    }
+
+    // アクティブなメンバーの場合は従来通りのボタン配置
     return Column(
       children: [
         // 上段：更新ボタン
@@ -205,12 +215,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
         // 下段：アーカイブ・削除ボタン
         Row(
           children: [
-            Expanded(
-              child:
-                  isArchived
-                      ? _buildUnarchiveButton(viewModel, theme)
-                      : _buildArchiveButton(viewModel, theme),
-            ),
+            Expanded(child: _buildArchiveButton(viewModel, theme)),
             const SizedBox(width: 12),
             Expanded(child: _buildDeleteButton(viewModel, theme)),
           ],
@@ -327,9 +332,12 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
       height: 48,
       child: OutlinedButton(
         style: OutlinedButton.styleFrom(
-          foregroundColor: Colors.green[700],
-          side: BorderSide(color: Colors.green[300]!, width: 1.5),
-          backgroundColor: Colors.green[50],
+          foregroundColor: AppColors.primary,
+          side: BorderSide(
+            color: AppColors.primary.withOpacity(0.5),
+            width: 1.5,
+          ),
+          backgroundColor: AppColors.primary.withOpacity(0.1),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         onPressed:
@@ -342,7 +350,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    color: Colors.green[700],
+                    color: AppColors.primary,
                     strokeWidth: 2,
                   ),
                 )
@@ -352,7 +360,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                     Icon(
                       Icons.unarchive_outlined,
                       size: 16,
-                      color: Colors.green[700],
+                      color: AppColors.primary,
                     ),
                     const SizedBox(width: 6),
                     Text(
@@ -360,7 +368,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 14,
-                        color: Colors.green[700],
+                        color: AppColors.primary,
                       ),
                     ),
                   ],
@@ -513,7 +521,7 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
                 child: Text(
                   '復元',
                   style: TextStyle(
-                    color: Colors.green[700],
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
