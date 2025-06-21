@@ -25,7 +25,7 @@ as $$
                 u.id as user_id,
                 -- 最新のkindness_reflectionのcreated_atが基準日
                 -- レコードが存在しない場合はユーザーの作成日を基準日とする
-                coalesce(lr.last_ref_date, u.created_at::date) as base_date,
+                coalesce(lr.latest_ref_date, u.created_at::date) as base_date,
                 u.reflection_type_id,
                 rtm.reflection_period
             from 
