@@ -1,3 +1,6 @@
+// Package imports:
+import 'package:shared_preferences/shared_preferences.dart';
+
 // Project imports:
 import 'repositories/user_repository.dart';
 import 'kindness_reflection.dart';
@@ -5,6 +8,9 @@ import 'kindness_reflection.dart';
 /// ユーザー設定に関するビジネスロジック
 class UserModel {
   static final UserRepository _userRepository = UserRepository();
+
+  // SharedPreferences用のキー
+  static const String _hasCompletedTutorialKey = 'has_completed_tutorial';
 
   /// ユーザー設定を取得
   static Future<Map<String, dynamic>?> getUserSettings() async {
@@ -83,6 +89,27 @@ class UserModel {
       return true;
     } catch (e) {
       return false;
+    }
+  }
+
+  /// チュートリアル完了状態を確認
+  static Future<bool> hasCompletedTutorial() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getBool(_hasCompletedTutorialKey) ?? false;
+    } catch (e) {
+      // エラー時は未完了として扱う
+      return false;
+    }
+  }
+
+  /// チュートリアル完了をマーク
+  static Future<void> markTutorialCompleted() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_hasCompletedTutorialKey, true);
+    } catch (e) {
+      throw Exception('チュートリアル完了状態の保存に失敗しました: $e');
     }
   }
 }
