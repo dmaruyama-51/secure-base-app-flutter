@@ -3,6 +3,7 @@ CREATE TABLE public.reflection_type_master (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   reflection_type_name text NULL,
   reflection_period bigint NULL,
+  description text NULL,
   CONSTRAINT reflection_type_master_pkey PRIMARY KEY (id)
 );
 
@@ -12,6 +13,7 @@ comment on column reflection_type_master.id is 'リフレクション種別ID';
 comment on column reflection_type_master.created_at is '作成日';
 comment on column reflection_type_master.reflection_type_name is 'リフレクション種別名';
 comment on column reflection_type_master.reflection_period is 'リフレクション期間（日数）';
+comment on column reflection_type_master.description is 'リフレクション種別の説明';
 
 -- RLSを有効化
 ALTER TABLE reflection_type_master ENABLE ROW LEVEL SECURITY;

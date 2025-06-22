@@ -3,7 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 // Project imports:
-import '../../models/settings_model.dart';
+import '../../models/user_model.dart';
+import '../../models/auth_model.dart';
+import '../../models/kindness_reflection.dart';
 
 /// 設定のViewModel（プレゼンテーションロジックと状態管理に特化）
 class SettingsViewModel extends ChangeNotifier {
@@ -43,6 +45,32 @@ class SettingsViewModel extends ChangeNotifier {
   String get selectedReflectionFrequency => _selectedReflectionFrequency;
   bool get isLoadingReflectionSettings => _isLoadingReflectionSettings;
 
+  // バリデーションメソッド
+
+  /// パスワードバリデーション
+  String? _validatePassword(String password, String confirmPassword) {
+    if (password != confirmPassword) {
+      return 'パスワードが一致しません';
+    }
+    if (password.length < 6) {
+      return 'パスワードは6文字以上で入力してください';
+    }
+    return null;
+  }
+
+  /// メールアドレスバリデーション
+  String? _validateEmail(String email) {
+    if (email.trim().isEmpty) {
+      return 'メールアドレスを入力してください';
+    }
+    // 簡単なメールアドレス形式チェック
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    if (!emailRegex.hasMatch(email)) {
+      return '正しいメールアドレス形式で入力してください';
+    }
+    return null;
+  }
+
   // ダイアログ表示メソッド
   void showEmailChangeDialog() {
     _showEmailDialog = true;
@@ -65,14 +93,9 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // 現在の設定を読み込み（Modelのビジネスロジックを使用）
-      final settings = await Settings.getCurrentSettings();
-      if (settings['reflection_type_id'] != null) {
-        final reflectionTypeId = settings['reflection_type_id'] as int;
-        _selectedReflectionFrequency = Settings.getFrequencyFromId(
-          reflectionTypeId,
-        );
-      }
+      // UserModelを使用して現在の設定を読み込み
+      _selectedReflectionFrequency =
+          await UserModel.getCurrentReflectionFrequency();
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
@@ -124,7 +147,21 @@ class SettingsViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      await Settings.changeEmail(_currentEmail, _newEmail);
+      // バリデーション
+      final currentEmailError = _validateEmail(_currentEmail);
+      if (currentEmailError != null) {
+        _errorMessage = currentEmailError;
+        return;
+      }
+
+      final newEmailError = _validateEmail(_newEmail);
+      if (newEmailError != null) {
+        _errorMessage = newEmailError;
+        return;
+      }
+
+      // AuthModelを使用してメールアドレス変更
+      await AuthModel.changeEmail(_currentEmail, _newEmail);
       _successMessage = 'メールアドレスを変更しました';
       _showEmailDialog = false;
     } catch (e) {
@@ -139,7 +176,21 @@ class SettingsViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      await Settings.changePassword(
+      // バリデーション
+      final validationError = _validatePassword(_newPassword, _confirmPassword);
+      if (validationError != null) {
+        _errorMessage = validationError;
+        return;
+      }
+
+      // 現在のパスワードが空でないかチェック
+      if (_currentPassword.trim().isEmpty) {
+        _errorMessage = '現在のパスワードを入力してください';
+        return;
+      }
+
+      // AuthModelを使用してパスワード変更
+      await AuthModel.changePassword(
         _currentPassword,
         _newPassword,
         _confirmPassword,
@@ -159,7 +210,7 @@ class SettingsViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Settings.saveReflectionSettings(_selectedReflectionFrequency);
+      await UserModel.updateReflectionFrequency(_selectedReflectionFrequency);
       _successMessage = 'リフレクション設定を保存しました';
       _showReflectionDialog = false;
     } catch (e) {
@@ -175,7 +226,7 @@ class SettingsViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      await Settings.initialize();
+      await UserModel.initializeUserSettings();
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
@@ -188,7 +239,8 @@ class SettingsViewModel extends ChangeNotifier {
     _clearMessages();
 
     try {
-      await Settings.signOut();
+      // AuthModelを使用してログアウト
+      await AuthModel.signOut();
       _successMessage = 'ログアウトしました';
     } catch (e) {
       _errorMessage = e.toString();
@@ -197,9 +249,9 @@ class SettingsViewModel extends ChangeNotifier {
     }
   }
 
-  // プレゼンテーション用メソッド（Modelのビジネスロジックを使用）
-  String getFrequencyDescription(String frequency) {
-    return Settings.getFrequencyDescription(frequency);
+  // プレゼンテーション用メソッド（KindnessReflectionのビジネスロジックを使用）
+  Future<String> getFrequencyDescription(String frequency) async {
+    return await KindnessReflection.getFrequencyDescription(frequency);
   }
 
   // ヘルパーメソッド
