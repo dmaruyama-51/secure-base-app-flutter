@@ -46,16 +46,52 @@ class KindnessRecordListItem extends StatelessWidget {
               ),
             ],
             border: Border.all(
-              color: theme.colorScheme.secondary.withOpacity(0.8),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               width: 1,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ヘッダー部分（アバター、名前、日時）
+              // ヘッダー部分（記録タイプタグ、アバター、名前、日時）
               Row(
                 children: [
+                  // 記録タイプタグ
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          record.recordType == KindnessRecordType.received
+                              ? Icons.inbox
+                              : Icons.send,
+                          color: Colors.white,
+                          size: 10,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          record.recordType == KindnessRecordType.received
+                              ? '受け取った'
+                              : '送った',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
                   // アバター
                   KindnessGiverAvatar(
                     gender: record.giverGender,

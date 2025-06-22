@@ -124,9 +124,99 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          _buildRecordTypeSelector(viewModel, theme),
+          const SizedBox(height: 16),
           _buildFormCard(viewModel, theme),
           const SizedBox(height: 24),
           _buildSaveButton(viewModel, theme),
+        ],
+      ),
+    );
+  }
+
+  // 記録タイプ選択セクション
+  Widget _buildRecordTypeSelector(
+    KindnessRecordAddViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: theme.colorScheme.primary.withOpacity(0.08),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildSectionTitle('記録の種類', Icons.category, theme),
+          const SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: Colors.grey[100],
+            ),
+            child: Row(
+              children:
+                  viewModel.availableRecordTypes.map((type) {
+                    final isSelected = viewModel.selectedRecordType == type;
+                    return Expanded(
+                      child: GestureDetector(
+                        onTap: () {
+                          viewModel.selectRecordType(type);
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(12),
+                            color:
+                                isSelected
+                                    ? AppColors.primary
+                                    : Colors.transparent,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                viewModel.getRecordTypeIcon(type),
+                                size: 16,
+                                color:
+                                    isSelected
+                                        ? Colors.white
+                                        : AppColors.primary,
+                              ),
+                              const SizedBox(width: 6),
+                              Text(
+                                viewModel.getRecordTypeLabel(type),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color:
+                                      isSelected
+                                          ? Colors.white
+                                          : AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+            ),
+          ),
         ],
       ),
     );
@@ -159,12 +249,20 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('どんなやさしさを受け取りましたか？', Icons.edit, theme),
+          _buildSectionTitle(
+            viewModel.currentContentQuestionText,
+            Icons.edit,
+            theme,
+          ),
           const SizedBox(height: 16),
           _buildContentField(viewModel, theme),
           const SizedBox(height: 24),
           if (viewModel.kindnessGivers.isNotEmpty) ...[
-            _buildSectionTitle('誰からのやさしさですか？', Icons.person, theme),
+            _buildSectionTitle(
+              viewModel.currentGiverQuestionText,
+              Icons.person,
+              theme,
+            ),
             const SizedBox(height: 16),
             _buildKindnessGiverSelector(viewModel, theme),
             const SizedBox(height: 16),
@@ -209,7 +307,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
         minLines: 4,
         maxLines: 6,
         decoration: InputDecoration(
-          hintText: '例：「お疲れさま」と声をかけてくれた\n　　◯◯◯について話を聞いてくれた',
+          hintText: viewModel.currentContentPlaceholderText,
           hintStyle: theme.textTheme.bodyMedium?.copyWith(
             color: AppColors.textLight.withOpacity(0.8),
             fontSize: 13,
@@ -331,7 +429,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 ? []
                 : [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.3),
+                    color: AppColors.primary.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 4),
                   ),
@@ -339,14 +437,14 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
+          backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(28),
           ),
         ),
-        onPressed: viewModel.isSaving ? null : viewModel.saveKindnessRecord,
+        onPressed: viewModel.isSaving ? null : () => _saveRecord(viewModel),
         child:
             viewModel.isSaving
                 ? const SizedBox(
@@ -360,7 +458,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 : Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.favorite, size: 20),
+                    Icon(viewModel.currentRecordTypeIcon, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       'やさしさを記録する',
@@ -373,5 +471,10 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                 ),
       ),
     );
+  }
+
+  // 保存メソッド
+  void _saveRecord(KindnessRecordAddViewModel viewModel) {
+    viewModel.saveKindnessRecord();
   }
 }
