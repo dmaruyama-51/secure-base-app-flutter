@@ -2,7 +2,10 @@
 import 'package:flutter/foundation.dart';
 
 // Project imports:
-import '../../models/tutorial_model.dart';
+import '../../models/user_model.dart';
+import '../../models/kindness_giver.dart';
+import '../../models/kindness_record.dart';
+import '../../models/kindness_reflection.dart';
 
 /// チュートリアル関連のバリデーションエラー用の例外クラス
 class TutorialValidationException implements Exception {
@@ -129,10 +132,24 @@ class TutorialViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await Tutorial.recordTutorialKindness(
-        kindnessContent: _kindnessContent,
-        selectedGender: _selectedGender,
-        selectedRelation: _selectedRelation,
+      if (_kindnessContent.trim().isEmpty) {
+        _isRecordingKindness = false;
+        notifyListeners();
+        return true; // 空の場合はスキップ
+      }
+
+      // まず作成されたメンバーを取得
+      final kindnessGivers = await KindnessGiver.fetchKindnessGivers();
+      if (kindnessGivers.isEmpty) {
+        throw Exception('メンバーが見つかりません');
+      }
+
+      final selectedGiver = kindnessGivers.first;
+
+      // やさしさ記録を作成
+      await KindnessRecord.createKindnessRecord(
+        content: _kindnessContent,
+        selectedKindnessGiver: selectedGiver,
       );
 
       _isRecordingKindness = false;
@@ -146,15 +163,17 @@ class TutorialViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> saveReflectionSettings() async {
+  Future<bool> completeReflectionSettings() async {
     _isSettingReflection = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      await Tutorial.saveReflectionSettings(
-        selectedReflectionFrequency: _selectedReflectionFrequency,
-      );
+      // リフレクション設定を保存
+      await UserModel.updateReflectionFrequency(_selectedReflectionFrequency);
+
+      // チュートリアル完了をマーク
+      await UserModel.markTutorialCompleted();
 
       _isSettingReflection = false;
       notifyListeners();
@@ -176,10 +195,11 @@ class TutorialViewModel extends ChangeNotifier {
       // バリデーション
       _validateTutorialCompletion();
 
-      await Tutorial.completeTutorial(
-        kindnessGiverName: _kindnessGiverName,
-        selectedGender: _selectedGender,
-        selectedRelation: _selectedRelation,
+      // メンバー作成
+      await KindnessGiver.createKindnessGiver(
+        giverName: _kindnessGiverName,
+        genderName: _selectedGender,
+        relationshipName: _selectedRelation,
       );
 
       _isCompleting = false;
@@ -308,15 +328,17 @@ class TutorialViewModel extends ChangeNotifier {
   }
 
   Future<void> _executeReflectionSettingAction() async {
-    final success = await saveReflectionSettings();
+    // リフレクション設定を完了（設定保存 + チュートリアル完了マーク）
+    final success = await completeReflectionSettings();
     if (success) {
+      // プレゼンテーションロジック：メイン画面にナビゲーション
       _shouldNavigateToMain = true;
       notifyListeners();
     }
   }
 
   /// 頻度の説明文を取得
-  String getFrequencyDescription(String frequency) {
-    return Tutorial.getFrequencyDescription(frequency);
+  Future<String> getFrequencyDescription(String frequency) async {
+    return await KindnessReflection.getFrequencyDescription(frequency);
   }
 }

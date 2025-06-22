@@ -62,7 +62,7 @@ class _TutorialPageState extends State<TutorialPage> {
 
           // ナビゲーション処理
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (viewModel.shouldNavigateNext) {
+            if (viewModel.shouldNavigateNext && mounted) {
               _pageController.nextPage(
                 duration: Duration(
                   milliseconds: TutorialViewModel.pageAnimationDurationMs,
@@ -73,7 +73,12 @@ class _TutorialPageState extends State<TutorialPage> {
             }
 
             if (viewModel.shouldNavigateToMain && mounted) {
-              context.go('/kindness-records');
+              // チュートリアル完了マークの反映を待つ
+              Future.delayed(const Duration(milliseconds: 200), () {
+                if (mounted) {
+                  context.go('/kindness-records');
+                }
+              });
               viewModel.clearNavigationState();
             }
           });
@@ -802,11 +807,16 @@ class _TutorialPageState extends State<TutorialPage> {
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  subtitle: Text(
-                    viewModel.getFrequencyDescription(frequency),
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textLight,
-                    ),
+                  subtitle: FutureBuilder<String>(
+                    future: viewModel.getFrequencyDescription(frequency),
+                    builder: (context, snapshot) {
+                      return Text(
+                        snapshot.data ?? '',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.textLight,
+                        ),
+                      );
+                    },
                   ),
                   activeColor: theme.colorScheme.primary,
                   shape: RoundedRectangleBorder(

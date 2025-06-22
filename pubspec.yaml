@@ -45,6 +45,7 @@ dependencies:
   shared_preferences: ^2.2.2
   # Fonts
   google_fonts: ^6.1.0
+  url_launcher: ^6.2.2
 
 dev_dependencies:
   import_sorter: ^4.6.0

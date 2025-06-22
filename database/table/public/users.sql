@@ -1,7 +1,8 @@
 create table if not exists public.users (
     id uuid references auth.users on delete cascade not null primary key,
     created_at timestamp with time zone default timezone('utc' :: text, now()) not null,
-    updated_at timestamp with time zone default timezone('utc' :: text, now()) not null
+    updated_at timestamp with time zone default timezone('utc' :: text, now()) not null,
+    reflection_type_id bigint NULL DEFAULT '2'::bigint,
 );
 comment on table public.users is 'ユーザー情報を保持する';
 
