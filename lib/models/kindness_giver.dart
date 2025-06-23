@@ -1,16 +1,6 @@
 // Project imports:
 import 'repositories/kindness_giver_repository.dart';
 
-/// バリデーションエラー用の例外クラス
-class ValidationException implements Exception {
-  final String message;
-
-  ValidationException(this.message);
-
-  @override
-  String toString() => message;
-}
-
 class KindnessGiver {
   final int? id;
   final String userId;
