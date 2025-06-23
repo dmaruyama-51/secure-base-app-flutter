@@ -39,7 +39,9 @@ class KindnessRecord {
   }) async {
     final repo = repository ?? KindnessGiverRepository();
     try {
-      final kindnessGivers = await repo.fetchKindnessGivers();
+      final kindnessGivers = await repo.fetchKindnessGivers(
+        includeArchived: false,
+      );
       if (kindnessGivers.isEmpty) {
         throw Exception('記録できるメンバーがいません。まずメンバーを追加してください。');
       }
@@ -150,21 +152,55 @@ class KindnessRecord {
   }) async {
     final repo = repository ?? KindnessGiverRepository();
     try {
-      final kindnessGivers = await repo.fetchKindnessGivers();
+      // アクティブなメンバーを取得
+      final activeKindnessGivers = await repo.fetchKindnessGivers(
+        includeArchived: false,
+      );
+
+      // 元のレコードのメンバーがアーカイブされている場合は、そのメンバーも含める
+      final originalGiver = await _findOriginalGiver(
+        originalRecord.giverId,
+        repo,
+      );
+
+      List<KindnessGiver> allAvailableGivers = [...activeKindnessGivers];
+
+      // 元のメンバーがアーカイブされていて、アクティブな一覧に含まれていない場合は追加
+      if (originalGiver != null &&
+          originalGiver.isArchived &&
+          !activeKindnessGivers.any((g) => g.id == originalGiver.id)) {
+        allAvailableGivers.add(originalGiver);
+      }
 
       // 元のレコードに対応するKindnessGiverを選択
       KindnessGiver? selectedGiver;
-      if (kindnessGivers.isNotEmpty) {
+      if (allAvailableGivers.isNotEmpty) {
         selectedGiver =
-            kindnessGivers
+            allAvailableGivers
                 .where((giver) => giver.id == originalRecord.giverId)
                 .firstOrNull ??
-            kindnessGivers.first;
+            allAvailableGivers.first;
       }
 
-      return (kindnessGivers: kindnessGivers, selectedGiver: selectedGiver);
+      return (kindnessGivers: allAvailableGivers, selectedGiver: selectedGiver);
     } catch (e) {
       throw Exception('メンバー一覧の取得に失敗しました: $e');
+    }
+  }
+
+  /// 元のメンバーを個別に取得するヘルパーメソッド
+  static Future<KindnessGiver?> _findOriginalGiver(
+    int? giverId,
+    KindnessGiverRepository repo,
+  ) async {
+    if (giverId == null) return null;
+
+    try {
+      // アーカイブされたメンバーも含めて全て取得
+      final allGivers = await repo.fetchKindnessGivers(includeArchived: true);
+      return allGivers.where((g) => g.id == giverId).firstOrNull;
+    } catch (e) {
+      return null;
     }
   }
 

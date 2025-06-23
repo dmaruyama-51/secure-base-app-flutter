@@ -23,6 +23,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   String _selectedRelation = '家族';
   bool _isSaving = false;
   bool _isDeleting = false;
+  bool _isArchiving = false;
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
@@ -40,6 +41,7 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
   String get selectedRelation => _selectedRelation;
   bool get isSaving => _isSaving;
   bool get isDeleting => _isDeleting;
+  bool get isArchiving => _isArchiving;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
@@ -132,6 +134,70 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
       notifyListeners();
     } catch (e) {
       _isDeleting = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// メンバーをアーカイブ
+  Future<void> archiveKindnessGiver() async {
+    if (_originalKindnessGiver == null) {
+      _errorMessage = 'アーカイブ対象のメンバーが見つかりません';
+      notifyListeners();
+      return;
+    }
+
+    if (_originalKindnessGiver!.id == null) {
+      _errorMessage = '無効なメンバーIDです';
+      notifyListeners();
+      return;
+    }
+
+    _isArchiving = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await KindnessGiver.archiveKindnessGiver(_originalKindnessGiver!.id!);
+
+      _isArchiving = false;
+      _successMessage = 'メンバーをアーカイブしました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isArchiving = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
+  }
+
+  /// やさしさをくれる人のアーカイブを解除
+  Future<void> unarchiveKindnessGiver() async {
+    if (_originalKindnessGiver == null) {
+      _errorMessage = 'アーカイブ解除対象のメンバーが見つかりません';
+      notifyListeners();
+      return;
+    }
+
+    if (_originalKindnessGiver!.id == null) {
+      _errorMessage = '無効なメンバーIDです';
+      notifyListeners();
+      return;
+    }
+
+    _isArchiving = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      await KindnessGiver.unarchiveKindnessGiver(_originalKindnessGiver!.id!);
+
+      _isArchiving = false;
+      _successMessage = 'メンバーのアーカイブを解除しました';
+      _shouldNavigateBack = true;
+      notifyListeners();
+    } catch (e) {
+      _isArchiving = false;
       _errorMessage = e.toString();
       notifyListeners();
     }

@@ -9,6 +9,7 @@ class KindnessGiver {
   final int genderId;
   final DateTime? createdAt;
   final String? avatarUrl;
+  final bool isArchived;
 
   // UI表示用のプロパティ（JOINしたデータから取得）
   final String? relationshipName;
@@ -22,6 +23,7 @@ class KindnessGiver {
     required this.genderId,
     this.createdAt,
     this.avatarUrl,
+    this.isArchived = false,
     this.relationshipName,
     this.genderName,
   });
@@ -38,6 +40,7 @@ class KindnessGiver {
               ? DateTime.parse(json['created_at'] as String)
               : null,
       avatarUrl: json['avatar_url'] as String?,
+      isArchived: json['is_archived'] as bool? ?? false,
       relationshipName: json['relationship_name'] as String?,
       genderName: json['gender_name'] as String?,
     );
@@ -52,6 +55,7 @@ class KindnessGiver {
       'gender_id': genderId,
       'created_at': createdAt?.toIso8601String(),
       'avatar_url': avatarUrl,
+      'is_archived': isArchived,
     };
   }
 
@@ -64,6 +68,7 @@ class KindnessGiver {
     this.avatarUrl,
   }) : id = null,
        createdAt = null,
+       isArchived = false,
        relationshipName = null,
        genderName = null;
 
@@ -76,6 +81,7 @@ class KindnessGiver {
     int? genderId,
     DateTime? createdAt,
     String? avatarUrl,
+    bool? isArchived,
     String? relationshipName,
     String? genderName,
   }) {
@@ -87,6 +93,7 @@ class KindnessGiver {
       genderId: genderId ?? this.genderId,
       createdAt: createdAt ?? this.createdAt,
       avatarUrl: avatarUrl ?? this.avatarUrl,
+      isArchived: isArchived ?? this.isArchived,
       relationshipName: relationshipName ?? this.relationshipName,
       genderName: genderName ?? this.genderName,
     );
@@ -166,15 +173,71 @@ class KindnessGiver {
     return updatedKindnessGiver;
   }
 
-  /// メンバー一覧取得
+  /// メンバー一覧取得（アクティブのみ）
   static Future<List<KindnessGiver>> fetchKindnessGivers({
     KindnessGiverRepository? repository,
   }) async {
     final repo = repository ?? KindnessGiverRepository();
     try {
-      return await repo.fetchKindnessGivers();
+      return await repo.fetchKindnessGivers(includeArchived: false);
     } catch (e) {
       throw Exception('やさしさをくれる人の一覧取得に失敗しました: $e');
+    }
+  }
+
+  /// アクティブなメンバー一覧を取得
+  static Future<List<KindnessGiver>> fetchActiveKindnessGivers({
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      return await repo.fetchKindnessGivers(includeArchived: false);
+    } catch (e) {
+      throw Exception('やさしさをくれる人の一覧取得に失敗しました: $e');
+    }
+  }
+
+  /// アーカイブされたメンバー一覧を取得
+  static Future<List<KindnessGiver>> fetchArchivedKindnessGivers({
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      return await repo.fetchArchivedKindnessGivers();
+    } catch (e) {
+      throw Exception('アーカイブされたメンバーの一覧取得に失敗しました: $e');
+    }
+  }
+
+  /// メンバーをアーカイブする
+  static Future<void> archiveKindnessGiver(
+    int id, {
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      final success = await repo.archiveKindnessGiver(id);
+      if (!success) {
+        throw Exception('アーカイブ処理が失敗しました');
+      }
+    } catch (e) {
+      throw Exception('やさしさをくれる人のアーカイブに失敗しました: $e');
+    }
+  }
+
+  /// メンバーのアーカイブを解除する
+  static Future<void> unarchiveKindnessGiver(
+    int id, {
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      final success = await repo.unarchiveKindnessGiver(id);
+      if (!success) {
+        throw Exception('アーカイブ解除処理が失敗しました');
+      }
+    } catch (e) {
+      throw Exception('やさしさをくれる人のアーカイブ解除に失敗しました: $e');
     }
   }
 

@@ -66,6 +66,8 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
                 children: [
                   _buildHeader(theme),
                   const SizedBox(height: 24),
+                  _buildStatusToggle(viewModel, theme),
+                  const SizedBox(height: 16),
                   _buildMembersSection(viewModel, theme),
                 ],
               ),
@@ -138,6 +140,132 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     );
   }
 
+  Widget _buildStatusToggle(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(2),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.primary.withOpacity(0.04),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: GestureDetector(
+              onTap: () => viewModel.showActiveOnly(),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color:
+                      !viewModel.showArchivedOnly
+                          ? Colors.white.withOpacity(0.9)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow:
+                      !viewModel.showArchivedOnly
+                          ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.people_outline,
+                      size: 14,
+                      color:
+                          !viewModel.showArchivedOnly
+                              ? theme.colorScheme.primary.withOpacity(0.8)
+                              : theme.colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'アクティブ',
+                      style: TextStyle(
+                        color:
+                            !viewModel.showArchivedOnly
+                                ? theme.colorScheme.primary.withOpacity(0.8)
+                                : theme.colorScheme.onSurface.withOpacity(0.5),
+                        fontWeight:
+                            !viewModel.showArchivedOnly
+                                ? FontWeight.w500
+                                : FontWeight.w400,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            child: GestureDetector(
+              onTap: () => viewModel.setShowArchivedOnly(),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color:
+                      viewModel.showArchivedOnly
+                          ? Colors.white.withOpacity(0.9)
+                          : Colors.transparent,
+                  borderRadius: BorderRadius.circular(4),
+                  boxShadow:
+                      viewModel.showArchivedOnly
+                          ? [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.06),
+                              blurRadius: 3,
+                              offset: const Offset(0, 1),
+                            ),
+                          ]
+                          : null,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.archive_outlined,
+                      size: 14,
+                      color:
+                          viewModel.showArchivedOnly
+                              ? theme.colorScheme.primary.withOpacity(0.8)
+                              : theme.colorScheme.onSurface.withOpacity(0.5),
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      'アーカイブ',
+                      style: TextStyle(
+                        color:
+                            viewModel.showArchivedOnly
+                                ? theme.colorScheme.primary.withOpacity(0.8)
+                                : theme.colorScheme.onSurface.withOpacity(0.5),
+                        fontWeight:
+                            viewModel.showArchivedOnly
+                                ? FontWeight.w500
+                                : FontWeight.w400,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMembersSection(
     KindnessGiverListViewModel viewModel,
     ThemeData theme,
@@ -151,7 +279,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     }
 
     if (viewModel.kindnessGivers.isEmpty) {
-      return _buildEmptyCard(theme);
+      return _buildEmptyCard(viewModel, theme);
     }
 
     return Column(
@@ -160,13 +288,13 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
         Row(
           children: [
             Icon(
-              Icons.people_outline,
+              viewModel.showArchivedOnly ? Icons.archive : Icons.people_outline,
               color: theme.colorScheme.primary,
               size: 18,
             ),
             const SizedBox(width: 8),
             Text(
-              'メンバー',
+              viewModel.showArchivedOnly ? 'アーカイブされたメンバー' : 'アクティブなメンバー',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
@@ -194,13 +322,62 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
         ...viewModel.kindnessGivers.map(
           (kindnessGiver) => Padding(
             padding: const EdgeInsets.only(bottom: 10),
-            child: KindnessGiverCard(
-              kindnessGiver: kindnessGiver,
-              onTap: () => _navigateToEdit(kindnessGiver),
-            ),
+            child: _buildKindnessGiverCard(kindnessGiver, viewModel, theme),
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildKindnessGiverCard(
+    KindnessGiver kindnessGiver,
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
+    final bool isArchived = kindnessGiver.isArchived;
+
+    return Opacity(
+      opacity: isArchived ? 0.6 : 1.0,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border:
+              isArchived
+                  ? Border.all(color: Colors.orange.withOpacity(0.3), width: 1)
+                  : null,
+        ),
+        child: Stack(
+          children: [
+            KindnessGiverCard(
+              kindnessGiver: kindnessGiver,
+              onTap: () => _navigateToEdit(kindnessGiver),
+            ),
+            if (isArchived)
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.orange,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    'アーカイブ',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -292,7 +469,12 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     );
   }
 
-  Widget _buildEmptyCard(ThemeData theme) {
+  Widget _buildEmptyCard(
+    KindnessGiverListViewModel viewModel,
+    ThemeData theme,
+  ) {
+    final bool showingArchived = viewModel.showArchivedOnly;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -322,14 +504,14 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
               borderRadius: BorderRadius.circular(32),
             ),
             child: Icon(
-              Icons.people_outline,
+              showingArchived ? Icons.archive_outlined : Icons.people_outline,
               size: 32,
               color: theme.colorScheme.primary.withOpacity(0.6),
             ),
           ),
           const SizedBox(height: 16),
           Text(
-            'まだメンバーがいません',
+            showingArchived ? 'アーカイブされたメンバーはいません' : 'まだメンバーがいません',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               fontSize: 15,
@@ -337,7 +519,9 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
           ),
           const SizedBox(height: 6),
           Text(
-            '右下のボタンから\n最初のメンバーを追加しましょう',
+            showingArchived
+                ? 'アーカイブされたメンバーがここに表示されます'
+                : '右下のボタンから\n最初のメンバーを追加しましょう',
             style: TextStyle(color: AppColors.textLight, fontSize: 13),
             textAlign: TextAlign.center,
           ),

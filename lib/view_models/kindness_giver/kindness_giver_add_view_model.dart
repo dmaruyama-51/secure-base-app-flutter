@@ -67,7 +67,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// やさしさをくれる人を保存
+  /// メンバーを保存
   Future<void> saveKindnessGiver() async {
     _isSaving = true;
     _errorMessage = null;

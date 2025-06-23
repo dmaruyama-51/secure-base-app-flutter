@@ -5,6 +5,7 @@ CREATE TABLE public.kindness_givers (
   giver_name character varying NOT NULL,
   relationship_id bigint NULL,
   gender_id bigint NULL,
+  is_archived boolean NOT NULL DEFAULT false,
   CONSTRAINT kindness_givers_pkey PRIMARY KEY (id),
   CONSTRAINT kindness_givers_gender_id_fkey FOREIGN KEY (gender_id) REFERENCES gender_master(id) ON UPDATE CASCADE ON DELETE SET NULL,
   CONSTRAINT kindness_givers_relationship_id_fkey FOREIGN KEY (relationship_id) REFERENCES relationship_master(id) ON UPDATE CASCADE ON DELETE SET NULL,
@@ -19,6 +20,7 @@ comment on column kindness_givers.created_at is '作成日';
 comment on column kindness_givers.giver_name is 'メンバーの名前';
 comment on column kindness_givers.relationship_id is 'メンバーの関係性ID (relationship_master.idと連携)';
 comment on column kindness_givers.gender_id is 'メンバーの性別ID (gender_master.idと連携)';
+comment on column kindness_givers.is_archived is 'アーカイブフラグ（true: アーカイブ済み、false: アクティブ）';
 
 -- RLSを有効化
 alter table kindness_givers enable row level security;

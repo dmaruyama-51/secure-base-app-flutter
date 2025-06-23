@@ -23,6 +23,7 @@ class KindnessRecordRepository {
             *,
             kindness_givers:giver_id (
               giver_name,
+              is_archived,
               relationship_master:relationship_id (name),
               gender_master:gender_id (name)
             )
@@ -35,6 +36,11 @@ class KindnessRecordRepository {
 
       for (final data in response) {
         final giver = data['kindness_givers'];
+
+        // アーカイブされたメンバーのレコードは除外
+        if (giver != null && giver['is_archived'] == true) {
+          continue;
+        }
 
         records.add(
           KindnessRecord(
@@ -69,10 +75,22 @@ class KindnessRecordRepository {
 
       final response = await Supabase.instance.client
           .from('kindness_records')
-          .select('id')
+          .select('''
+            id,
+            kindness_givers:giver_id (is_archived)
+          ''')
           .eq('user_id', currentUser.id);
 
-      return response.length;
+      // アーカイブされていないメンバーのレコードのみカウント
+      int count = 0;
+      for (final data in response) {
+        final giver = data['kindness_givers'];
+        if (giver != null && giver['is_archived'] != true) {
+          count++;
+        }
+      }
+
+      return count;
     } catch (e) {
       // カウント取得に失敗した場合は0を返す
       return 0;
@@ -94,6 +112,7 @@ class KindnessRecordRepository {
             *,
             kindness_givers:giver_id (
               giver_name,
+              is_archived,
               relationship_master:relationship_id (name),
               gender_master:gender_id (name)
             )
@@ -105,6 +124,11 @@ class KindnessRecordRepository {
       if (response == null) return null;
 
       final giver = response['kindness_givers'];
+
+      // アーカイブされたメンバーのレコードの場合はnullを返す
+      if (giver != null && giver['is_archived'] == true) {
+        return null;
+      }
 
       return KindnessRecord(
         id: response['id'],

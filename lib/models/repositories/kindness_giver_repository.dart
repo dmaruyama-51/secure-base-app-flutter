@@ -11,7 +11,52 @@ class KindnessGiverRepository {
   final SupabaseClient _supabase = Supabase.instance.client;
 
   /// メンバー一覧を取得（JOINしてマスターデータも取得）
-  Future<List<KindnessGiver>> fetchKindnessGivers() async {
+  Future<List<KindnessGiver>> fetchKindnessGivers({
+    bool includeArchived = false,
+  }) async {
+    try {
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      var query = _supabase
+          .from('kindness_givers')
+          .select('''
+            id,
+            user_id,
+            giver_name,
+            relationship_id,
+            gender_id,
+            created_at,
+            is_archived,
+            relationship_master!inner(name),
+            gender_master!inner(name)
+          ''')
+          .eq('user_id', currentUser.id);
+
+      // アーカイブされたものを含むかどうかで条件を分岐
+      if (!includeArchived) {
+        query = query.eq('is_archived', false);
+      }
+
+      final response = await query.order('created_at', ascending: false);
+
+      return response.map((data) {
+        return KindnessGiver.fromJson({
+          ...data,
+          'relationship_name': data['relationship_master']['name'],
+          'gender_name': data['gender_master']['name'],
+        });
+      }).toList();
+    } catch (e) {
+      print('Error fetching kindness givers: $e');
+      throw Exception('メンバー一覧の取得に失敗しました: ${e.toString()}');
+    }
+  }
+
+  /// アーカイブされたメンバー一覧を取得
+  Future<List<KindnessGiver>> fetchArchivedKindnessGivers() async {
     try {
       final currentUser = _supabase.auth.currentUser;
       if (currentUser == null) {
@@ -27,10 +72,12 @@ class KindnessGiverRepository {
             relationship_id,
             gender_id,
             created_at,
+            is_archived,
             relationship_master!inner(name),
             gender_master!inner(name)
           ''')
           .eq('user_id', currentUser.id)
+          .eq('is_archived', true)
           .order('created_at', ascending: false);
 
       return response.map((data) {
@@ -41,8 +88,8 @@ class KindnessGiverRepository {
         });
       }).toList();
     } catch (e) {
-      print('Error fetching kindness givers: $e');
-      throw Exception('メンバー一覧の取得に失敗しました: ${e.toString()}');
+      print('Error fetching archived kindness givers: $e');
+      throw Exception('アーカイブされたメンバー一覧の取得に失敗しました: ${e.toString()}');
     }
   }
 
@@ -142,6 +189,48 @@ class KindnessGiverRepository {
     } catch (e) {
       print('Error updating kindness giver: $e');
       throw Exception('メンバーの更新に失敗しました: ${e.toString()}');
+    }
+  }
+
+  /// メンバーをアーカイブする
+  Future<bool> archiveKindnessGiver(int id) async {
+    try {
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      await _supabase
+          .from('kindness_givers')
+          .update({'is_archived': true})
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
+
+      return true;
+    } catch (e) {
+      print('Error archiving kindness giver: $e');
+      throw Exception('メンバーのアーカイブに失敗しました: ${e.toString()}');
+    }
+  }
+
+  /// メンバーのアーカイブを解除する
+  Future<bool> unarchiveKindnessGiver(int id) async {
+    try {
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      await _supabase
+          .from('kindness_givers')
+          .update({'is_archived': false})
+          .eq('id', id)
+          .eq('user_id', currentUser.id);
+
+      return true;
+    } catch (e) {
+      print('Error unarchiving kindness giver: $e');
+      throw Exception('メンバーのアーカイブ解除に失敗しました: ${e.toString()}');
     }
   }
 
