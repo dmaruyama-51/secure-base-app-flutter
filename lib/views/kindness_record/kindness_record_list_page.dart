@@ -167,7 +167,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '日常の小さなやさしさにアンテナをたてて、記録していきましょう',
+            '送ったやさしさも、もらったやさしさも、どちらも大切に記録しましょう',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,
