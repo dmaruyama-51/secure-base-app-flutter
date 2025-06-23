@@ -170,12 +170,20 @@ class _KindnessRecordEditPageState extends State<KindnessRecordEditPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle('やさしさの内容', Icons.edit, theme),
+          _buildSectionTitle(
+            viewModel.currentContentQuestionText,
+            Icons.edit,
+            theme,
+          ),
           const SizedBox(height: 16),
           _buildContentField(viewModel, theme),
           const SizedBox(height: 24),
           if (viewModel.kindnessGivers.isNotEmpty) ...[
-            _buildSectionTitle('誰からのやさしさですか？', Icons.person, theme),
+            _buildSectionTitle(
+              viewModel.currentGiverQuestionText,
+              Icons.person,
+              theme,
+            ),
             const SizedBox(height: 16),
             _buildKindnessGiverSelector(viewModel, theme),
           ],
@@ -218,7 +226,7 @@ class _KindnessRecordEditPageState extends State<KindnessRecordEditPage> {
         minLines: 4,
         maxLines: 6,
         decoration: InputDecoration(
-          hintText: '受け取ったやさしさを記録してください',
+          hintText: viewModel.currentContentPlaceholderText,
           hintStyle: theme.textTheme.bodyMedium?.copyWith(
             color: AppColors.textLight.withOpacity(0.8),
             fontSize: 13,
