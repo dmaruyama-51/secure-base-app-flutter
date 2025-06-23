@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 
 // Project imports:
 import '../../models/kindness_reflection.dart';
+import '../../models/kindness_record.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
 import '../../widgets/kindness_record_list_item.dart';
@@ -275,7 +276,6 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
 
   Widget _buildRecordsSection(ReflectionDetailViewModel viewModel) {
     final theme = Theme.of(context);
-    final groupedRecords = viewModel.getGroupedRecords();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,42 +317,15 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
 
         const SizedBox(height: 16),
 
-        // レコードリスト
-        ...groupedRecords.entries.map((entry) {
-          return _buildDateGroup(entry.key, entry.value);
-        }),
-      ],
-    );
-  }
-
-  Widget _buildDateGroup(String dateKey, List<dynamic> records) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 日付ヘッダー
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            dateKey,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textLight,
-              fontSize: 13,
-            ),
-          ),
-        ),
-
-        // その日のレコード
-        ...records.map(
-          (record) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: KindnessRecordListItem(record: record),
-          ),
-        ),
-
-        const SizedBox(height: 8),
+        // レコード一覧
+        if (viewModel.records.isNotEmpty) ...[
+          ...viewModel.records.map((record) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: KindnessRecordListItem(record: record),
+            );
+          }),
+        ],
       ],
     );
   }

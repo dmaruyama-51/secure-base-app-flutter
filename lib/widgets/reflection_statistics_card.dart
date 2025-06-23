@@ -74,7 +74,9 @@ class ReflectionStatisticsCard extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      '気づいたやさしさの数だけ、毎日が少し豊かになります',
+                      statistics.balanceDescription.isNotEmpty
+                          ? statistics.balanceDescription
+                          : '気づいたやさしさの数だけ、毎日が少し豊かになります',
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: AppColors.textLight,
                         fontSize: 11,
@@ -103,9 +105,9 @@ class ReflectionStatisticsCard extends StatelessWidget {
             Expanded(
               child: _buildStatCard(
                 context,
-                icon: Icons.favorite,
+                icon: Icons.inbox,
                 title: '受け取った\nやさしさ',
-                value: '${statistics.totalRecords}',
+                value: '${statistics.receivedRecords}',
                 unit: '件',
                 color: const Color(0xFFE91E63),
               ),
@@ -114,9 +116,37 @@ class ReflectionStatisticsCard extends StatelessWidget {
             Expanded(
               child: _buildStatCard(
                 context,
+                icon: Icons.send,
+                title: '送った\nやさしさ',
+                value: '${statistics.givenRecords}',
+                unit: '件',
+                color: const Color(0xFF2196F3),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        // 1日平均統計
+        Row(
+          children: [
+            Expanded(
+              child: _buildStatCard(
+                context,
                 icon: Icons.trending_up,
-                title: '1日平均',
-                value: statistics.averageRecordsPerDay.toStringAsFixed(1),
+                title: '受け取り\n1日平均',
+                value: statistics.averageReceivedPerDay.toStringAsFixed(1),
+                unit: '件',
+                color: const Color(0xFF4CAF50),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildStatCard(
+                context,
+                icon: Icons.trending_up,
+                title: '送り\n1日平均',
+                value: statistics.averageGivenPerDay.toStringAsFixed(1),
                 unit: '件',
                 color: const Color(0xFF4CAF50),
               ),
@@ -353,7 +383,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
               Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
               const SizedBox(width: 6),
               Text(
-                '最も多く受け取った曜日',
+                '最も記録の多かった曜日',
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.text,

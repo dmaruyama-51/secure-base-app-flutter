@@ -8,18 +8,50 @@ import '../../models/kindness_reflection.dart';
 /// リフレクション詳細画面の統計情報
 class ReflectionStatistics {
   final int totalRecords;
+  final int receivedRecords; // 受け取ったやさしさの件数
+  final int givenRecords; // 送ったやさしさの件数
   final Map<String, int> categoryCount;
   final Map<String, int> genderCount;
+  final Map<String, int> receivedCategoryCount; // 受け取ったやさしさのカテゴリ別
+  final Map<String, int> givenCategoryCount; // 送ったやさしさのカテゴリ別
   final List<String> mostActiveWeekdays;
   final double averageRecordsPerDay;
+  final double averageReceivedPerDay; // 受け取ったやさしさの1日平均
+  final double averageGivenPerDay; // 送ったやさしさの1日平均
 
   ReflectionStatistics({
     required this.totalRecords,
+    required this.receivedRecords,
+    required this.givenRecords,
     required this.categoryCount,
     required this.genderCount,
+    required this.receivedCategoryCount,
+    required this.givenCategoryCount,
     required this.mostActiveWeekdays,
     required this.averageRecordsPerDay,
+    required this.averageReceivedPerDay,
+    required this.averageGivenPerDay,
   });
+
+  /// やさしさのバランス（0.0-1.0、0.5が完全にバランス取れている状態）
+  double get kindnessBalance {
+    if (totalRecords == 0) return 0.5;
+    return receivedRecords / totalRecords;
+  }
+
+  /// バランスの説明文を取得
+  String get balanceDescription {
+    if (totalRecords == 0) return '';
+
+    final balance = kindnessBalance;
+    if (balance > 0.7) {
+      return '大切にされていると感じることの多い期間でしたね。';
+    } else if (balance < 0.3) {
+      return 'たくさん相手の支えになることのできた期間でしたね。';
+    } else {
+      return '支え合うことのできた期間でしたね。';
+    }
+  }
 }
 
 /// リフレクション詳細のViewModel
@@ -152,8 +184,18 @@ class ReflectionDetailViewModel extends ChangeNotifier {
       return _createEmptyStatistics();
     }
 
-    // カテゴリ別集計
+    // 受け取ったやさしさと送ったやさしさを分ける
+    final receivedRecords =
+        records
+            .where((r) => r.recordType == KindnessRecordType.received)
+            .toList();
+    final givenRecords =
+        records.where((r) => r.recordType == KindnessRecordType.given).toList();
+
+    // カテゴリ別集計（全体・受け取った・送った）
     final categoryCount = <String, int>{};
+    final receivedCategoryCount = <String, int>{};
+    final givenCategoryCount = <String, int>{};
     final genderCount = <String, int>{};
     final weekdayCount = <int, int>{};
 
@@ -162,6 +204,14 @@ class ReflectionDetailViewModel extends ChangeNotifier {
       final category =
           record.giverCategory.isNotEmpty ? record.giverCategory : 'その他';
       categoryCount[category] = (categoryCount[category] ?? 0) + 1;
+
+      // 受け取った/送ったカテゴリ別集計
+      if (record.recordType == KindnessRecordType.received) {
+        receivedCategoryCount[category] =
+            (receivedCategoryCount[category] ?? 0) + 1;
+      } else {
+        givenCategoryCount[category] = (givenCategoryCount[category] ?? 0) + 1;
+      }
 
       // 性別集計
       final gender = record.giverGender.isNotEmpty ? record.giverGender : 'その他';
@@ -182,13 +232,21 @@ class ReflectionDetailViewModel extends ChangeNotifier {
             .inDays +
         1;
     final averageRecordsPerDay = records.length / totalDays;
+    final averageReceivedPerDay = receivedRecords.length / totalDays;
+    final averageGivenPerDay = givenRecords.length / totalDays;
 
     return ReflectionStatistics(
       totalRecords: records.length,
+      receivedRecords: receivedRecords.length,
+      givenRecords: givenRecords.length,
       categoryCount: categoryCount,
       genderCount: genderCount,
+      receivedCategoryCount: receivedCategoryCount,
+      givenCategoryCount: givenCategoryCount,
       mostActiveWeekdays: mostActiveWeekdays,
       averageRecordsPerDay: averageRecordsPerDay,
+      averageReceivedPerDay: averageReceivedPerDay,
+      averageGivenPerDay: averageGivenPerDay,
     );
   }
 
@@ -213,26 +271,90 @@ class ReflectionDetailViewModel extends ChangeNotifier {
   ReflectionStatistics _createEmptyStatistics() {
     return ReflectionStatistics(
       totalRecords: 0,
+      receivedRecords: 0,
+      givenRecords: 0,
       categoryCount: {},
       genderCount: {},
+      receivedCategoryCount: {},
+      givenCategoryCount: {},
       mostActiveWeekdays: [],
       averageRecordsPerDay: 0,
+      averageReceivedPerDay: 0,
+      averageGivenPerDay: 0,
     );
   }
 
-  /// 日付別にグループ化されたレコードを取得
+  /// 日付でグループ化されたレコードを取得
   Map<String, List<KindnessRecord>> getGroupedRecords() {
-    final Map<String, List<KindnessRecord>> grouped = {};
+    final grouped = <String, List<KindnessRecord>>{};
 
     for (final record in _records) {
-      final dateKey = _formatDateKey(record.createdAt);
-      if (!grouped.containsKey(dateKey)) {
-        grouped[dateKey] = [];
-      }
-      grouped[dateKey]!.add(record);
+      final key = _formatDateKey(record.createdAt);
+      grouped[key] = (grouped[key] ?? [])..add(record);
     }
 
-    return grouped;
+    // 日付でソート（新しい順）
+    final sortedKeys = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+
+    final sortedGrouped = <String, List<KindnessRecord>>{};
+    for (final key in sortedKeys) {
+      // 各日付内のレコードを時間順でソート（新しい順）
+      grouped[key]!.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      sortedGrouped[key] = grouped[key]!;
+    }
+
+    return sortedGrouped;
+  }
+
+  /// タイプ別にグループ化されたレコードを取得
+  Map<KindnessRecordType, List<KindnessRecord>> getRecordsByType() {
+    final receivedRecords =
+        _records
+            .where((r) => r.recordType == KindnessRecordType.received)
+            .toList();
+    final givenRecords =
+        _records
+            .where((r) => r.recordType == KindnessRecordType.given)
+            .toList();
+
+    // 時間順でソート（新しい順）
+    receivedRecords.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    givenRecords.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+
+    return {
+      KindnessRecordType.received: receivedRecords,
+      KindnessRecordType.given: givenRecords,
+    };
+  }
+
+  /// タイプ別かつ日付別にグループ化されたレコードを取得
+  Map<KindnessRecordType, Map<String, List<KindnessRecord>>>
+  getGroupedRecordsByType() {
+    final recordsByType = getRecordsByType();
+    final result = <KindnessRecordType, Map<String, List<KindnessRecord>>>{};
+
+    for (final entry in recordsByType.entries) {
+      final grouped = <String, List<KindnessRecord>>{};
+
+      for (final record in entry.value) {
+        final key = _formatDateKey(record.createdAt);
+        grouped[key] = (grouped[key] ?? [])..add(record);
+      }
+
+      // 日付でソート（新しい順）
+      final sortedKeys = grouped.keys.toList()..sort((a, b) => b.compareTo(a));
+
+      final sortedGrouped = <String, List<KindnessRecord>>{};
+      for (final key in sortedKeys) {
+        // 各日付内のレコードを時間順でソート（新しい順）
+        grouped[key]!.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+        sortedGrouped[key] = grouped[key]!;
+      }
+
+      result[entry.key] = sortedGrouped;
+    }
+
+    return result;
   }
 
   /// 日付キーをフォーマット
