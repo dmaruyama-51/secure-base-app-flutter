@@ -6,6 +6,16 @@ import 'kindness_giver.dart';
 import 'repositories/kindness_giver_repository.dart';
 import 'repositories/kindness_record_repository.dart';
 
+/// やさしさ記録のタイプを表す列挙型
+enum KindnessRecordType {
+  received('received', '受け取った'),
+  given('given', '送った');
+
+  const KindnessRecordType(this.value, this.label);
+  final String value;
+  final String label;
+}
+
 class KindnessRecord {
   final int? id;
   final String userId;
@@ -17,6 +27,7 @@ class KindnessRecord {
   final String? giverAvatarUrl; // kindness_giversテーブルから取得する情報
   final String giverCategory; // kindness_giversテーブルから取得する情報（必須）
   final String giverGender; // kindness_giversテーブルから取得する情報（必須）
+  final KindnessRecordType recordType; // 記録タイプ
 
   KindnessRecord({
     this.id,
@@ -29,6 +40,7 @@ class KindnessRecord {
     this.giverAvatarUrl,
     required this.giverCategory,
     required this.giverGender,
+    this.recordType = KindnessRecordType.received,
   });
 
   // ===== ビジネスロジック（静的メソッド） =====
@@ -55,6 +67,7 @@ class KindnessRecord {
   static Future<KindnessRecord> createKindnessRecord({
     required String content,
     required KindnessGiver selectedKindnessGiver,
+    KindnessRecordType recordType = KindnessRecordType.received,
     KindnessRecordRepository? repository,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
@@ -77,6 +90,7 @@ class KindnessRecord {
       giverAvatarUrl: selectedKindnessGiver.avatarUrl,
       giverCategory: selectedKindnessGiver.relationshipName ?? '',
       giverGender: selectedKindnessGiver.genderName ?? '',
+      recordType: recordType,
     );
 
     try {
@@ -118,6 +132,7 @@ class KindnessRecord {
       giverAvatarUrl: selectedKindnessGiver.avatarUrl,
       giverCategory: selectedKindnessGiver.relationshipName ?? '',
       giverGender: selectedKindnessGiver.genderName ?? '',
+      recordType: originalRecord.recordType,
     );
 
     try {
@@ -133,10 +148,15 @@ class KindnessRecord {
     KindnessRecordRepository? repository,
     int limit = 50,
     int offset = 0,
+    KindnessRecordType? recordType,
   }) async {
     final repo = repository ?? KindnessRecordRepository();
     try {
-      return await repo.fetchKindnessRecords(limit: limit, offset: offset);
+      return await repo.fetchKindnessRecords(
+        limit: limit,
+        offset: offset,
+        recordType: recordType,
+      );
     } catch (e) {
       throw Exception('やさしさ記録の取得に失敗しました: $e');
     }

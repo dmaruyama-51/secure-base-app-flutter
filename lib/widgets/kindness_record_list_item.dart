@@ -46,16 +46,71 @@ class KindnessRecordListItem extends StatelessWidget {
               ),
             ],
             border: Border.all(
-              color: theme.colorScheme.secondary.withOpacity(0.8),
+              color: theme.colorScheme.primary.withOpacity(0.1),
               width: 1,
             ),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // ヘッダー部分（アバター、名前、日時）
+              // ヘッダー部分（記録タイプタグ、アバター、名前、日時）
               Row(
                 children: [
+                  // 記録タイプタグ
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 3,
+                    ),
+                    decoration: BoxDecoration(
+                      color:
+                          record.recordType == KindnessRecordType.received
+                              ? AppColors
+                                  .primary // 受け取った: 濃いオレンジ
+                              : Colors.white, // 送った: 白い背景（軽やか）
+                      borderRadius: BorderRadius.circular(6),
+                      border:
+                          record.recordType == KindnessRecordType.given
+                              ? Border.all(
+                                color: AppColors.primary.withOpacity(0.4),
+                                width: 1, // 境界線を細く
+                              )
+                              : null, // 受け取ったは境界線なし
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          record.recordType == KindnessRecordType.received
+                              ? Icons.inbox
+                              : Icons.send,
+                          color:
+                              record.recordType == KindnessRecordType.received
+                                  ? Colors
+                                      .white // 受け取った: 白いアイコン
+                                  : AppColors.primary, // 送った: オレンジのアイコン
+                          size: 10,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          record.recordType == KindnessRecordType.received
+                              ? '受け取った'
+                              : '送った',
+                          style: TextStyle(
+                            color:
+                                record.recordType == KindnessRecordType.received
+                                    ? Colors
+                                        .white // 受け取った: 白いテキスト
+                                    : AppColors.primary, // 送った: オレンジのテキスト
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+
                   // アバター
                   KindnessGiverAvatar(
                     gender: record.giverGender,

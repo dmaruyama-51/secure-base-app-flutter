@@ -8,6 +8,7 @@ class KindnessRecordRepository {
   Future<List<KindnessRecord>> fetchKindnessRecords({
     int limit = 50,
     int offset = 0,
+    KindnessRecordType? recordType,
   }) async {
     try {
       // 現在のユーザーを取得
@@ -16,8 +17,8 @@ class KindnessRecordRepository {
         throw Exception('ユーザーがログインしていません');
       }
 
-      // ページネーション機能を追加してパフォーマンス向上
-      final response = await Supabase.instance.client
+      // ベースクエリを作成
+      var query = Supabase.instance.client
           .from('kindness_records')
           .select('''
             *,
@@ -28,7 +29,15 @@ class KindnessRecordRepository {
               gender_master:gender_id (name)
             )
           ''')
-          .eq('user_id', currentUser.id)
+          .eq('user_id', currentUser.id);
+
+      // 記録タイプでフィルタリング（指定された場合のみ）
+      if (recordType != null) {
+        query = query.eq('record_type', recordType.value);
+      }
+
+      // ページネーション機能を追加してパフォーマンス向上
+      final response = await query
           .order('created_at', ascending: false)
           .range(offset, offset + limit - 1);
 
@@ -54,6 +63,10 @@ class KindnessRecordRepository {
             giverAvatarUrl: null, // avatar_urlカラムが存在しないためnull
             giverCategory: giver?['relationship_master']?['name'] ?? '',
             giverGender: giver?['gender_master']?['name'] ?? '',
+            recordType: KindnessRecordType.values.firstWhere(
+              (type) => type.value == (data['record_type'] ?? 'received'),
+              orElse: () => KindnessRecordType.received,
+            ),
           ),
         );
       }
@@ -141,6 +154,10 @@ class KindnessRecordRepository {
         giverAvatarUrl: null, // avatar_urlカラムが存在しないためnull
         giverCategory: giver?['relationship_master']?['name'] ?? '',
         giverGender: giver?['gender_master']?['name'] ?? '',
+        recordType: KindnessRecordType.values.firstWhere(
+          (type) => type.value == (response['record_type'] ?? 'received'),
+          orElse: () => KindnessRecordType.received,
+        ),
       );
     } catch (e) {
       throw Exception('やさしさ記録の取得に失敗しました: $e');
@@ -157,6 +174,7 @@ class KindnessRecordRepository {
         'user_id': record.userId,
         'giver_id': record.giverId,
         'content': record.content,
+        'record_type': record.recordType.value,
         'created_at': now,
         'updated_at': now,
       };
@@ -192,6 +210,7 @@ class KindnessRecordRepository {
           .update({
             'giver_id': record.giverId,
             'content': record.content,
+            'record_type': record.recordType.value,
             'updated_at': record.updatedAt.toIso8601String(),
           })
           .eq('id', record.id!)

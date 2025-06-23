@@ -138,11 +138,8 @@ class KindnessRecordListViewModel extends ChangeNotifier {
       return '今日';
     } else if (recordDate == yesterday) {
       return '昨日';
-    } else if (recordDate.isAfter(today.subtract(const Duration(days: 7)))) {
-      final weekdays = ['月', '火', '水', '木', '金', '土', '日'];
-      return '${date.month}/${date.day}(${weekdays[date.weekday - 1]})';
     } else {
-      return '${date.year}/${date.month}/${date.day}';
+      return 'これまで';
     }
   }
 

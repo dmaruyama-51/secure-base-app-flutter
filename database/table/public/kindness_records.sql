@@ -3,6 +3,7 @@ CREATE TABLE public.kindness_records (
   user_id uuid NOT NULL,
   giver_id bigint NOT NULL,
   content text NOT NULL,
+  record_type varchar(20) DEFAULT 'received' NOT NULL.
   created_at timestamp with time zone default timezone('utc' :: text, now()) not null,
   updated_at timestamp with time zone default timezone('utc' :: text, now()) not null,
 
@@ -16,6 +17,7 @@ comment on table public.kindness_records is 'ユーザーが他人から受け�
 comment on column kindness_records.user_id is '記録作成ユーザーID（users.idと連携）';
 comment on column kindness_records.giver_id is '優しさ記録対象者ID（kindness_givers.idと連携）';
 comment on column kindness_records.content is '記録内容（テキスト）';
+comment on column kindness_records.record_type is '記録タイプ（received: 受け取った, given: 送った）';
 
 
 -- RLSを有効化

@@ -7,18 +7,15 @@ import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 
 // Project imports:
-import '../../models/kindness_reflection.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
 import '../../widgets/kindness_record_list_item.dart';
 import '../../widgets/reflection_statistics_card.dart';
 
 class ReflectionDetailPage extends StatefulWidget {
-  final KindnessReflection? reflection;
   final String? reflectionId; // IDからデータを取得するため
 
-  const ReflectionDetailPage({Key? key, this.reflection, this.reflectionId})
-    : super(key: key);
+  const ReflectionDetailPage({Key? key, this.reflectionId}) : super(key: key);
 
   @override
   ReflectionDetailPageState createState() => ReflectionDetailPageState();
@@ -60,17 +57,16 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
   }
 
   Widget _buildSafeBody() {
-    // reflectionもreflectionIdもない場合
-    if (widget.reflection == null && widget.reflectionId == null) {
+    // reflectionIdがない場合
+    if (widget.reflectionId == null) {
       return _buildErrorState('リフレクションデータが見つかりません');
     }
 
     return ChangeNotifierProvider(
       create: (_) {
-        // ここでもnullチェックを行い、安全にViewModelを作成
+        // ViewModelを作成し、reflectionIdを渡す
         final viewModel = ReflectionDetailViewModel(
-          reflection: widget.reflection, // 既にnullチェック済み
-          reflectionId: widget.reflectionId, // IDも渡す
+          reflectionId: widget.reflectionId,
         );
         // 初期データ読み込み（エラーハンドリング付き）
         WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -168,11 +164,10 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
     final theme = Theme.of(context);
     final dateFormat = DateFormat('yyyy/MM/dd');
 
-    // ViewModelのcurrentReflectionを使用
-    final reflection = viewModel.currentReflection;
-    final title = reflection?.reflectionTitle ?? 'リフレクション';
-    final startDate = reflection?.reflectionStartDate;
-    final endDate = reflection?.reflectionEndDate;
+    // ViewModelのゲッターメソッドを使用
+    final title = viewModel.reflectionTitle;
+    final startDate = viewModel.reflectionStartDate;
+    final endDate = viewModel.reflectionEndDate;
 
     return Container(
       width: double.infinity,
@@ -275,7 +270,6 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
 
   Widget _buildRecordsSection(ReflectionDetailViewModel viewModel) {
     final theme = Theme.of(context);
-    final groupedRecords = viewModel.getGroupedRecords();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -317,42 +311,15 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
 
         const SizedBox(height: 16),
 
-        // レコードリスト
-        ...groupedRecords.entries.map((entry) {
-          return _buildDateGroup(entry.key, entry.value);
-        }),
-      ],
-    );
-  }
-
-  Widget _buildDateGroup(String dateKey, List<dynamic> records) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 日付ヘッダー
-        Padding(
-          padding: const EdgeInsets.only(left: 4, bottom: 8),
-          child: Text(
-            dateKey,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: AppColors.textLight,
-              fontSize: 13,
-            ),
-          ),
-        ),
-
-        // その日のレコード
-        ...records.map(
-          (record) => Padding(
-            padding: const EdgeInsets.only(bottom: 12),
-            child: KindnessRecordListItem(record: record),
-          ),
-        ),
-
-        const SizedBox(height: 8),
+        // レコード一覧
+        if (viewModel.records.isNotEmpty) ...[
+          ...viewModel.records.map((record) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: KindnessRecordListItem(record: record),
+            );
+          }),
+        ],
       ],
     );
   }
@@ -419,7 +386,7 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
 
             // ポジティブなメインメッセージ
             Text(
-              '小さなやさしさを\n探しにいきませんか？',
+              '日々の小さなやさしさを\n探しにいきませんか？',
               textAlign: TextAlign.center,
               style: theme.textTheme.titleLarge?.copyWith(
                 fontWeight: FontWeight.w700,

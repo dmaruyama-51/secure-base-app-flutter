@@ -5,7 +5,6 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 // Project imports:
 import '../models/kindness_giver.dart';
 import '../models/kindness_record.dart';
-import '../models/kindness_reflection.dart';
 import '../models/user_model.dart';
 import '../views/kindness_giver/kindness_giver_add_page.dart';
 import '../views/kindness_giver/kindness_giver_edit_page.dart';
@@ -112,12 +111,8 @@ final GoRouter appRouter = GoRouter(
         GoRoute(
           path: 'detail/:id',
           builder: (context, state) {
-            final reflection = state.extra as KindnessReflection?;
             final id = state.pathParameters['id'];
-            return ReflectionDetailPage(
-              reflection: reflection,
-              reflectionId: id,
-            );
+            return ReflectionDetailPage(reflectionId: id);
           },
         ),
       ],

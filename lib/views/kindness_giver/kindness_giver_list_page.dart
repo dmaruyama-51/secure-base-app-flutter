@@ -128,7 +128,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            '心の安全基地のメンバーを登録・管理できます',
+            'あなたが安心できる場所をつくる人たちです',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,
