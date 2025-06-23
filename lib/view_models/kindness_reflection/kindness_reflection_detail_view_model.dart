@@ -78,6 +78,31 @@ class ReflectionDetailViewModel extends ChangeNotifier {
   // 実際に使用するリフレクションを取得
   KindnessReflection? get currentReflection => reflection ?? _loadedReflection;
 
+  /// リフレクションのタイトルを取得
+  String get reflectionTitle => currentReflection?.reflectionTitle ?? 'リフレクション';
+
+  /// リフレクションの開始日を取得
+  DateTime? get reflectionStartDate => currentReflection?.reflectionStartDate;
+
+  /// リフレクションの終了日を取得
+  DateTime? get reflectionEndDate => currentReflection?.reflectionEndDate;
+
+  /// ViewModel作成用のファクトリーメソッド（reflectionIdから）
+  static Future<ReflectionDetailViewModel> createFromId(
+    String reflectionId,
+  ) async {
+    final viewModel = ReflectionDetailViewModel(reflectionId: reflectionId);
+    await viewModel.initialize();
+    return viewModel;
+  }
+
+  /// ViewModel作成用のファクトリーメソッド（reflectionオブジェクトから）
+  static ReflectionDetailViewModel createFromReflection(
+    KindnessReflection reflection,
+  ) {
+    return ReflectionDetailViewModel(reflection: reflection);
+  }
+
   /// 初期化処理
   Future<void> initialize() async {
     _isLoading = true;
