@@ -1,5 +1,6 @@
 // Project imports:
 import 'repositories/kindness_giver_repository.dart';
+import 'repositories/kindness_record_repository.dart';
 
 class KindnessGiver {
   final int? id;
@@ -205,7 +206,19 @@ class KindnessGiver {
     try {
       return await repo.fetchArchivedKindnessGivers();
     } catch (e) {
-      throw Exception('アーカイブされたメンバーの一覧取得に失敗しました: $e');
+      throw Exception('アーカイブされたメンバー一覧の取得に失敗しました: $e');
+    }
+  }
+
+  /// 全メンバー一覧を取得（アクティブ+アーカイブ）
+  static Future<List<KindnessGiver>> fetchAllKindnessGivers({
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      return await repo.fetchKindnessGivers(includeArchived: true);
+    } catch (e) {
+      throw Exception('全メンバー一覧の取得に失敗しました: $e');
     }
   }
 
@@ -254,6 +267,26 @@ class KindnessGiver {
       }
     } catch (e) {
       throw Exception('やさしさをくれる人の削除に失敗しました: $e');
+    }
+  }
+
+  /// 特定のメンバーの統計情報を取得
+  static Future<Map<String, dynamic>> fetchKindnessGiverStatistics(
+    int giverId, {
+    KindnessRecordRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessRecordRepository();
+    try {
+      return await repo.fetchKindnessGiverStatistics(giverId);
+    } catch (e) {
+      // エラーが発生した場合は空の統計を返す
+      return {
+        'totalCount': 0,
+        'receivedCount': 0,
+        'givenCount': 0,
+        'lastRecordDate': null,
+        'recentCount': 0,
+      };
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../models/kindness_giver.dart';
 import 'kindness_giver_avatar.dart';
 import 'kindness_giver_info_chip.dart';
+import 'kindness_giver_statistics_chip.dart';
 
 /// メンバーカード表示ウィジェット
 class KindnessGiverCard extends StatefulWidget {
@@ -99,7 +100,7 @@ class _KindnessGiverCardState extends State<KindnessGiverCard>
                 ),
                 child: Row(
                   children: [
-                    // アバターセクション
+                    // 左側：アバター
                     Container(
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
@@ -113,70 +114,40 @@ class _KindnessGiverCardState extends State<KindnessGiverCard>
                       ),
                       child: KindnessGiverAvatar(
                         kindnessGiver: widget.kindnessGiver,
-                        size: 44,
+                        size: 50,
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+
+                    // 中央：メンバー情報
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // 名前
+                          Text(
+                            widget.kindnessGiver.giverName,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 14,
+                              color: theme.colorScheme.onSurface,
+                              letterSpacing: 0.2,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          // 関係性情報
+                          KindnessGiverInfoChip(
+                            kindnessGiver: widget.kindnessGiver,
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(width: 12),
 
-                    // メンバー情報セクション
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  widget.kindnessGiver.giverName,
-                                  style: theme.textTheme.titleMedium?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 15,
-                                    color: theme.colorScheme.onSurface,
-                                    letterSpacing: 0.2,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 6,
-                                  vertical: 3,
-                                ),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      theme.colorScheme.primary.withOpacity(
-                                        0.08,
-                                      ),
-                                      theme.colorScheme.primary.withOpacity(
-                                        0.05,
-                                      ),
-                                    ],
-                                  ),
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(
-                                    color: theme.colorScheme.primary
-                                        .withOpacity(0.1),
-                                  ),
-                                ),
-                                child: Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 10,
-                                  color: theme.colorScheme.primary.withOpacity(
-                                    0.7,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 1),
-                            child: KindnessGiverInfoChip(
-                              kindnessGiver: widget.kindnessGiver,
-                            ),
-                          ),
-                        ],
-                      ),
+                    // 右側：統計情報のみ
+                    KindnessGiverStatisticsChip(
+                      kindnessGiver: widget.kindnessGiver,
                     ),
                   ],
                 ),
