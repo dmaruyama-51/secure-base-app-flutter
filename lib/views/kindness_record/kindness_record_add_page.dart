@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
+import '../../models/kindness_giver.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
@@ -65,6 +66,14 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
               if (viewModel.shouldNavigateBack) {
                 GoRouter.of(context).pop();
               }
+              viewModel.clearMessages();
+            }
+          });
+
+          // 新規メンバー登録画面への遷移
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (viewModel.shouldNavigateToAddGiver) {
+              _navigateToAddGiver(context, viewModel);
               viewModel.clearMessages();
             }
           });
@@ -336,33 +345,70 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
         borderRadius: BorderRadius.circular(12),
       ),
       child: DropdownButtonHideUnderline(
-        child: DropdownButton(
+        child: DropdownButton<KindnessGiver?>(
           isExpanded: true,
           value: viewModel.selectedKindnessGiver,
           hint: Text('メンバーを選択', style: TextStyle(color: AppColors.textLight)),
-          items:
-              viewModel.kindnessGivers.map((kindnessGiver) {
-                return DropdownMenuItem(
-                  value: kindnessGiver,
-                  child: Row(
-                    children: [
-                      KindnessGiverAvatar(
-                        kindnessGiver: kindnessGiver,
-                        size: 32,
+          items: [
+            // 既存のメンバー
+            ...viewModel.kindnessGivers.map((kindnessGiver) {
+              return DropdownMenuItem<KindnessGiver?>(
+                value: kindnessGiver,
+                child: Row(
+                  children: [
+                    KindnessGiverAvatar(kindnessGiver: kindnessGiver, size: 32),
+                    const SizedBox(width: 12),
+                    Text(
+                      kindnessGiver.giverName,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
                       ),
-                      const SizedBox(width: 12),
-                      Text(
-                        kindnessGiver.giverName,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                        ),
+                    ),
+                  ],
+                ),
+              );
+            }),
+            // 新規登録オプション
+            DropdownMenuItem<KindnessGiver?>(
+              value: null,
+              child: Row(
+                children: [
+                  Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: theme.colorScheme.primary,
+                        width: 2,
+                        style: BorderStyle.solid,
                       ),
-                    ],
+                    ),
+                    child: Icon(
+                      Icons.add,
+                      color: theme.colorScheme.primary,
+                      size: 20,
+                    ),
                   ),
-                );
-              }).toList(),
-          onChanged: (value) {
-            if (value != null) {
+                  const SizedBox(width: 12),
+                  Text(
+                    '新しいメンバーを追加',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+          onChanged: (KindnessGiver? value) {
+            if (value == null) {
+              // 新規登録オプションが選択された場合
+              viewModel.navigateToAddGiver();
+            } else {
+              // 既存のメンバーが選択された場合
               viewModel.selectKindnessGiver(value);
             }
           },
@@ -476,5 +522,18 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
   // 保存メソッド
   void _saveRecord(KindnessRecordAddViewModel viewModel) {
     viewModel.saveKindnessRecord();
+  }
+
+  // 新規メンバー登録画面への遷移
+  Future<void> _navigateToAddGiver(
+    BuildContext context,
+    KindnessRecordAddViewModel viewModel,
+  ) async {
+    final result = await GoRouter.of(context).push('/kindness-givers/add');
+
+    // 新規メンバーが追加された場合、リストを再読み込みし、追加されたメンバーを選択
+    if (result is KindnessGiver) {
+      await viewModel.reloadKindnessGivers(result);
+    }
   }
 }
