@@ -12,8 +12,7 @@ class KindnessGiverCard extends StatefulWidget {
   final KindnessGiver kindnessGiver;
   final VoidCallback? onTap;
 
-  const KindnessGiverCard({Key? key, required this.kindnessGiver, this.onTap})
-    : super(key: key);
+  const KindnessGiverCard({super.key, required this.kindnessGiver, this.onTap});
 
   @override
   State<KindnessGiverCard> createState() => _KindnessGiverCardState();
