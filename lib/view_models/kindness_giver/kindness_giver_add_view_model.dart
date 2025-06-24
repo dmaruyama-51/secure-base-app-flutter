@@ -24,6 +24,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
+  KindnessGiver? _createdKindnessGiver;
 
   // ゲッター
   String get name => _name;
@@ -33,6 +34,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
+  KindnessGiver? get createdKindnessGiver => _createdKindnessGiver;
 
   /// 基本的な入力値のバリデーション
   void _validateBasicInput() {
@@ -77,7 +79,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
       // バリデーション
       _validateBasicInput();
 
-      await KindnessGiver.createKindnessGiver(
+      _createdKindnessGiver = await KindnessGiver.createKindnessGiver(
         giverName: _name,
         genderName: _selectedGender,
         relationshipName: _selectedRelation,
@@ -99,6 +101,7 @@ class KindnessGiverAddViewModel extends ChangeNotifier {
     _errorMessage = null;
     _successMessage = null;
     _shouldNavigateBack = false;
+    _createdKindnessGiver = null;
     notifyListeners();
   }
 }

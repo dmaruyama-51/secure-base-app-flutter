@@ -28,6 +28,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   String? _errorMessage;
   String? _successMessage;
   bool _shouldNavigateBack = false;
+  bool _shouldNavigateToAddGiver = false;
 
   // ゲッター
   List<KindnessGiver> get kindnessGivers => _kindnessGivers;
@@ -39,6 +40,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
   bool get shouldNavigateBack => _shouldNavigateBack;
+  bool get shouldNavigateToAddGiver => _shouldNavigateToAddGiver;
 
   /// 初期化
   Future<void> initialize() async {
@@ -58,6 +60,12 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
       _errorMessage = e.toString();
       notifyListeners();
     }
+  }
+
+  /// 新規メンバー登録画面への遷移をトリガー
+  void navigateToAddGiver() {
+    _shouldNavigateToAddGiver = true;
+    notifyListeners();
   }
 
   /// メンバーを選択
@@ -120,7 +128,45 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     _errorMessage = null;
     _successMessage = null;
     _shouldNavigateBack = false;
+    _shouldNavigateToAddGiver = false;
     notifyListeners();
+  }
+
+  /// メンバーリストを再読み込み（新規追加後など）
+  Future<void> reloadKindnessGivers([KindnessGiver? newlyCreatedGiver]) async {
+    try {
+      final previousSelectedId = _selectedKindnessGiver?.id;
+      _kindnessGivers = await KindnessRecord.fetchKindnessGiversForRecordAdd();
+
+      // 新しく作成されたメンバーがある場合は、それを選択
+      if (newlyCreatedGiver != null) {
+        final createdGiver =
+            _kindnessGivers
+                .where((giver) => giver.id == newlyCreatedGiver.id)
+                .firstOrNull;
+        if (createdGiver != null) {
+          _selectedKindnessGiver = createdGiver;
+        }
+      }
+      // 以前選択されていたメンバーを新しいリストから探して再設定
+      else if (previousSelectedId != null) {
+        final previousSelected =
+            _kindnessGivers
+                .where((giver) => giver.id == previousSelectedId)
+                .firstOrNull;
+        _selectedKindnessGiver = previousSelected;
+      }
+
+      // 選択されているメンバーがない場合は、リストの最初のメンバーを選択
+      if (_selectedKindnessGiver == null && _kindnessGivers.isNotEmpty) {
+        _selectedKindnessGiver = _kindnessGivers.first;
+      }
+
+      notifyListeners();
+    } catch (e) {
+      _errorMessage = e.toString();
+      notifyListeners();
+    }
   }
 
   // ===== プレゼンテーションロジック =====

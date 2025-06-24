@@ -59,7 +59,8 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
                 SnackBar(content: Text(viewModel.successMessage!)),
               );
               if (viewModel.shouldNavigateBack) {
-                GoRouter.of(context).pop();
+                // 作成されたメンバー情報を返す
+                GoRouter.of(context).pop(viewModel.createdKindnessGiver);
               }
               viewModel.clearMessages();
             }
