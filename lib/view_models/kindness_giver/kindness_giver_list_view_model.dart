@@ -11,7 +11,9 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   String? _successMessage;
-  bool _showArchivedOnly = false;
+
+  /// アーカイブセクションが展開されているかどうか
+  bool _isArchiveSectionExpanded = false;
 
   // コールバック管理
   VoidCallback? _onRefreshCallback;
@@ -21,32 +23,7 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
   String? get successMessage => _successMessage;
-  bool get showArchivedOnly => _showArchivedOnly;
-
-  /// アーカイブ表示の切り替え
-  void toggleShowArchived() {
-    _showArchivedOnly = !_showArchivedOnly;
-    notifyListeners();
-    loadKindnessGivers();
-  }
-
-  /// アクティブメンバーのみ表示に切り替え
-  void showActiveOnly() {
-    if (_showArchivedOnly) {
-      _showArchivedOnly = false;
-      notifyListeners();
-      loadKindnessGivers();
-    }
-  }
-
-  /// アーカイブメンバーのみ表示に切り替え
-  void setShowArchivedOnly() {
-    if (!_showArchivedOnly) {
-      _showArchivedOnly = true;
-      notifyListeners();
-      loadKindnessGivers();
-    }
-  }
+  bool get isArchiveSectionExpanded => _isArchiveSectionExpanded;
 
   /// リフレッシュコールバックを設定
   void setRefreshCallback(VoidCallback? callback) {
@@ -58,18 +35,14 @@ class KindnessGiverListViewModel extends ChangeNotifier {
     _onRefreshCallback?.call();
   }
 
-  /// メンバー一覧を読み込む
+  /// メンバー一覧を読み込む（全メンバー：アクティブ+アーカイブ）
   Future<void> loadKindnessGivers() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      if (_showArchivedOnly) {
-        _kindnessGivers = await KindnessGiver.fetchArchivedKindnessGivers();
-      } else {
-        _kindnessGivers = await KindnessGiver.fetchActiveKindnessGivers();
-      }
+      _kindnessGivers = await KindnessGiver.fetchAllKindnessGivers();
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -82,5 +55,39 @@ class KindnessGiverListViewModel extends ChangeNotifier {
   /// リストを再読み込みする
   Future<void> refreshKindnessGivers() async {
     await loadKindnessGivers();
+  }
+
+  /// 統計情報を含む完全なリフレッシュを実行
+  /// 統計情報は各カードで個別に読み込まれるため、
+  /// ここではメンバー一覧のみを更新する
+  Future<void> refreshWithStatistics() async {
+    await refreshKindnessGivers();
+    // 統計情報は KindnessGiverStatisticsChip で個別に更新される
+  }
+
+  /// メンバーをアクティブとアーカイブでグループ分けする
+  Map<String, List<KindnessGiver>> getGroupedMembers() {
+    final grouped = <String, List<KindnessGiver>>{};
+
+    final activeMembers =
+        _kindnessGivers.where((member) => !member.isArchived).toList();
+    final archivedMembers =
+        _kindnessGivers.where((member) => member.isArchived).toList();
+
+    if (activeMembers.isNotEmpty) {
+      grouped['アクティブ'] = activeMembers;
+    }
+
+    if (archivedMembers.isNotEmpty) {
+      grouped['アーカイブ'] = archivedMembers;
+    }
+
+    return grouped;
+  }
+
+  /// アーカイブセクションの展開状態をトグルする
+  void toggleArchiveSectionExpanded() {
+    _isArchiveSectionExpanded = !_isArchiveSectionExpanded;
+    notifyListeners();
   }
 }

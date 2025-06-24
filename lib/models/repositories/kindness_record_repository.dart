@@ -239,4 +239,59 @@ class KindnessRecordRepository {
       throw Exception('やさしさ記録の削除に失敗しました: $e');
     }
   }
+
+  /// 特定のkindness_giverの統計情報を取得
+  Future<Map<String, dynamic>> fetchKindnessGiverStatistics(int giverId) async {
+    try {
+      final currentUser = Supabase.instance.client.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      // 該当giverの記録を全件取得
+      final response = await Supabase.instance.client
+          .from('kindness_records')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .eq('giver_id', giverId)
+          .order('created_at', ascending: false);
+
+      // 統計情報を計算
+      final totalCount = response.length;
+      final receivedCount =
+          response.where((r) => r['record_type'] == 'received').length;
+      final givenCount =
+          response.where((r) => r['record_type'] == 'given').length;
+
+      DateTime? lastRecordDate;
+      if (response.isNotEmpty) {
+        lastRecordDate = DateTime.parse(response.first['created_at']);
+      }
+
+      // 過去30日間の記録数
+      final thirtyDaysAgo = DateTime.now().subtract(const Duration(days: 30));
+      final recentCount =
+          response.where((r) {
+            final recordDate = DateTime.parse(r['created_at']);
+            return recordDate.isAfter(thirtyDaysAgo);
+          }).length;
+
+      return {
+        'totalCount': totalCount,
+        'receivedCount': receivedCount,
+        'givenCount': givenCount,
+        'lastRecordDate': lastRecordDate,
+        'recentCount': recentCount, // 過去30日間の記録数
+      };
+    } catch (e) {
+      // エラーが発生した場合は空の統計を返す
+      return {
+        'totalCount': 0,
+        'receivedCount': 0,
+        'givenCount': 0,
+        'lastRecordDate': null,
+        'recentCount': 0,
+      };
+    }
+  }
 }
