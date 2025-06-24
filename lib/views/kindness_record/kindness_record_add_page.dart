@@ -374,21 +374,21 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
               child: Row(
                 children: [
                   Container(
-                    width: 32,
-                    height: 32,
+                    width: 24,
+                    height: 24,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(14),
                       border: Border.all(
                         color: theme.colorScheme.primary,
-                        width: 2,
+                        width: 1.5,
                         style: BorderStyle.solid,
                       ),
                     ),
                     child: Icon(
                       Icons.add,
                       color: theme.colorScheme.primary,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                   const SizedBox(width: 12),
