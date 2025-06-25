@@ -27,21 +27,11 @@ class ReflectionListItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         child: Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 8,
-                offset: const Offset(0, 1),
-              ),
-            ],
-            border: Border.all(
-              color: theme.colorScheme.secondary.withOpacity(0.8),
-              width: 1,
-            ),
+            color: Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.withOpacity(0.15), width: 1),
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -49,37 +39,26 @@ class ReflectionListItem extends StatelessWidget {
               // ヘッダー部分
               Row(
                 children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Icon(
-                      Icons.auto_awesome,
-                      size: 20,
-                      color: AppColors.primary,
-                    ),
+                  Icon(
+                    Icons.article_outlined,
+                    size: 18,
+                    color: AppColors.primary,
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          reflection.reflectionTitle ?? 'リフレクション',
-                          style: theme.textTheme.titleSmall?.copyWith(
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.text,
-                          ),
-                        ),
-                      ],
+                    child: Text(
+                      reflection.reflectionTitle ?? 'リフレクション',
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.text,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
                   Icon(
                     Icons.chevron_right,
                     color: AppColors.textLight,
-                    size: 18,
+                    size: 16,
                   ),
                 ],
               ),
@@ -87,45 +66,19 @@ class ReflectionListItem extends StatelessWidget {
               // 期間表示
               if (reflection.reflectionStartDate != null &&
                   reflection.reflectionEndDate != null) ...[
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [
-                        theme.colorScheme.primary.withOpacity(0.05),
-                        theme.colorScheme.primary.withOpacity(0.02),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withOpacity(0.15),
-                      width: 1,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.date_range,
-                        size: 14,
-                        color: AppColors.primary,
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.schedule, size: 12, color: AppColors.textLight),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${dateFormat.format(reflection.reflectionStartDate!)} - ${dateFormat.format(reflection.reflectionEndDate!)}',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: AppColors.textLight,
+                        fontSize: 11,
                       ),
-                      const SizedBox(width: 6),
-                      Text(
-                        '期間: ${dateFormat.format(reflection.reflectionStartDate!)} - ${dateFormat.format(reflection.reflectionEndDate!)}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: AppColors.primary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
               ],
             ],

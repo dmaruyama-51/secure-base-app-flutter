@@ -7,7 +7,7 @@ CREATE TABLE public.balance_scores (
   sent_count bigint NULL,
   sent_uu bigint NULL,
   receive_count bigint NULL,
-  reveive_uu bigint NULL,
+  receive_uu bigint NULL,
   supporting_score bigint NULL,
   supported_score bigint NULL,
   supporting_score_norm double precision NULL,
