@@ -91,7 +91,7 @@ class _BalanceScoreTrendCardAdvancedState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'バランススコアの推移',
+                'バランススコア',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.primary,
@@ -99,7 +99,7 @@ class _BalanceScoreTrendCardAdvancedState
                 ),
               ),
               Text(
-                '過去${widget.weeklyData.length}週間のやさしさのバランス',
+                '過去${widget.weeklyData.length}週間の安全基地メンバーとの支え合いのバランス',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 11,
@@ -339,17 +339,21 @@ class _BalanceScoreTrendCardAdvancedState
               Icon(Icons.arrow_upward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
               Text(
-                '50点以上: 「受け取る」が多め',
+                '50点以上: メンバーの支えになることが多め',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 9,
                 ),
               ),
-              const SizedBox(width: 16),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
               Icon(Icons.arrow_downward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
               Text(
-                '50点以下: 「送った」が多め',
+                '50点以下: メンバーからの支えを受け取ることが多め',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 9,
