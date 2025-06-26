@@ -22,6 +22,7 @@ class ReflectionListPage extends StatefulWidget {
 
 class ReflectionListPageState extends State<ReflectionListPage> {
   late ScrollController _scrollController;
+  bool _showPastReflections = false; // 過去のリフレクション表示状態
 
   @override
   void initState() {
@@ -171,7 +172,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildReflectionsCardHeader(),
+          _buildReflectionsCardHeader(viewModel),
           const SizedBox(height: 16),
           _buildReflectionsList(viewModel),
         ],
@@ -179,41 +180,99 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     );
   }
 
-  Widget _buildReflectionsCardHeader() {
+  Widget _buildReflectionsCardHeader(ReflectionListViewModel viewModel) {
     final theme = Theme.of(context);
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(Icons.auto_awesome, size: 20, color: AppColors.primary),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '安全基地ノート',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  fontSize: 16,
-                ),
+        Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
-              Text(
-                'あなたのやさしさの記録',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textLight,
-                  fontSize: 11,
-                ),
+              child: Icon(
+                Icons.auto_awesome,
+                size: 20,
+                color: AppColors.primary,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '安全基地ノート',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  Text(
+                    '設定した頻度で振り返りレポートをお届けします',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textLight,
+                      fontSize: 11,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
+        // 次回配信日の表示
+        if (viewModel.nextDeliveryDate != null ||
+            viewModel.isCalculatingNextDelivery ||
+            viewModel.nextDeliveryDateError != null) ...[
+          const SizedBox(height: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.schedule, size: 14, color: AppColors.primary),
+                const SizedBox(width: 4),
+                if (viewModel.isCalculatingNextDelivery)
+                  const SizedBox(
+                    width: 12,
+                    height: 12,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 1.5,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
+                    ),
+                  )
+                else if (viewModel.nextDeliveryDateError != null)
+                  Text(
+                    '配信日計算エラー',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: Colors.orange,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  )
+                else if (viewModel.nextDeliveryDate != null)
+                  Text(
+                    '次回お届け: ${_formatDeliveryDate(viewModel.nextDeliveryDate!)}',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.primary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
       ],
     );
   }
@@ -251,66 +310,117 @@ class ReflectionListPageState extends State<ReflectionListPage> {
           ),
         ],
 
-        // 過去のリフレクション
+        // 過去のリフレクション（トグル制御）
         if (pastReflections.isNotEmpty) ...[
           if (latestReflections.isNotEmpty) const SizedBox(height: 12),
-          _buildSectionHeader('過去', Icons.history),
-          ...pastReflections.map(
-            (reflection) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: ReflectionListItem(
-                reflection: reflection,
-                onTap: () {
-                  // リフレクション詳細ページに遷移（URLパラメータ付き）
-                  context.go(
-                    '/reflections/detail/${reflection.id}',
-                    extra: reflection,
-                  );
-                },
+          // 過去のリフレクション用のトグルヘッダー
+          _buildPastReflectionsToggleHeader(pastReflections.length),
+          if (_showPastReflections) ...[
+            const SizedBox(height: 8),
+            ...pastReflections.map(
+              (reflection) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: ReflectionListItem(
+                  reflection: reflection,
+                  onTap: () {
+                    // リフレクション詳細ページに遷移（URLパラメータ付き）
+                    context.go(
+                      '/reflections/detail/${reflection.id}',
+                      extra: reflection,
+                    );
+                  },
+                ),
               ),
             ),
-          ),
+          ],
         ],
 
         // ページネーション用のローディング
-        if (viewModel.hasMore) _buildLoadingItem(),
+        if (viewModel.hasMore && _showPastReflections) _buildLoadingItem(),
       ],
+    );
+  }
+
+  /// 過去のリフレクション用のトグルヘッダー
+  Widget _buildPastReflectionsToggleHeader(int count) {
+    final theme = Theme.of(context);
+    return InkWell(
+      onTap: () {
+        setState(() {
+          _showPastReflections = !_showPastReflections;
+        });
+      },
+      borderRadius: BorderRadius.circular(8),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+        child: Row(
+          children: [
+            Icon(Icons.history, color: AppColors.textLight, size: 16),
+            const SizedBox(width: 6),
+            Text(
+              '過去 ($count)',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w500,
+                fontSize: 13,
+                color: AppColors.textLight,
+              ),
+            ),
+            const Spacer(),
+            AnimatedRotation(
+              turns: _showPastReflections ? 0.5 : 0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                Icons.keyboard_arrow_down,
+                color: AppColors.textLight,
+                size: 20,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
   Widget _buildEmptyReflectionsContent() {
     final theme = Theme.of(context);
-    return Column(
-      children: [
-        Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Icon(
-            Icons.auto_awesome,
-            size: 24,
-            color: AppColors.primary.withOpacity(0.6),
-          ),
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(24),
+              ),
+              child: Icon(
+                Icons.auto_awesome,
+                size: 24,
+                color: AppColors.primary.withOpacity(0.6),
+              ),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'まだノートがありません',
+              style: theme.textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+                fontSize: 15,
+                color: AppColors.text,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              '安全基地ノートは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.textLight, fontSize: 13),
+            ),
+          ],
         ),
-        const SizedBox(height: 12),
-        Text(
-          'まだリフレクションがありません',
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 15,
-            color: AppColors.text,
-          ),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          'リフレクションは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: AppColors.textLight, fontSize: 13),
-        ),
-      ],
+      ),
     );
   }
 
@@ -382,58 +492,6 @@ class ReflectionListPageState extends State<ReflectionListPage> {
                   fontWeight: FontWeight.w400,
                 ),
               ),
-              // 次回配信日の表示
-              if (viewModel.nextDeliveryDate != null ||
-                  viewModel.isCalculatingNextDelivery ||
-                  viewModel.nextDeliveryDateError != null) ...[
-                const SizedBox(height: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.schedule, size: 14, color: AppColors.primary),
-                      const SizedBox(width: 4),
-                      if (viewModel.isCalculatingNextDelivery)
-                        const SizedBox(
-                          width: 12,
-                          height: 12,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              AppColors.primary,
-                            ),
-                          ),
-                        )
-                      else if (viewModel.nextDeliveryDateError != null)
-                        Text(
-                          '配信日計算エラー',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: Colors.orange,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        )
-                      else if (viewModel.nextDeliveryDate != null)
-                        Text(
-                          '次回お届け: ${_formatDeliveryDate(viewModel.nextDeliveryDate!)}',
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-              ],
             ],
           ),
         );

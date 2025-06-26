@@ -99,7 +99,7 @@ class _BalanceScoreTrendCardAdvancedState
                 ),
               ),
               Text(
-                '過去${widget.weeklyData.length}週間の安全基地メンバーとの支え合いのバランス',
+                '安全基地メンバーとの支え合いのバランスの推移を表示します',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 11,
@@ -434,33 +434,46 @@ class _BalanceScoreTrendCardAdvancedState
     final theme = Theme.of(context);
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: AppColors.primary.withOpacity(0.2),
-          width: 1.5,
-        ),
+        border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.analytics, color: AppColors.textLight, size: 48),
-          const SizedBox(height: 16),
-          Text(
-            'バランススコアデータがありません',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: AppColors.text,
-              fontWeight: FontWeight.w600,
+          _buildHeader(context),
+          const SizedBox(height: 20),
+          Center(
+            child: Column(
+              children: [
+                Icon(Icons.analytics, color: AppColors.textLight, size: 48),
+                const SizedBox(height: 16),
+                Text(
+                  'まだバランススコアデータがありません',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'やさしさ記録を行うと翌週から\nバランススコアが表示されます',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            '週次でやさしさの記録があると\nバランススコアが表示されます',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textLight,
-            ),
-            textAlign: TextAlign.center,
           ),
         ],
       ),
