@@ -90,13 +90,26 @@ class _BalanceScoreTrendCardAdvancedState
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'バランススコア',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
-                  fontSize: 16,
-                ),
+              Row(
+                children: [
+                  Text(
+                    '支え合いバランス',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.primary,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                  GestureDetector(
+                    onTap: () => _showBalanceInfoDialog(context),
+                    child: Icon(
+                      Icons.info_outline,
+                      size: 16,
+                      color: AppColors.primary.withOpacity(0.7),
+                    ),
+                  ),
+                ],
               ),
               Text(
                 '安全基地メンバーとの支え合いのバランスの推移を表示します',
@@ -109,6 +122,49 @@ class _BalanceScoreTrendCardAdvancedState
           ),
         ),
       ],
+    );
+  }
+
+  void _showBalanceInfoDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.info_outline, color: AppColors.primary, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                '支え合いバランスについて',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            '支え合いバランスは、「送ったやさしさの数・人数」「受け取ったやさしさの数・人数」を考慮して計算されています。',
+            style: TextStyle(color: AppColors.text, fontSize: 14, height: 1.5),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                '閉じる',
+                style: TextStyle(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 
@@ -168,15 +224,8 @@ class _BalanceScoreTrendCardAdvancedState
             ),
             leftTitles: AxisTitles(
               sideTitles: SideTitles(
-                showTitles: true,
-                interval: 25,
-                reservedSize: 40,
-                getTitlesWidget: (value, meta) {
-                  return Text(
-                    value.toInt().toString(),
-                    style: TextStyle(color: AppColors.textLight, fontSize: 10),
-                  );
-                },
+                showTitles: false, // スコア値を非表示
+                reservedSize: 0,
               ),
             ),
           ),
@@ -277,8 +326,18 @@ class _BalanceScoreTrendCardAdvancedState
                             ? DateFormat('M/d').format(data.weekStartDate!)
                             : '不明';
 
+                    // スコア値を隠し、中央線からの位置のみ表示
+                    final String positionText;
+                    if (data.balanceScore == 50) {
+                      positionText = 'バランスが取れています';
+                    } else if (data.balanceScore > 50) {
+                      positionText = '支えることが多め';
+                    } else {
+                      positionText = '支えられることが多め';
+                    }
+
                     return LineTooltipItem(
-                      '$dateStr週\nスコア: ${data.balanceScore}',
+                      '$dateStr週\n$positionText',
                       TextStyle(
                         color: AppColors.primary,
                         fontWeight: FontWeight.w600,
@@ -324,7 +383,7 @@ class _BalanceScoreTrendCardAdvancedState
               ),
               const SizedBox(width: 8),
               Text(
-                '50点 = バランス均等ライン',
+                'バランス均等ライン',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.primary,
                   fontSize: 10,
@@ -339,7 +398,7 @@ class _BalanceScoreTrendCardAdvancedState
               Icon(Icons.arrow_upward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
               Text(
-                '50点以上: メンバーの支えになることが多め',
+                'ライン以上: メンバーからの支えを受け取ることが多め',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 9,
@@ -353,7 +412,7 @@ class _BalanceScoreTrendCardAdvancedState
               Icon(Icons.arrow_downward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
               Text(
-                '50点以下: メンバーからの支えを受け取ることが多め',
+                'ライン以下: メンバーを支えることが多め',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textLight,
                   fontSize: 9,
