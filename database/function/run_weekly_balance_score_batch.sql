@@ -92,8 +92,6 @@ as $$
                 round(supported_score_norm * 100) as supported_score,
                 supporting_score_norm,
                 supported_score_norm,
-                
-                -- バランススコア（調和平均）
                 case 
                 when supporting_score_norm + supported_score_norm = 0 then 0
                 else ROUND(50 + 50 * (supported_score_norm - supporting_score_norm)
