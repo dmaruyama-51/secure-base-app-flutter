@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../models/balance_score.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_list_view_model.dart';
+import '../../utils/constants.dart';
 
 /// バランススコア推移表示カード
 class BalanceScoreTrendCardAdvanced extends StatelessWidget {
@@ -43,7 +44,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: AppColors.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: AppColors.grey300, width: 1),
         boxShadow: [
           BoxShadow(
@@ -74,7 +75,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppBorderRadius.mediumRadius,
           ),
           child: Icon(Icons.timeline, size: 20, color: AppColors.primary),
         ),
@@ -124,7 +125,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppBorderRadius.largeRadius,
           ),
           title: Row(
             children: [
@@ -373,7 +374,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppBorderRadius.mediumRadius,
         border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Column(
@@ -385,7 +386,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
                 height: 8,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppBorderRadius.smallRadius,
                 ),
               ),
               const SizedBox(width: 8),
@@ -445,7 +446,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: AppColors.primary.withOpacity(0.2),
           width: 1.5,
@@ -475,7 +476,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.red.withOpacity(0.2), width: 1.5),
       ),
       child: Column(
@@ -509,7 +510,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(

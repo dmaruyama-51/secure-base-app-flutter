@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import '../../utils/app_colors.dart';
+import '../../utils/constants.dart';
 
 /// 汎用削除確認ダイアログ
 class DeleteConfirmDialog extends StatelessWidget {
@@ -26,7 +27,7 @@ class DeleteConfirmDialog extends StatelessWidget {
     final theme = Theme.of(context);
 
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      shape: RoundedRectangleBorder(borderRadius: AppBorderRadius.largeRadius),
       title: Row(
         children: [
           Icon(

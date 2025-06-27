@@ -12,6 +12,7 @@ import '../../view_models/tutorial/tutorial_view_model.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
 import '../../widgets/kindness_giver/relation_selection.dart';
+import '../../utils/constants.dart';
 
 class TutorialPage extends StatefulWidget {
   const TutorialPage({super.key});
@@ -200,7 +201,7 @@ class _TutorialPageState extends State<TutorialPage> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppBorderRadius.largeRadius,
               border: Border.all(
                 color: theme.colorScheme.primary.withOpacity(0.1),
               ),
@@ -279,7 +280,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -340,19 +341,19 @@ class _TutorialPageState extends State<TutorialPage> {
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary,
                 width: 2,
@@ -450,7 +451,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -515,19 +516,19 @@ class _TutorialPageState extends State<TutorialPage> {
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary,
                 width: 2,
@@ -557,7 +558,7 @@ class _TutorialPageState extends State<TutorialPage> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppBorderRadius.largeRadius,
             color: AppColors.grey100,
           ),
           child: Row(
@@ -572,7 +573,7 @@ class _TutorialPageState extends State<TutorialPage> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppBorderRadius.largeRadius,
                           color:
                               isSelected
                                   ? AppColors.primary
@@ -622,7 +623,7 @@ class _TutorialPageState extends State<TutorialPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Column(
@@ -730,7 +731,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -776,7 +777,7 @@ class _TutorialPageState extends State<TutorialPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Column(
@@ -822,7 +823,7 @@ class _TutorialPageState extends State<TutorialPage> {
           height: 32,
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppBorderRadius.largeRadius,
           ),
           child: Icon(icon, size: 18, color: theme.colorScheme.primary),
         ),
@@ -901,7 +902,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   ),
                   activeColor: theme.colorScheme.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                     side: BorderSide(
                       color:
                           viewModel.selectedReflectionFrequency == frequency
@@ -943,7 +944,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: theme.colorScheme.primary),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                   ),
                 ),
                 child: Text(
@@ -963,7 +964,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: AppColors.textLight),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                   ),
                 ),
                 child: Text(
@@ -989,7 +990,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 backgroundColor: theme.colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppBorderRadius.largeRadius,
                 ),
               ),
               child:

@@ -159,7 +159,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
@@ -191,7 +191,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppBorderRadius.mediumRadius,
               ),
               child: Icon(
                 Icons.auto_awesome,
@@ -233,7 +233,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.smallRadius,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,

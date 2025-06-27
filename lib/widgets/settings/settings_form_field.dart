@@ -1,6 +1,9 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
+import '../../utils/constants.dart';
+
 /// 設定モーダル用の統一されたテキストフィールド
 class SettingsFormField extends StatelessWidget {
   const SettingsFormField({
@@ -35,7 +38,7 @@ class SettingsFormField extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppBorderRadius.largeRadius,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.04),
@@ -48,19 +51,19 @@ class SettingsFormField extends StatelessWidget {
             onChanged: onChanged,
             decoration: InputDecoration(
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppBorderRadius.largeRadius,
                 borderSide: BorderSide(
                   color: theme.colorScheme.primary.withOpacity(0.1),
                 ),
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppBorderRadius.largeRadius,
                 borderSide: BorderSide(
                   color: theme.colorScheme.primary.withOpacity(0.1),
                 ),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppBorderRadius.largeRadius,
                 borderSide: BorderSide(
                   color: theme.colorScheme.primary,
                   width: 2,
@@ -107,7 +110,7 @@ class SettingsActionButtons extends StatelessWidget {
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: AppBorderRadius.largeRadius,
               border: Border.all(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
@@ -117,7 +120,7 @@ class SettingsActionButtons extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 side: BorderSide.none,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: AppBorderRadius.largeRadius,
                 ),
                 backgroundColor: theme.colorScheme.surface.withOpacity(0.5),
               ),
@@ -136,7 +139,7 @@ class SettingsActionButtons extends StatelessWidget {
           child: Container(
             height: 50,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(25),
+              borderRadius: AppBorderRadius.largeRadius,
               boxShadow: [
                 BoxShadow(
                   color: theme.colorScheme.primary.withOpacity(0.3),
@@ -152,7 +155,7 @@ class SettingsActionButtons extends StatelessWidget {
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(25),
+                  borderRadius: AppBorderRadius.largeRadius,
                 ),
               ),
               child:

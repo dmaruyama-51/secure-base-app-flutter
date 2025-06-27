@@ -1,6 +1,9 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
+import '../../utils/constants.dart';
+
 /// 設定セクション
 class SettingsSection extends StatelessWidget {
   const SettingsSection({
@@ -29,7 +32,7 @@ class SettingsSection extends StatelessWidget {
                 padding: const EdgeInsets.all(6),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(6),
+                  borderRadius: AppBorderRadius.mediumRadius,
                 ),
                 child: Icon(icon, size: 18, color: theme.colorScheme.primary),
               ),
@@ -67,7 +70,7 @@ class SettingsCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.08),
           width: 1,
@@ -111,7 +114,7 @@ class SettingsItem extends StatelessWidget {
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppBorderRadius.largeRadius,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
         child: Row(
@@ -120,7 +123,7 @@ class SettingsItem extends StatelessWidget {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
               child: Icon(icon, size: 20, color: theme.colorScheme.primary),
             ),

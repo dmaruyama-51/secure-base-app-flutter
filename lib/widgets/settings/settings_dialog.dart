@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
+import '../../utils/constants.dart';
 import '../../view_models/settings/settings_view_model.dart';
 import 'settings_form_field.dart';
 
@@ -32,7 +33,7 @@ class BaseSettingsDialog extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 420),
           decoration: BoxDecoration(
             color: theme.colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppBorderRadius.extraLargeRadius,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.1),
@@ -50,8 +51,8 @@ class BaseSettingsDialog extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: theme.colorScheme.primary.withOpacity(0.05),
                   borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(AppBorderRadius.extraLarge),
+                    topRight: Radius.circular(AppBorderRadius.extraLarge),
                   ),
                 ),
                 child: Row(
@@ -60,7 +61,7 @@ class BaseSettingsDialog extends StatelessWidget {
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: theme.colorScheme.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: AppBorderRadius.mediumRadius,
                       ),
                       child: Icon(
                         icon,
@@ -122,7 +123,7 @@ class EmailChangeDialog extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppBorderRadius.mediumRadius,
               ),
               child: Row(
                 children: [
@@ -195,7 +196,7 @@ class PasswordChangeDialog extends StatelessWidget {
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
                 color: theme.colorScheme.primary.withOpacity(0.08),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: AppBorderRadius.mediumRadius,
               ),
               child: Row(
                 children: [
@@ -293,7 +294,7 @@ class ReflectionSettingsDialog extends StatelessWidget {
                         child: InkWell(
                           onTap:
                               () => viewModel.updateReflectionFrequency(option),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: AppBorderRadius.mediumRadius,
                           child: Container(
                             padding: const EdgeInsets.all(16),
                             decoration: BoxDecoration(
@@ -312,7 +313,7 @@ class ReflectionSettingsDialog extends StatelessWidget {
                                         ),
                                 width: isSelected ? 2 : 1,
                               ),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: AppBorderRadius.mediumRadius,
                             ),
                             child: Row(
                               children: [

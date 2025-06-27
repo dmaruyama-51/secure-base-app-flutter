@@ -188,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
               foregroundColor: AppColors.textOnPrimary,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child:
@@ -344,23 +344,23 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           decoration: InputDecoration(
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             fillColor: Colors.white,
@@ -410,7 +410,7 @@ class _RegisterPageState extends State<RegisterPage> {
             style: OutlinedButton.styleFrom(
               side: BorderSide(color: AppColors.border.withOpacity(0.4)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child: const Text(

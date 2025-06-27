@@ -11,6 +11,7 @@ import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_add_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
+import '../../utils/constants.dart';
 
 /// やさしさ記録追加ページ
 class KindnessRecordAddPage extends StatefulWidget {
@@ -98,7 +99,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: theme.colorScheme.secondary.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppBorderRadius.mediumRadius,
           ),
           child: Icon(
             Icons.arrow_back,
@@ -153,7 +154,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -173,7 +174,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           const SizedBox(height: 16),
           Container(
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               color: Colors.grey[100],
             ),
             child: Row(
@@ -188,7 +189,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                         child: Container(
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
+                            borderRadius: AppBorderRadius.largeRadius,
                             color:
                                 isSelected
                                     ? AppColors.primary
@@ -237,7 +238,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -305,7 +306,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
     return Container(
       decoration: BoxDecoration(
         color: theme.colorScheme.surface.withOpacity(0.5),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.1),
           width: 1,
@@ -342,7 +343,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           color: theme.colorScheme.primary.withOpacity(0.1),
           width: 1,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<KindnessGiver?>(
@@ -378,7 +379,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
                     height: 24,
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(14),
+                      borderRadius: AppBorderRadius.mediumRadius,
                       border: Border.all(
                         color: theme.colorScheme.primary,
                         width: 1.5,
@@ -426,7 +427,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Column(
@@ -472,7 +473,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
       width: double.infinity,
       height: 56,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(28),
+        borderRadius: AppBorderRadius.largeRadius,
         boxShadow:
             viewModel.isSaving
                 ? []
@@ -490,7 +491,7 @@ class _KindnessRecordAddPageState extends State<KindnessRecordAddPage> {
           foregroundColor: Colors.white,
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(28),
+            borderRadius: AppBorderRadius.largeRadius,
           ),
         ),
         onPressed: viewModel.isSaving ? null : () => _saveRecord(viewModel),
