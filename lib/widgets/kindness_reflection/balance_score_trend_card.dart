@@ -182,7 +182,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
                     );
                   }
                   return FlLine(
-                    color: AppColors.textLight.withOpacity(0.2),
+                    color: AppColors.gridLine.withOpacity(0.2),
                     strokeWidth: 1,
                   );
                 },
@@ -241,7 +241,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
               borderData: FlBorderData(
                 show: true,
                 border: Border.all(
-                  color: AppColors.textLight.withOpacity(0.2),
+                  color: AppColors.border.withOpacity(0.2),
                   width: 1,
                 ),
               ),

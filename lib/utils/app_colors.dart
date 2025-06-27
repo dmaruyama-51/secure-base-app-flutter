@@ -14,6 +14,12 @@ class AppColors {
   static const Color textLight = Color(0xFF96704F);
   static const Color textOnPrimary = Colors.white; // プライマリカラー上のテキスト色
 
+  // UI要素用カラー
+  static const Color border = Color(0xFF96704F); // ボーダー・枠線用
+  static const Color divider = Color(0xFF96704F); // 区切り線用
+  static const Color gridLine = Color(0xFF96704F); // チャートグリッド線用
+  static const Color subtle = Color(0xFF96704F); // 汎用的な薄いカラー
+
   // サーフェス
   static const Color surface = Colors.white;
   static const Color surfaceVariant = Color(0xFFF5F5F5);

@@ -345,15 +345,11 @@ class _RegisterPageState extends State<RegisterPage> {
           decoration: InputDecoration(
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(6),
@@ -393,9 +389,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // 区切り線
         Row(
           children: [
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -403,9 +397,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: TextStyle(fontSize: 14, color: AppColors.textLight),
               ),
             ),
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
           ],
         ),
         const SizedBox(height: 24),
@@ -416,7 +408,7 @@ class _RegisterPageState extends State<RegisterPage> {
           child: OutlinedButton(
             onPressed: () => context.go('/login'),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.textLight.withOpacity(0.4)),
+              side: BorderSide(color: AppColors.border.withOpacity(0.4)),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
               ),
