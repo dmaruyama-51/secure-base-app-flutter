@@ -207,7 +207,7 @@ class _TutorialPageState extends State<TutorialPage> {
             child: Column(
               children: [
                 Text(
-                  'Kindly は日々受け取っている小さな優しさに目を向けて、心がほっとする場所を作っていくアプリです。',
+                  'Kindly は日々の暮らしの中で、やさしさを送ったり受け取ったりした瞬間を大切にし、心がほっとする場所を作っていくアプリです。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.text,
@@ -306,7 +306,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'あなたにやさしさを向けてくれる大切な人を登録しましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更や追加もできます。',
+            'まずは１人、大切な人を登録してみましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更や追加もできます。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -463,7 +463,7 @@ class _TutorialPageState extends State<TutorialPage> {
               Icon(Icons.edit_note, size: 20, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                '最初の優しさを記録してみましょう',
+                '最初のやさしさ記録をしてみましょう',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
@@ -473,7 +473,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '最近${viewModel.kindnessGiverName}さんから受け取った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
+            '最近${viewModel.kindnessGiverName}さんから受け取った、あるいは送った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
