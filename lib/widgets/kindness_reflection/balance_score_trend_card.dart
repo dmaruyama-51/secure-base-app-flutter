@@ -524,39 +524,233 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
+          const SizedBox(height: 20),
+          // スケルトンチャートにオーバーレイでメッセージを表示
+          Stack(
+            children: [
+              _buildSkeletonChart(context),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'まだデータがありません',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'やさしさ記録を行うと翌週から表示されます',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textLight,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
           const SizedBox(height: 16),
-          Center(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.analytics,
-                    color: AppColors.primary.withOpacity(0.4),
-                    size: 32,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'データがありません',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      color: AppColors.text,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'やさしさ記録を行うと翌週から表示されます',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: AppColors.textLight,
-                      fontSize: 12,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+          _buildSkeletonLegend(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonChart(BuildContext context) {
+    return Container(
+      height: 180,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 25,
+            getDrawingHorizontalLine: (value) {
+              if (value == 50) {
+                // 50点の中央ライン（スケルトン用）
+                return FlLine(
+                  color: AppColors.primary.withOpacity(0.15),
+                  strokeWidth: 1.5,
+                  dashArray: [6, 3],
+                );
+              }
+              return FlLine(
+                color: Colors.grey.withOpacity(0.1),
+                strokeWidth: 1,
+              );
+            },
+          ),
+          // バランスゾーンのスケルトン表示
+          rangeAnnotations: RangeAnnotations(
+            horizontalRangeAnnotations: [
+              HorizontalRangeAnnotation(
+                y1: 30,
+                y2: 70,
+                color: AppColors.primary.withOpacity(0.02),
+              ),
+            ],
+          ),
+          titlesData: FlTitlesData(
+            show: true,
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: 1,
+                getTitlesWidget: (value, meta) {
+                  final weeks = ['週1', '週2', '週3', '週4'];
+                  final index = value.toInt();
+                  if (index >= 0 && index < weeks.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        weeks[index],
+                        style: TextStyle(
+                          color: AppColors.textLight.withOpacity(0.5),
+                          fontSize: 10,
+                        ),
+                      ),
+                    );
+                  }
+                  return const Text('');
+                },
               ),
             ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false, reservedSize: 0),
+            ),
+          ),
+          borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+          ),
+          minX: 0,
+          maxX: 3,
+          minY: 0,
+          maxY: 100,
+          lineBarsData: [
+            LineChartBarData(
+              spots: [
+                FlSpot(0, 15),
+                FlSpot(1, 5),
+                FlSpot(2, 76),
+                FlSpot(3, 80),
+              ],
+              isCurved: true,
+              color: AppColors.primary.withOpacity(0.2),
+              barWidth: 3,
+              isStrokeCapRound: true,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) {
+                  return FlDotCirclePainter(
+                    radius: 4,
+                    color: Colors.white,
+                    strokeWidth: 2,
+                    strokeColor: AppColors.primary.withOpacity(0.2),
+                  );
+                },
+              ),
+            ),
+          ],
+          lineTouchData: LineTouchData(enabled: false),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLegend(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50.withOpacity(0.5),
+        borderRadius: AppBorderRadius.mediumRadius,
+        border: Border.all(
+          color: Colors.grey.shade200.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: AppBorderRadius.smallRadius,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'バランスゾーン',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.primary.withOpacity(0.5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.arrow_upward,
+                size: 12,
+                color: AppColors.textLight.withOpacity(0.5),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '中央より上: メンバーからの支えを受け取ることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight.withOpacity(0.5),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              Icon(
+                Icons.arrow_downward,
+                size: 12,
+                color: AppColors.textLight.withOpacity(0.5),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '中央より下: メンバーを支えることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight.withOpacity(0.5),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),
