@@ -40,7 +40,7 @@ class TutorialViewModel extends ChangeNotifier {
     introductionPageIndex: '次へ',
     memberRegistrationPageIndex: '次へ',
     kindnessRecordPageIndex: '記録して次へ',
-    reflectionSettingPageIndex: 'チュートリアル完了',
+    reflectionSettingPageIndex: 'はじめる',
   };
 
   // =============================================================================
@@ -245,6 +245,10 @@ class TutorialViewModel extends ChangeNotifier {
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
+    // 記録画面では戻るボタンを表示しない
+    if (_currentPage == kindnessRecordPageIndex) {
+      return false;
+    }
     return _currentPage > firstPageIndex;
   }
 
@@ -273,7 +277,8 @@ class TutorialViewModel extends ChangeNotifier {
     return switch (_currentPage) {
       memberRegistrationPageIndex =>
         _kindnessGiverName.trim().isEmpty || _isCompleting,
-      kindnessRecordPageIndex => _isRecordingKindness,
+      kindnessRecordPageIndex =>
+        _kindnessContent.trim().isEmpty || _isRecordingKindness,
       reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
       _ => false,
     };

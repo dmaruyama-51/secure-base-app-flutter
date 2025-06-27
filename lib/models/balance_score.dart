@@ -1,6 +1,9 @@
 // Flutter imports:
 import 'package:flutter/material.dart';
 
+// Project imports:
+import '../utils/app_colors.dart';
+
 /// バランススコアの状態を表す列挙型
 enum BalanceStatus {
   supporting, // 支えることが多め（0-29）
@@ -71,11 +74,12 @@ class BalanceScore {
 
   /// バランススコアに基づいて色を計算
   Color getScoreColor() {
-    const centerColor = Color(0xFFFFB366); // 明るいオレンジ（50点）
-    const edgeColor = Color(0xFFB8540F); // 濃いオレンジ（端）
-
-    return Color.lerp(centerColor, edgeColor, distanceFromCenter) ??
-        const Color(0xFFE5781A);
+    return Color.lerp(
+          AppColors.balanceCenter,
+          AppColors.balanceEdge,
+          distanceFromCenter,
+        ) ??
+        AppColors.primary;
   }
 
   /// バランスゾーンにいるかどうかを判定
@@ -85,18 +89,12 @@ class BalanceScore {
 
   /// チャート表示用のグラデーション色を取得
   static List<Color> getChartGradientColors() {
-    return const [
-      Color(0xFFB8540F), // 0点側（濃いオレンジ）
-      Color(0xFFD16515), // 25点付近（中間の濃さ）
-      Color(0xFFFFB366), // 50点中央（明るいオレンジ）
-      Color(0xFFD16515), // 75点付近（中間の濃さ）
-      Color(0xFFB8540F), // 100点側（濃いオレンジ）
-    ];
+    return AppColors.balanceGradientColors;
   }
 
   /// チャート表示用のグラデーション停止点を取得
   static List<double> getChartGradientStops() {
-    return const [0.0, 0.2, 0.5, 0.8, 1.0];
+    return AppColors.balanceGradientStops;
   }
 
   factory BalanceScore.fromJson(Map<String, dynamic> json) {

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 // Project imports:
 import '../../models/kindness_giver.dart';
+import '../../utils/app_colors.dart';
 import 'kindness_giver_avatar.dart';
 import 'kindness_giver_info_chip.dart';
 import 'kindness_giver_statistics_chip.dart';
@@ -73,11 +74,11 @@ class _KindnessGiverCardState extends State<KindnessGiverCard>
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: AppColors.surface,
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.06),
+                      color: AppColors.mediumShadow,
                       blurRadius: 10,
                       offset: const Offset(0, 2),
                       spreadRadius: 0,

@@ -36,11 +36,11 @@ class KindnessRecordListItem extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surface,
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: AppColors.lightShadow,
                 blurRadius: 8,
                 offset: const Offset(0, 1),
               ),

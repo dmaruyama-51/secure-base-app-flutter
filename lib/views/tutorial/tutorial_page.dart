@@ -208,7 +208,7 @@ class _TutorialPageState extends State<TutorialPage> {
             child: Column(
               children: [
                 Text(
-                  'Kindly は日々の暮らしの中で、やさしさを送ったり受け取ったりした瞬間を大切にし、心がほっとする場所を作っていくアプリです。',
+                  'Kindly はポケットの中に『心がほっとする場所』を作っていくアプリです。日々の暮らしの中で、やさしさを送ったり受け取ったりした瞬間を大切に記録できます。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.text,
@@ -217,7 +217,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'まずは、あなたの安全基地のメンバーを登録しましょう。',
+                  'まずは、あなたの安全基地のメンバーを登録してみましょう。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
@@ -558,7 +558,7 @@ class _TutorialPageState extends State<TutorialPage> {
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            color: Colors.grey[100],
+            color: AppColors.grey100,
           ),
           child: Row(
             children:
@@ -587,7 +587,9 @@ class _TutorialPageState extends State<TutorialPage> {
                                   : Icons.send,
                               size: 16,
                               color:
-                                  isSelected ? Colors.white : AppColors.primary,
+                                  isSelected
+                                      ? AppColors.textOnPrimary
+                                      : AppColors.primary,
                             ),
                             const SizedBox(width: 6),
                             Text(
@@ -596,7 +598,7 @@ class _TutorialPageState extends State<TutorialPage> {
                               style: TextStyle(
                                 color:
                                     isSelected
-                                        ? Colors.white
+                                        ? AppColors.textOnPrimary
                                         : AppColors.primary,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
@@ -746,7 +748,7 @@ class _TutorialPageState extends State<TutorialPage> {
               ),
               const SizedBox(width: 8),
               Text(
-                'リフレクション',
+                '振り返り頻度の設定',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
@@ -756,7 +758,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '設定した頻度で、受け取った優しさを振り返る機会をお届けします。',
+            '設定した頻度で『安全基地ノート』をお届けします。やさしさの記録を定期的に振り返り、日常に温かな気づきを育てていきましょう。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -781,7 +783,7 @@ class _TutorialPageState extends State<TutorialPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'リフレクションでできること',
+            '安全基地ノートとは？',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.primary,
@@ -791,22 +793,15 @@ class _TutorialPageState extends State<TutorialPage> {
           _buildFeatureItem(
             theme,
             Icons.summarize,
-            '受け取ったやさしさのサマリ',
-            '期間中に記録した優しさをまとめて表示',
+            '該当期間の記録のサマリ',
+            '記録したやさしさのサマリーをお届け',
           ),
           const SizedBox(height: 12),
           _buildFeatureItem(
             theme,
-            Icons.schedule,
-            '定期的な振り返り',
-            '忙しい日常でも大切なことを思い出せる',
-          ),
-          const SizedBox(height: 12),
-          _buildFeatureItem(
-            theme,
-            Icons.volunteer_activism,
-            'あたたかい気持ちを育てる',
-            '自然と大切な相手にやさしくなれる',
+            Icons.analytics,
+            '統計表示',
+            '関係性や曜日別の統計を見やすく表示',
           ),
         ],
       ),
@@ -868,7 +863,7 @@ class _TutorialPageState extends State<TutorialPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'リフレクションの頻度',
+          '振り返りの頻度',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
