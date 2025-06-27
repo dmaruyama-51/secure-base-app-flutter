@@ -759,7 +759,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '設定した頻度で『安全基地ノート』をお届けします。やさしさの記録を定期的に振り返り、日常に温かな気づきを育てていきましょう。',
+            '設定した頻度で『安全基地レポート』をお届けします。やさしさの記録を定期的に振り返り、日常に温かな気づきを育てていきましょう。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -784,7 +784,7 @@ class _TutorialPageState extends State<TutorialPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            '安全基地ノートとは？',
+            '安全基地レポートとは？',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.primary,

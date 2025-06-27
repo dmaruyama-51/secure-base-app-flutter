@@ -109,7 +109,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             // バランススコア推移カード（空の状態でも表示）
             _buildBalanceScoreSection(viewModel),
             const SizedBox(height: 24),
-            // 安全基地ノートカード（空の状態）
+            // 安全基地レポートカード（空の状態）
             _buildReflectionsCard(viewModel),
           ],
         ),
@@ -138,7 +138,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             _buildBalanceScoreSection(viewModel),
             const SizedBox(height: 24),
 
-            // 安全基地ノートカード
+            // 安全基地レポートカード
             _buildReflectionsCard(viewModel),
 
             // ローディングインジケーター（追加データ読み込み中）
@@ -205,7 +205,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '安全基地ノート',
+                    '安全基地レポート',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
@@ -414,7 +414,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             ),
             const SizedBox(height: 6),
             Text(
-              '安全基地ノートは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
+              '安全基地レポートは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
               textAlign: TextAlign.center,
               style: TextStyle(color: AppColors.textLight, fontSize: 13),
             ),
