@@ -1,5 +1,4 @@
 // Flutter imports:
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 // Project imports:
@@ -216,6 +215,16 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
     }
   }
 
+  /// 記録タイプに応じたヒントテキストを取得
+  String getRecordHintText(KindnessRecordType recordType) {
+    switch (recordType) {
+      case KindnessRecordType.received:
+        return '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと';
+      case KindnessRecordType.given:
+        return '小さな行動も、相手の心の支えになっています：\n・笑顔であいさつをした瞬間\n・体調を気にかけた声かけ\n・話をじっくり聞いてあげたとき\n・ちょっとした手助けをしたこと';
+    }
+  }
+
   // 現在選択されている記録タイプに基づいたヘルパーメソッド
 
   /// 利用可能な記録タイプの一覧を取得
@@ -236,4 +245,7 @@ class KindnessRecordAddViewModel extends ChangeNotifier {
   /// 現在選択されている記録タイプのプレースホルダーテキストを取得
   String get currentContentPlaceholderText =>
       getContentPlaceholderText(_selectedRecordType);
+
+  /// 現在選択されている記録タイプのヒントテキストを取得
+  String get currentRecordHintText => getRecordHintText(_selectedRecordType);
 }
