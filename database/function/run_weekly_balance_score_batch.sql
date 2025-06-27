@@ -96,8 +96,8 @@ as $$
                 -- バランススコア（調和平均）
                 case 
                 when supporting_score_norm + supported_score_norm = 0 then 0
-                else round(2 * greatest(supporting_score_norm, 0.05) * greatest(supported_score_norm, 0.05) / 
-                            (greatest(supporting_score_norm, 0.05) + greatest(supported_score_norm, 0.05)) * 100)
+                else ROUND(50 + 50 * (supported_score_norm - supporting_score_norm)
+                        / (supported_score_norm + supporting_score_norm)
                 end as balance_score
                 
             from 
