@@ -193,11 +193,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
                 color: AppColors.primary.withOpacity(0.1),
                 borderRadius: AppBorderRadius.mediumRadius,
               ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              child: Icon(Icons.article, size: 20, color: AppColors.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -386,37 +382,29 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 24,
-                color: AppColors.primary.withOpacity(0.6),
-              ),
+            Icon(
+              Icons.article,
+              size: 32,
+              color: AppColors.primary.withOpacity(0.4),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              'まだノートがありません',
+              'レポートがありません',
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
                 color: AppColors.text,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
-              '安全基地レポートは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
+              '設定した頻度で自動配信されます',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textLight, fontSize: 13),
+              style: TextStyle(color: AppColors.textLight, fontSize: 12),
             ),
           ],
         ),
@@ -471,7 +459,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
+                  Icon(Icons.article, size: 18, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
                     'リフレクション',

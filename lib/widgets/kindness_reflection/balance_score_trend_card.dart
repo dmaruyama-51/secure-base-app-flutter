@@ -524,28 +524,38 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           _buildHeader(context),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
           Center(
-            child: Column(
-              children: [
-                Icon(Icons.analytics, color: AppColors.textLight, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  'まだバランススコアデータがありません',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.analytics,
+                    color: AppColors.primary.withOpacity(0.4),
+                    size: 32,
                   ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'やさしさ記録を行うと翌週から\nバランススコアが表示されます',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textLight,
+                  const SizedBox(height: 8),
+                  Text(
+                    'データがありません',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.w500,
+                      fontSize: 14,
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+                  const SizedBox(height: 4),
+                  Text(
+                    'やさしさ記録を行うと翌週から表示されます',
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textLight,
+                      fontSize: 12,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
             ),
           ),
         ],
