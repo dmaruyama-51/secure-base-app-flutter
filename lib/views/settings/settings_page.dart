@@ -103,6 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
       elevation: 0,
       backgroundColor: theme.scaffoldBackgroundColor,
       automaticallyImplyLeading: false,
+      toolbarHeight: 20, // AppBarを完全に非表示にして余白を削除
     );
   }
 

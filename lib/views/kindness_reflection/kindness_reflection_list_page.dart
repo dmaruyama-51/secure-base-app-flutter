@@ -459,7 +459,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             children: [
               Row(
                 children: [
-                  Icon(Icons.article, size: 18, color: AppColors.primary),
+                  Icon(Icons.auto_awesome, size: 18, color: AppColors.primary),
                   const SizedBox(width: 8),
                   Text(
                     'リフレクション',
