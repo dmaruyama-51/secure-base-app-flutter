@@ -10,8 +10,8 @@ import '../../utils/app_colors.dart';
 import '../../utils/constants.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../widgets/kindness_reflection_list_item.dart';
-import '../../widgets/balance_score_trend_card_advanced.dart';
+import '../../widgets/kindness_reflection/kindness_reflection_list_item.dart';
+import '../../widgets/kindness_reflection/balance_score_trend_card.dart';
 
 class ReflectionListPage extends StatefulWidget {
   const ReflectionListPage({Key? key}) : super(key: key);

@@ -9,8 +9,8 @@ import 'package:go_router/go_router.dart';
 // Project imports:
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
-import '../../widgets/kindness_record_list_item.dart';
-import '../../widgets/reflection_statistics_card.dart';
+import '../../widgets/kindness_record/kindness_record_list_item.dart';
+import '../../widgets/kindness_reflection/reflection_statistics_card.dart';
 
 class ReflectionDetailPage extends StatefulWidget {
   final String? reflectionId; // IDからデータを取得するため

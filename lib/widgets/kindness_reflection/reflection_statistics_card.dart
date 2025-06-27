@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 
 // Project imports:
-import '../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
-import '../utils/app_colors.dart';
+import '../../view_models/kindness_reflection/kindness_reflection_detail_view_model.dart';
+import '../../utils/app_colors.dart';
 
 /// リフレクション統計情報を表示するカードウィジェット
 class ReflectionStatisticsCard extends StatelessWidget {

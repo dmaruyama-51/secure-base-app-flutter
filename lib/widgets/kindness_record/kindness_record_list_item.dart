@@ -5,9 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 // Project imports:
-import '../models/kindness_record.dart';
-import '../utils/app_colors.dart';
-import 'kindness_giver/kindness_giver_avatar.dart';
+import '../../models/kindness_record.dart';
+import '../../utils/app_colors.dart';
+import '../kindness_giver/kindness_giver_avatar.dart';
 
 // やさしさ記録リストの1件分を表示するウィジェット
 class KindnessRecordListItem extends StatelessWidget {

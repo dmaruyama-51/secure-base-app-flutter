@@ -26,6 +26,9 @@ class ReflectionListViewModel extends ChangeNotifier {
   final BalanceScoreRepository _balanceScoreRepository =
       BalanceScoreRepository();
 
+  // バランススコアチャートの状態管理
+  int? _selectedBalanceScoreIndex;
+
   // ゲッター
   List<KindnessReflection> get reflections => _reflections;
   bool get isLoading => _isLoading;
@@ -38,6 +41,25 @@ class ReflectionListViewModel extends ChangeNotifier {
   List<BalanceScore> get balanceScores => _balanceScores;
   bool get isLoadingBalanceScores => _isLoadingBalanceScores;
   String? get balanceScoreError => _balanceScoreError;
+  int? get selectedBalanceScoreIndex => _selectedBalanceScoreIndex;
+
+  /// バランススコアチャートの選択状態を更新
+  void selectBalanceScoreIndex(int? index) {
+    if (_selectedBalanceScoreIndex != index) {
+      _selectedBalanceScoreIndex = index;
+      notifyListeners();
+    }
+  }
+
+  /// 選択されたバランススコアデータを取得
+  BalanceScore? get selectedBalanceScore {
+    if (_selectedBalanceScoreIndex == null ||
+        _selectedBalanceScoreIndex! < 0 ||
+        _selectedBalanceScoreIndex! >= _balanceScores.length) {
+      return null;
+    }
+    return _balanceScores[_selectedBalanceScoreIndex!];
+  }
 
   /// リフレクションを「最新」と「過去」にグループ分け
   /// リフレクションが1つしかない場合は、それを最新として扱う
@@ -192,12 +214,14 @@ class ReflectionListViewModel extends ChangeNotifier {
   Future<void> loadBalanceScores() async {
     _isLoadingBalanceScores = true;
     _balanceScoreError = null;
+    _selectedBalanceScoreIndex = null; // 選択状態をリセット
     notifyListeners();
 
     try {
       _balanceScores = await _balanceScoreRepository.fetchWeeklyBalanceScores();
     } catch (e) {
       _balanceScoreError = 'バランススコアの取得に失敗しました: $e';
+      _balanceScores = []; // エラー時は空リストに
     } finally {
       _isLoadingBalanceScores = false;
       notifyListeners();
