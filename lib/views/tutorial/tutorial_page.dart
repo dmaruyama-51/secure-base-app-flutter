@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
+import '../../models/kindness_record.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/tutorial/tutorial_view_model.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
@@ -492,8 +493,12 @@ class _TutorialPageState extends State<TutorialPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 記録タイプ選択セクション
+        _buildRecordTypeSelector(viewModel, theme),
+        const SizedBox(height: 24),
+        // 優しさ内容入力セクション
         Text(
-          '優しさの内容',
+          viewModel.currentContentQuestionText,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
@@ -505,7 +510,7 @@ class _TutorialPageState extends State<TutorialPage> {
           onChanged: viewModel.updateKindnessContent,
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: '例：疲れているときに「お疲れ様」と声をかけてくれた',
+            hintText: viewModel.currentContentPlaceholderText,
             hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
             filled: true,
             fillColor: theme.colorScheme.surface,
@@ -528,6 +533,81 @@ class _TutorialPageState extends State<TutorialPage> {
                 width: 2,
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 記録タイプ選択セクション
+  Widget _buildRecordTypeSelector(
+    TutorialViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '記録の種類',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            color: Colors.grey[100],
+          ),
+          child: Row(
+            children:
+                viewModel.availableRecordTypes.map((type) {
+                  final isSelected = viewModel.selectedRecordType == type;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        viewModel.selectRecordType(type);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              type == KindnessRecordType.received
+                                  ? Icons.inbox
+                                  : Icons.send,
+                              size: 16,
+                              color:
+                                  isSelected ? Colors.white : AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              type.label,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:
+                                    isSelected
+                                        ? Colors.white
+                                        : AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -564,12 +644,18 @@ class _TutorialPageState extends State<TutorialPage> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textLight,
-              height: 1.4,
-            ),
+          Consumer<TutorialViewModel>(
+            builder: (context, viewModel, child) {
+              return Text(
+                viewModel.selectedRecordType == KindnessRecordType.received
+                    ? '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと'
+                    : '小さな行動も、相手の心の支えになっています：\n・笑顔であいさつをした瞬間\n・体調を気にかけた声かけ\n・話をじっくり聞いてあげたとき\n・ちょっとした手助けをしたこと',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textLight,
+                  height: 1.4,
+                ),
+              );
+            },
           ),
         ],
       ),
