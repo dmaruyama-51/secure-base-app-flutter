@@ -3,7 +3,7 @@ CREATE TABLE public.kindness_records (
   user_id uuid NOT NULL,
   giver_id bigint NOT NULL,
   content text NOT NULL,
-  record_type varchar(20) DEFAULT 'received' NOT NULL.
+  record_type varchar(20) DEFAULT 'received' NOT NULL,
   created_at timestamp with time zone default timezone('utc' :: text, now()) not null,
   updated_at timestamp with time zone default timezone('utc' :: text, now()) not null,
 

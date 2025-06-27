@@ -46,6 +46,8 @@ dependencies:
   # Fonts
   google_fonts: ^6.1.0
   url_launcher: ^6.2.2
+  # Charts
+  fl_chart: ^0.69.0
 
 dev_dependencies:
   import_sorter: ^4.6.0

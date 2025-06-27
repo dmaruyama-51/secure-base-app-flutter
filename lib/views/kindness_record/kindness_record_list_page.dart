@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_record/kindness_record_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
-import '../../widgets/kindness_record_list_item.dart';
+import '../../widgets/kindness_record/kindness_record_list_item.dart';
 
 /// やさしさ記録一覧ページ
 class KindnessRecordListPage extends StatefulWidget {
