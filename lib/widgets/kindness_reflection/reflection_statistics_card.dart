@@ -375,12 +375,14 @@ class ReflectionStatisticsCard extends StatelessWidget {
             children: [
               Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
               const SizedBox(width: 6),
-              Text(
-                '最も記録の多かった曜日',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                  fontSize: 14,
+              Expanded(
+                child: Text(
+                  '最も記録の多かった曜日',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.text,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],

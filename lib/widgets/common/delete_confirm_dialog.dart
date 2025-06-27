@@ -35,7 +35,7 @@ class DeleteConfirmDialog extends StatelessWidget {
             size: 24,
           ),
           const SizedBox(width: 8),
-          Text(title),
+          Expanded(child: Text(title, overflow: TextOverflow.ellipsis)),
         ],
       ),
       content: Text(message, style: theme.textTheme.bodyMedium),

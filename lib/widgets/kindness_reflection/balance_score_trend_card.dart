@@ -130,12 +130,14 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
             children: [
               Icon(Icons.info_outline, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
-              Text(
-                '支え合いバランスについて',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+              Expanded(
+                child: Text(
+                  '支え合いバランスについて',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -387,12 +389,14 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                'バランスゾーン',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Text(
+                  'バランスゾーン',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -402,11 +406,13 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
             children: [
               Icon(Icons.arrow_upward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
-              Text(
-                '中央より上: メンバーからの支えを受け取ることが多め',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textLight,
-                  fontSize: 11,
+              Expanded(
+                child: Text(
+                  '中央より上: メンバーからの支えを受け取ることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight,
+                    fontSize: 11,
+                  ),
                 ),
               ),
             ],
@@ -416,11 +422,13 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
             children: [
               Icon(Icons.arrow_downward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
-              Text(
-                '中央より下: メンバーを支えることが多め',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textLight,
-                  fontSize: 11,
+              Expanded(
+                child: Text(
+                  '中央より下: メンバーを支えることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight,
+                    fontSize: 11,
+                  ),
                 ),
               ),
             ],

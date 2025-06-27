@@ -321,7 +321,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text('Secure Base App'),
+                const Expanded(child: Text('Kindly')),
               ],
             ),
             content: Column(
@@ -335,13 +335,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  '心の安全基地を育てるアプリです。\n日々の小さな優しさを記録し、大切な人との関係を深めましょう。',
-                  style: theme.textTheme.bodyMedium,
-                ),
+                Text('心の安全基地を育てるアプリです。', style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 16),
                 Text(
-                  '© 2025 Team Secure-Base',
+                  '© 2025 Team Secure-base',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),

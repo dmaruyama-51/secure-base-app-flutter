@@ -71,11 +71,14 @@ class ReflectionListItem extends StatelessWidget {
                   children: [
                     Icon(Icons.schedule, size: 12, color: AppColors.textLight),
                     const SizedBox(width: 4),
-                    Text(
-                      '${dateFormat.format(reflection.reflectionStartDate!)} - ${dateFormat.format(reflection.reflectionEndDate!)}',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: AppColors.textLight,
-                        fontSize: 11,
+                    Expanded(
+                      child: Text(
+                        '${dateFormat.format(reflection.reflectionStartDate!)} - ${dateFormat.format(reflection.reflectionEndDate!)}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: AppColors.textLight,
+                          fontSize: 11,
+                        ),
+                        overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],

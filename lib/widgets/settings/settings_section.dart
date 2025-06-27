@@ -34,12 +34,14 @@ class SettingsSection extends StatelessWidget {
                 child: Icon(icon, size: 18, color: theme.colorScheme.primary),
               ),
               const SizedBox(width: 12),
-              Text(
-                title,
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 16,
+              Expanded(
+                child: Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],

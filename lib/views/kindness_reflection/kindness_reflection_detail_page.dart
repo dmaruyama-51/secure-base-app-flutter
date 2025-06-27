@@ -251,12 +251,15 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
                 children: [
                   Icon(Icons.date_range, size: 16, color: AppColors.primary),
                   const SizedBox(width: 8),
-                  Text(
-                    '${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: AppColors.primary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
+                  Expanded(
+                    child: Text(
+                      '${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: AppColors.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -281,12 +284,14 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
             children: [
               Icon(Icons.favorite_border, size: 20, color: AppColors.primary),
               const SizedBox(width: 8),
-              Text(
-                'やさしさの記録',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.text,
-                  fontSize: 16,
+              Expanded(
+                child: Text(
+                  'やさしさの記録',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.text,
+                    fontSize: 16,
+                  ),
                 ),
               ),
               const SizedBox(width: 8),
