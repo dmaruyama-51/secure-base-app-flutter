@@ -156,7 +156,6 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
     }
 
     final groupedMembers = viewModel.getGroupedMembers();
-    final sectionKeys = groupedMembers.keys.toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -459,23 +458,6 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
             _viewModel!.refreshKindnessGivers();
           }
         });
-  }
-
-  Widget _buildLegendChip(
-    IconData icon,
-    String label,
-    Color color,
-    ThemeData theme,
-  ) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.2),
-        borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: color.withOpacity(0.4), width: 0.8),
-      ),
-      child: Icon(icon, size: 12, color: color),
-    );
   }
 
   Widget _buildLegendIconChip(IconData icon, Color color) {

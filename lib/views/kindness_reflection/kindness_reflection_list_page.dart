@@ -14,7 +14,7 @@ import '../../widgets/kindness_reflection/kindness_reflection_list_item.dart';
 import '../../widgets/kindness_reflection/balance_score_trend_card.dart';
 
 class ReflectionListPage extends StatefulWidget {
-  const ReflectionListPage({Key? key}) : super(key: key);
+  const ReflectionListPage({super.key});
 
   @override
   ReflectionListPageState createState() => ReflectionListPageState();
@@ -511,9 +511,9 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     } else if (difference == 1) {
       return '明日';
     } else if (difference > 0) {
-      return '${difference}日後 (${date.month}/${date.day})';
+      return '$difference日後 ($date.month/$date.day)';
     } else {
-      return '${date.month}/${date.day}';
+      return '$date.month/$date.day';
     }
   }
 
@@ -521,61 +521,6 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     return const Center(
       child: CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-      ),
-    );
-  }
-
-  Widget _buildEmptyState() {
-    final theme = Theme.of(context);
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 1),
-          ),
-        ],
-        border: Border.all(
-          color: theme.colorScheme.secondary.withOpacity(0.8),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.secondary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(32),
-            ),
-            child: Icon(
-              Icons.auto_awesome,
-              size: 32,
-              color: AppColors.primary.withOpacity(0.6),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'まだリフレクションがありません',
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              fontSize: 15,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'リフレクションは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
-            textAlign: TextAlign.center,
-            style: TextStyle(color: AppColors.textLight, fontSize: 13),
-          ),
-        ],
       ),
     );
   }
