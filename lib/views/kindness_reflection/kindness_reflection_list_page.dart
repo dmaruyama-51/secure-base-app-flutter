@@ -511,7 +511,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     } else if (difference == 1) {
       return '明日';
     } else if (difference > 0) {
-      return '$difference日後 ($date.month/$date.day)';
+      return '$difference日後';
     } else {
       return '$date.month/$date.day';
     }
