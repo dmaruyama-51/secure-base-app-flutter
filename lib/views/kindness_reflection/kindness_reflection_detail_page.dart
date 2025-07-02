@@ -282,7 +282,7 @@ class ReflectionDetailPageState extends State<ReflectionDetailPage>
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
           child: Row(
             children: [
-              Icon(Icons.favorite_border, size: 20, color: AppColors.primary),
+              Icon(Icons.article_outlined, size: 20, color: AppColors.primary),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(

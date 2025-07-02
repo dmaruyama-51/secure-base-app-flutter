@@ -129,7 +129,7 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            'あなたが安心できる場所をつくる人たちです',
+            '支え合いの輪を広げていきましょう',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,

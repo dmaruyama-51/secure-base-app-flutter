@@ -91,8 +91,8 @@ class LoginPageState extends State<LoginPage> {
       children: [
         // より大きな円形デザイン
         Container(
-          width: 160,
-          height: 160,
+          width: 180,
+          height: 180,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(
@@ -112,7 +112,7 @@ class LoginPageState extends State<LoginPage> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Image.asset(
-              'assets/images/img_relax.png',
+              'assets/images/img_giftbox.png',
               fit: BoxFit.contain,
             ),
           ),
