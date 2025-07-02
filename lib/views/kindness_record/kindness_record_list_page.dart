@@ -154,7 +154,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb, size: 18, color: theme.colorScheme.primary),
+              Icon(Icons.edit_note, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 'やさしさ記録',
@@ -287,7 +287,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
               borderRadius: AppBorderRadius.largeRadius,
             ),
             child: Icon(
-              Icons.lightbulb_outline,
+              Icons.edit_note_outlined,
               size: 32,
               color: theme.colorScheme.primary.withOpacity(0.6),
             ),
