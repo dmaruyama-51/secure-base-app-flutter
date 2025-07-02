@@ -62,26 +62,21 @@ class ReflectionListViewModel extends ChangeNotifier {
   }
 
   /// リフレクションを「最新」と「過去」にグループ分け
-  /// リフレクションが1つしかない場合は、それを最新として扱う
+  /// createdAtの順序で最新のレコードを「最新」として扱う
   Map<String, List<KindnessReflection>> getGroupedReflections() {
-    final now = DateTime.now();
-    final sevenDaysAgo = DateTime(now.year, now.month, now.day - 7);
-
     final latestReflections = <KindnessReflection>[];
     final pastReflections = <KindnessReflection>[];
 
-    // リフレクションが1つしかない場合は、それを最新として扱う
-    if (_reflections.length == 1) {
-      latestReflections.add(_reflections.first);
-    } else {
-      // 複数ある場合は通常通り7日以内かどうかで分ける
-      for (final reflection in _reflections) {
-        if (reflection.createdAt.isAfter(sevenDaysAgo)) {
-          latestReflections.add(reflection);
-        } else {
-          pastReflections.add(reflection);
-        }
-      }
+    // リフレクションが空の場合は空のMapを返す
+    if (_reflections.isEmpty) {
+      return {'latest': latestReflections, 'past': pastReflections};
+    }
+
+    // 最初のレコード（最新）を「最新」として扱い、残りを「過去」とする
+    latestReflections.add(_reflections.first);
+
+    if (_reflections.length > 1) {
+      pastReflections.addAll(_reflections.skip(1));
     }
 
     return {'latest': latestReflections, 'past': pastReflections};

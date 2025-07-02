@@ -115,19 +115,21 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
             children: [
               Icon(Icons.people, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
-              Text(
-                '安全基地メンバー',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: theme.colorScheme.primary,
-                  fontSize: 14,
+              Expanded(
+                child: Text(
+                  '安全基地メンバー',
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.primary,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 4),
           Text(
-            'あなたが安心できる場所をつくる人たちです',
+            '支え合いの輪を広げていきましょう',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 12,
@@ -488,12 +490,14 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
             children: [
               _buildLegendIconChip(Icons.inbox, Colors.pink.shade400),
               const SizedBox(width: 8),
-              Text(
-                '受け取ったやさしさの数',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400,
+              Expanded(
+                child: Text(
+                  '受け取ったやさしさの数',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ],
@@ -503,12 +507,14 @@ class _KindnessGiverListPageState extends State<KindnessGiverListPage> {
             children: [
               _buildLegendIconChip(Icons.send, Colors.blue.shade400),
               const SizedBox(width: 8),
-              Text(
-                '送ったやさしさの数',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w400,
+              Expanded(
+                child: Text(
+                  '送ったやさしさの数',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
               ),
             ],

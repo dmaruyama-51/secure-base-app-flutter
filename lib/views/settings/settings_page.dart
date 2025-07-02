@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
+import '../../utils/constants.dart';
 import '../../view_models/settings/settings_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/settings/settings_section.dart';
@@ -102,6 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
       elevation: 0,
       backgroundColor: theme.scaffoldBackgroundColor,
       automaticallyImplyLeading: false,
+      toolbarHeight: 20, // AppBarを完全に非表示にして余白を削除
     );
   }
 
@@ -200,7 +202,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.08),
           width: 1,
@@ -220,7 +222,7 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       child: InkWell(
         onTap: () => _showLogoutDialog(viewModel),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
           child: Row(
@@ -229,7 +231,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
                   color: theme.colorScheme.error.withOpacity(0.08),
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: AppBorderRadius.largeRadius,
                 ),
                 child: Icon(
                   Icons.logout,
@@ -267,7 +269,7 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppBorderRadius.extraLargeRadius,
           ),
           title: const Text('ログアウト'),
           content: const Text('本当にログアウトしますか？'),
@@ -304,7 +306,7 @@ class _SettingsPageState extends State<SettingsPage> {
       builder:
           (context) => AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppBorderRadius.extraLargeRadius,
             ),
             title: Row(
               children: [
@@ -312,7 +314,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: theme.colorScheme.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: AppBorderRadius.largeRadius,
                   ),
                   child: Icon(
                     Icons.favorite,
@@ -321,7 +323,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Text('Secure Base App'),
+                const Expanded(child: Text('Kindly')),
               ],
             ),
             content: Column(
@@ -335,13 +337,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Text(
-                  '心の安全基地を育てるアプリです。\n日々の小さな優しさを記録し、大切な人との関係を深めましょう。',
-                  style: theme.textTheme.bodyMedium,
-                ),
+                Text('心の安全基地を育てるアプリです。', style: theme.textTheme.bodyMedium),
                 const SizedBox(height: 16),
                 Text(
-                  '© 2025 Team Secure-Base',
+                  '© 2025 Team Secure-base',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withOpacity(0.6),
                   ),

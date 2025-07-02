@@ -10,6 +10,7 @@ import 'package:provider/provider.dart';
 import '../../models/balance_score.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/kindness_reflection/kindness_reflection_list_view_model.dart';
+import '../../utils/constants.dart';
 
 /// バランススコア推移表示カード
 class BalanceScoreTrendCardAdvanced extends StatelessWidget {
@@ -42,12 +43,12 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
+        color: AppColors.surface,
+        borderRadius: AppBorderRadius.largeRadius,
+        border: Border.all(color: AppColors.grey300, width: 1),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -74,7 +75,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: AppColors.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: AppBorderRadius.mediumRadius,
           ),
           child: Icon(Icons.timeline, size: 20, color: AppColors.primary),
         ),
@@ -124,18 +125,20 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: AppBorderRadius.largeRadius,
           ),
           title: Row(
             children: [
               Icon(Icons.info_outline, color: AppColors.primary, size: 24),
               const SizedBox(width: 8),
-              Text(
-                '支え合いバランスについて',
-                style: TextStyle(
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                  fontSize: 16,
+              Expanded(
+                child: Text(
+                  '支え合いバランスについて',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],
@@ -182,7 +185,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
                     );
                   }
                   return FlLine(
-                    color: AppColors.textLight.withOpacity(0.2),
+                    color: AppColors.gridLine.withOpacity(0.2),
                     strokeWidth: 1,
                   );
                 },
@@ -241,7 +244,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
               borderData: FlBorderData(
                 show: true,
                 border: Border.all(
-                  color: AppColors.textLight.withOpacity(0.2),
+                  color: AppColors.border.withOpacity(0.2),
                   width: 1,
                 ),
               ),
@@ -371,7 +374,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: AppBorderRadius.mediumRadius,
         border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
       child: Column(
@@ -383,16 +386,18 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
                 height: 8,
                 decoration: BoxDecoration(
                   color: AppColors.primary.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(2),
+                  borderRadius: AppBorderRadius.smallRadius,
                 ),
               ),
               const SizedBox(width: 8),
-              Text(
-                'バランスゾーン',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.primary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Text(
+                  'バランスゾーン',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.primary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
               ),
             ],
@@ -402,11 +407,13 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
             children: [
               Icon(Icons.arrow_upward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
-              Text(
-                '中央より上: メンバーからの支えを受け取ることが多め',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textLight,
-                  fontSize: 11,
+              Expanded(
+                child: Text(
+                  '中央より上: メンバーからの支えを受け取ることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight,
+                    fontSize: 11,
+                  ),
                 ),
               ),
             ],
@@ -416,11 +423,13 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
             children: [
               Icon(Icons.arrow_downward, size: 12, color: AppColors.textLight),
               const SizedBox(width: 4),
-              Text(
-                '中央より下: メンバーを支えることが多め',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textLight,
-                  fontSize: 11,
+              Expanded(
+                child: Text(
+                  '中央より下: メンバーを支えることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight,
+                    fontSize: 11,
+                  ),
                 ),
               ),
             ],
@@ -437,7 +446,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: AppColors.primary.withOpacity(0.2),
           width: 1.5,
@@ -467,7 +476,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.red.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.red.withOpacity(0.2), width: 1.5),
       ),
       child: Column(
@@ -501,7 +510,7 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
@@ -516,28 +525,232 @@ class BalanceScoreTrendCardAdvanced extends StatelessWidget {
         children: [
           _buildHeader(context),
           const SizedBox(height: 20),
-          Center(
-            child: Column(
-              children: [
-                Icon(Icons.analytics, color: AppColors.textLight, size: 48),
-                const SizedBox(height: 16),
-                Text(
-                  'まだバランススコアデータがありません',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: AppColors.text,
-                    fontWeight: FontWeight.w600,
+          // スケルトンチャートにオーバーレイでメッセージを表示
+          Stack(
+            children: [
+              _buildSkeletonChart(context),
+              Positioned.fill(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'まだデータがありません',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: AppColors.text,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'やさしさ記録を行うと翌週から表示されます',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: AppColors.textLight,
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'やさしさ記録を行うと翌週から\nバランススコアが表示されます',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textLight,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          _buildSkeletonLegend(context),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSkeletonChart(BuildContext context) {
+    return Container(
+      height: 180,
+      child: LineChart(
+        LineChartData(
+          gridData: FlGridData(
+            show: true,
+            drawVerticalLine: false,
+            horizontalInterval: 25,
+            getDrawingHorizontalLine: (value) {
+              if (value == 50) {
+                // 50点の中央ライン（スケルトン用）
+                return FlLine(
+                  color: AppColors.primary.withOpacity(0.15),
+                  strokeWidth: 1.5,
+                  dashArray: [6, 3],
+                );
+              }
+              return FlLine(
+                color: Colors.grey.withOpacity(0.1),
+                strokeWidth: 1,
+              );
+            },
+          ),
+          // バランスゾーンのスケルトン表示
+          rangeAnnotations: RangeAnnotations(
+            horizontalRangeAnnotations: [
+              HorizontalRangeAnnotation(
+                y1: 30,
+                y2: 70,
+                color: AppColors.primary.withOpacity(0.02),
+              ),
+            ],
+          ),
+          titlesData: FlTitlesData(
+            show: true,
+            rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(
+                showTitles: true,
+                reservedSize: 30,
+                interval: 1,
+                getTitlesWidget: (value, meta) {
+                  final weeks = ['週1', '週2', '週3', '週4'];
+                  final index = value.toInt();
+                  if (index >= 0 && index < weeks.length) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        weeks[index],
+                        style: TextStyle(
+                          color: AppColors.textLight.withOpacity(0.5),
+                          fontSize: 10,
+                        ),
+                      ),
+                    );
+                  }
+                  return const Text('');
+                },
+              ),
             ),
+            leftTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: false, reservedSize: 0),
+            ),
+          ),
+          borderData: FlBorderData(
+            show: true,
+            border: Border.all(color: Colors.grey.withOpacity(0.1), width: 1),
+          ),
+          minX: 0,
+          maxX: 3,
+          minY: 0,
+          maxY: 100,
+          lineBarsData: [
+            LineChartBarData(
+              spots: [
+                FlSpot(0, 15),
+                FlSpot(1, 5),
+                FlSpot(2, 76),
+                FlSpot(3, 80),
+              ],
+              isCurved: true,
+              color: AppColors.primary.withOpacity(0.2),
+              barWidth: 3,
+              isStrokeCapRound: true,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (spot, percent, barData, index) {
+                  return FlDotCirclePainter(
+                    radius: 4,
+                    color: Colors.white,
+                    strokeWidth: 2,
+                    strokeColor: AppColors.primary.withOpacity(0.2),
+                  );
+                },
+              ),
+            ),
+          ],
+          lineTouchData: LineTouchData(enabled: false),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonLegend(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50.withOpacity(0.5),
+        borderRadius: AppBorderRadius.mediumRadius,
+        border: Border.all(
+          color: Colors.grey.shade200.withOpacity(0.5),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 12,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.1),
+                  borderRadius: AppBorderRadius.smallRadius,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'バランスゾーン',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.primary.withOpacity(0.5),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(
+                Icons.arrow_upward,
+                size: 12,
+                color: AppColors.textLight.withOpacity(0.5),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '中央より上: メンバーからの支えを受け取ることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight.withOpacity(0.5),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 2),
+          Row(
+            children: [
+              Icon(
+                Icons.arrow_downward,
+                size: 12,
+                color: AppColors.textLight.withOpacity(0.5),
+              ),
+              const SizedBox(width: 4),
+              Expanded(
+                child: Text(
+                  '中央より下: メンバーを支えることが多め',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: AppColors.textLight.withOpacity(0.5),
+                    fontSize: 11,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

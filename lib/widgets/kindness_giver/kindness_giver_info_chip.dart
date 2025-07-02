@@ -22,11 +22,14 @@ class KindnessGiverInfoChip extends StatelessWidget {
           color: theme.colorScheme.onSurface.withOpacity(0.7),
         ),
         const SizedBox(width: 6),
-        Text(
-          kindnessGiver.relationshipName ?? '',
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.normal,
-            fontSize: 12,
+        Expanded(
+          child: Text(
+            kindnessGiver.relationshipName ?? '',
+            style: theme.textTheme.bodySmall?.copyWith(
+              fontWeight: FontWeight.normal,
+              fontSize: 12,
+            ),
+            overflow: TextOverflow.ellipsis,
           ),
         ),
       ],

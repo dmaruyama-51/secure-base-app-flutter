@@ -144,10 +144,10 @@ class KindnessReflectionRepository {
         throw Exception('ユーザーが認証されていません');
       }
 
-      // kindness_reflectionsとreflection_type_masterをJOINして取得
+      // usersテーブルから現在の設定を取得
       final response =
           await _supabase
-              .from('kindness_reflections')
+              .from('users')
               .select('''
             reflection_type_id,
             reflection_type_master:reflection_type_id (
@@ -155,13 +155,11 @@ class KindnessReflectionRepository {
               reflection_type_name
             )
           ''')
-              .eq('user_id', user.id)
-              .order('created_at', ascending: false)
-              .limit(1)
+              .eq('id', user.id)
               .maybeSingle();
 
       if (response == null) {
-        // リフレクションがない場合はデフォルト（週に1回=7日）
+        // ユーザー情報が取得できない場合はデフォルト（週に1回=7日）
         return 7;
       }
 

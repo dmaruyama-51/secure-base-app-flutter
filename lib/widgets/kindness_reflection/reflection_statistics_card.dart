@@ -109,7 +109,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                 title: '受け取った\nやさしさ',
                 value: '${statistics.receivedRecords}',
                 unit: '件',
-                color: const Color(0xFFE91E63),
+                color: AppColors.chartColors[4], // ピンク
               ),
             ),
             const SizedBox(width: 12),
@@ -120,7 +120,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                 title: '送った\nやさしさ',
                 value: '${statistics.givenRecords}',
                 unit: '件',
-                color: const Color(0xFF2196F3),
+                color: AppColors.chartColors[0], // 青
               ),
             ),
           ],
@@ -137,7 +137,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                 title: '受け取り\n1日平均',
                 value: statistics.averageReceivedPerDay.toStringAsFixed(1),
                 unit: '件',
-                color: const Color(0xFF4CAF50),
+                color: AppColors.success,
               ),
             ),
             const SizedBox(width: 12),
@@ -148,7 +148,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                 title: '送り\n1日平均',
                 value: statistics.averageGivenPerDay.toStringAsFixed(1),
                 unit: '件',
-                color: const Color(0xFF4CAF50),
+                color: AppColors.success,
               ),
             ),
           ],
@@ -187,11 +187,11 @@ class ReflectionStatisticsCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -262,11 +262,11 @@ class ReflectionStatisticsCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -305,14 +305,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
   ) {
     final theme = Theme.of(context);
     final percentage = total > 0 ? (count / total * 100) : 0.0;
-    final colors = [
-      const Color(0xFF2196F3),
-      const Color(0xFF9C27B0),
-      const Color(0xFFFF9800),
-      const Color(0xFF4CAF50),
-      const Color(0xFFE91E63),
-    ];
-    final color = colors[label.hashCode.abs() % colors.length];
+    final color = AppColors.getChartColor(label);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
@@ -346,7 +339,7 @@ class ReflectionStatisticsCard extends StatelessWidget {
                 const SizedBox(height: 4),
                 LinearProgressIndicator(
                   value: percentage / 100,
-                  backgroundColor: Colors.grey.shade200,
+                  backgroundColor: AppColors.grey200,
                   valueColor: AlwaysStoppedAnimation<Color>(color),
                   minHeight: 4,
                 ),
@@ -365,11 +358,11 @@ class ReflectionStatisticsCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: AppColors.shadow,
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -382,12 +375,14 @@ class ReflectionStatisticsCard extends StatelessWidget {
             children: [
               Icon(Icons.calendar_today, size: 16, color: AppColors.primary),
               const SizedBox(width: 6),
-              Text(
-                '最も記録の多かった曜日',
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.text,
-                  fontSize: 14,
+              Expanded(
+                child: Text(
+                  '最も記録の多かった曜日',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.text,
+                    fontSize: 14,
+                  ),
                 ),
               ),
             ],

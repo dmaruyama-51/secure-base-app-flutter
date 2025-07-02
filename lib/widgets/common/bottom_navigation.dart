@@ -37,7 +37,7 @@ class BottomNavigation extends StatelessWidget {
         }
       },
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: 'ホーム'),
+        BottomNavigationBarItem(icon: Icon(Icons.edit_note), label: '記録'),
         BottomNavigationBarItem(icon: Icon(Icons.people), label: 'メンバー'),
         BottomNavigationBarItem(
           icon: Icon(Icons.auto_awesome),

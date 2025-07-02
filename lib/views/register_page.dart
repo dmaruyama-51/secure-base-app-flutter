@@ -57,28 +57,31 @@ class _RegisterPageState extends State<RegisterPage> {
           return Scaffold(
             backgroundColor: AppColors.background,
             body: SafeArea(
-              child: Center(
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 32),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // ロゴとタイトル
-                        _buildHeader(),
+              child: SingleChildScrollView(
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 400),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 32),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          // ロゴとタイトル
+                          _buildHeader(),
 
-                        const SizedBox(height: 48),
+                          const SizedBox(height: 32),
 
-                        // 新規登録フォーム
-                        _buildRegisterForm(viewModel),
+                          // 新規登録フォーム
+                          _buildRegisterForm(viewModel),
 
-                        const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                        // 区切り線とログインリンク
-                        _buildLoginSection(),
-                      ],
+                          // 区切り線とログインリンク
+                          _buildLoginSection(),
+
+                          const SizedBox(height: 32), // 下部余白を追加
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -93,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget _buildHeader() {
     return Column(
       children: [
-        // ログインページと統一した円形デザイン
+        const SizedBox(height: 32),
         Container(
           width: 160,
           height: 160,
@@ -116,12 +119,12 @@ class _RegisterPageState extends State<RegisterPage> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Image.asset(
-              'assets/images/img_relax.png',
+              'assets/images/img_welcome.png',
               fit: BoxFit.contain,
             ),
           ),
         ),
-        const SizedBox(height: 32),
+        const SizedBox(height: 40),
 
         // タイトル（デフォルトフォント使用）
         const Text(
@@ -188,7 +191,7 @@ class _RegisterPageState extends State<RegisterPage> {
               foregroundColor: AppColors.textOnPrimary,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child:
@@ -344,27 +347,23 @@ class _RegisterPageState extends State<RegisterPage> {
           ),
           decoration: InputDecoration(
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderRadius: AppBorderRadius.largeRadius,
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderRadius: AppBorderRadius.largeRadius,
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             errorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: Colors.red, width: 1),
             ),
             focusedErrorBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: Colors.red, width: 2),
             ),
             fillColor: Colors.white,
@@ -393,9 +392,7 @@ class _RegisterPageState extends State<RegisterPage> {
         // 区切り線
         Row(
           children: [
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -403,9 +400,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 style: TextStyle(fontSize: 14, color: AppColors.textLight),
               ),
             ),
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
           ],
         ),
         const SizedBox(height: 24),
@@ -416,9 +411,9 @@ class _RegisterPageState extends State<RegisterPage> {
           child: OutlinedButton(
             onPressed: () => context.go('/login'),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.textLight.withOpacity(0.4)),
+              side: BorderSide(color: AppColors.border.withOpacity(0.4)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child: const Text(

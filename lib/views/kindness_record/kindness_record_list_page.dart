@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 
 // Project imports:
 import '../../utils/app_colors.dart';
+import '../../utils/constants.dart';
 import '../../view_models/kindness_record/kindness_record_list_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_record/kindness_record_list_item.dart';
@@ -142,7 +143,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -153,7 +154,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
         children: [
           Row(
             children: [
-              Icon(Icons.lightbulb, size: 18, color: theme.colorScheme.primary),
+              Icon(Icons.edit_note, size: 18, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 'やさしさ記録',
@@ -263,7 +264,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -283,10 +284,10 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
             height: 64,
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(32),
+              borderRadius: AppBorderRadius.largeRadius,
             ),
             child: Icon(
-              Icons.lightbulb_outline,
+              Icons.edit_note_outlined,
               size: 32,
               color: theme.colorScheme.primary.withOpacity(0.6),
             ),
@@ -317,7 +318,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.mediumRadius,
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.04),
@@ -369,7 +370,7 @@ class _KindnessRecordListPageState extends State<KindnessRecordListPage> {
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         boxShadow: [
           BoxShadow(
             color: theme.colorScheme.primary.withOpacity(0.3),

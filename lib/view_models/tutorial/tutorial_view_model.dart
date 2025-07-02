@@ -40,7 +40,7 @@ class TutorialViewModel extends ChangeNotifier {
     introductionPageIndex: '次へ',
     memberRegistrationPageIndex: '次へ',
     kindnessRecordPageIndex: '記録して次へ',
-    reflectionSettingPageIndex: 'チュートリアル完了',
+    reflectionSettingPageIndex: 'はじめる',
   };
 
   // =============================================================================
@@ -52,6 +52,7 @@ class TutorialViewModel extends ChangeNotifier {
   String _selectedGender = '女性';
   String _selectedRelation = '家族';
   String _kindnessContent = '';
+  KindnessRecordType _selectedRecordType = KindnessRecordType.received;
   String _selectedReflectionFrequency = '2週に1回';
   bool _isCompleting = false;
   bool _isRecordingKindness = false;
@@ -72,6 +73,7 @@ class TutorialViewModel extends ChangeNotifier {
   String get selectedGender => _selectedGender;
   String get selectedRelation => _selectedRelation;
   String get kindnessContent => _kindnessContent;
+  KindnessRecordType get selectedRecordType => _selectedRecordType;
   String get selectedReflectionFrequency => _selectedReflectionFrequency;
   bool get isCompleting => _isCompleting;
   bool get isRecordingKindness => _isRecordingKindness;
@@ -121,6 +123,12 @@ class TutorialViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// 記録タイプを選択
+  void selectRecordType(KindnessRecordType recordType) {
+    _selectedRecordType = recordType;
+    notifyListeners();
+  }
+
   void updateReflectionFrequency(String frequency) {
     _selectedReflectionFrequency = frequency;
     notifyListeners();
@@ -150,6 +158,7 @@ class TutorialViewModel extends ChangeNotifier {
       await KindnessRecord.createKindnessRecord(
         content: _kindnessContent,
         selectedKindnessGiver: selectedGiver,
+        recordType: _selectedRecordType,
       );
 
       _isRecordingKindness = false;
@@ -236,6 +245,10 @@ class TutorialViewModel extends ChangeNotifier {
 
   /// 戻るボタンを表示するかどうか
   bool shouldShowBackButton() {
+    // 記録画面では戻るボタンを表示しない
+    if (_currentPage == kindnessRecordPageIndex) {
+      return false;
+    }
     return _currentPage > firstPageIndex;
   }
 
@@ -264,7 +277,8 @@ class TutorialViewModel extends ChangeNotifier {
     return switch (_currentPage) {
       memberRegistrationPageIndex =>
         _kindnessGiverName.trim().isEmpty || _isCompleting,
-      kindnessRecordPageIndex => _isRecordingKindness,
+      kindnessRecordPageIndex =>
+        _kindnessContent.trim().isEmpty || _isRecordingKindness,
       reflectionSettingPageIndex => _isSettingReflection || _isCompleting,
       _ => false,
     };
@@ -341,4 +355,40 @@ class TutorialViewModel extends ChangeNotifier {
   Future<String> getFrequencyDescription(String frequency) async {
     return await KindnessReflection.getFrequencyDescription(frequency);
   }
+
+  // =============================================================================
+  // プレゼンテーション用メソッド
+  // =============================================================================
+
+  /// 利用可能な記録タイプの一覧を取得
+  List<KindnessRecordType> get availableRecordTypes =>
+      KindnessRecordType.values;
+
+  /// 記録タイプに応じた質問文を取得
+  String getContentQuestionText(KindnessRecordType recordType) {
+    switch (recordType) {
+      case KindnessRecordType.received:
+        return 'どんなやさしさを受け取りましたか？';
+      case KindnessRecordType.given:
+        return 'どんなやさしさを送りましたか？';
+    }
+  }
+
+  /// 記録タイプに応じたプレースホルダーテキストを取得
+  String getContentPlaceholderText(KindnessRecordType recordType) {
+    switch (recordType) {
+      case KindnessRecordType.received:
+        return '例：疲れているときに「お疲れ様」と声をかけてくれた';
+      case KindnessRecordType.given:
+        return '例：「おはよう」と笑顔で挨拶をした';
+    }
+  }
+
+  /// 現在選択されている記録タイプの質問文を取得
+  String get currentContentQuestionText =>
+      getContentQuestionText(_selectedRecordType);
+
+  /// 現在選択されている記録タイプのプレースホルダーテキストを取得
+  String get currentContentPlaceholderText =>
+      getContentPlaceholderText(_selectedRecordType);
 }

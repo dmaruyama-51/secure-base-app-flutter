@@ -109,7 +109,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             // バランススコア推移カード（空の状態でも表示）
             _buildBalanceScoreSection(viewModel),
             const SizedBox(height: 24),
-            // 安全基地ノートカード（空の状態）
+            // 安全基地レポートカード（空の状態）
             _buildReflectionsCard(viewModel),
           ],
         ),
@@ -138,7 +138,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             _buildBalanceScoreSection(viewModel),
             const SizedBox(height: 24),
 
-            // 安全基地ノートカード
+            // 安全基地レポートカード
             _buildReflectionsCard(viewModel),
 
             // ローディングインジケーター（追加データ読み込み中）
@@ -159,7 +159,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: Colors.grey.withOpacity(0.2), width: 1),
         boxShadow: [
           BoxShadow(
@@ -191,13 +191,9 @@ class ReflectionListPageState extends State<ReflectionListPage> {
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: AppBorderRadius.mediumRadius,
               ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 20,
-                color: AppColors.primary,
-              ),
+              child: Icon(Icons.article, size: 20, color: AppColors.primary),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -205,7 +201,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    '安全基地ノート',
+                    '安全基地レポート',
                     style: theme.textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: AppColors.primary,
@@ -233,7 +229,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
               color: AppColors.primary.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.smallRadius,
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -386,37 +382,29 @@ class ReflectionListPageState extends State<ReflectionListPage> {
     final theme = Theme.of(context);
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12),
+        padding: const EdgeInsets.symmetric(vertical: 8),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: Icon(
-                Icons.auto_awesome,
-                size: 24,
-                color: AppColors.primary.withOpacity(0.6),
-              ),
+            Icon(
+              Icons.article,
+              size: 32,
+              color: AppColors.primary.withOpacity(0.4),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 8),
             Text(
-              'まだノートがありません',
+              'レポートがありません',
               style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
                 color: AppColors.text,
               ),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
-              '安全基地ノートは設定した頻度で自動でお届けします。\nもうしばらくお待ち下さい。',
+              '設定した頻度で自動配信されます',
               textAlign: TextAlign.center,
-              style: TextStyle(color: AppColors.textLight, fontSize: 13),
+              style: TextStyle(color: AppColors.textLight, fontSize: 12),
             ),
           ],
         ),
@@ -501,20 +489,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
 
   /// 配信日をフォーマットする
   String _formatDeliveryDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final targetDate = DateTime(date.year, date.month, date.day);
-    final difference = targetDate.difference(today).inDays;
-
-    if (difference == 0) {
-      return '今日';
-    } else if (difference == 1) {
-      return '明日';
-    } else if (difference > 0) {
-      return '$difference日後 ($date.month/$date.day)';
-    } else {
-      return '$date.month/$date.day';
-    }
+    return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   Widget _buildLoadingState() {

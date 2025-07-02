@@ -6,11 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 // Project imports:
+import '../../models/kindness_record.dart';
 import '../../utils/app_colors.dart';
 import '../../view_models/tutorial/tutorial_view_model.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
 import '../../widgets/kindness_giver/kindness_giver_avatar.dart';
 import '../../widgets/kindness_giver/relation_selection.dart';
+import '../../utils/constants.dart';
 
 class TutorialPage extends StatefulWidget {
   const TutorialPage({super.key});
@@ -199,7 +201,7 @@ class _TutorialPageState extends State<TutorialPage> {
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: theme.colorScheme.surface,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: AppBorderRadius.largeRadius,
               border: Border.all(
                 color: theme.colorScheme.primary.withOpacity(0.1),
               ),
@@ -207,7 +209,7 @@ class _TutorialPageState extends State<TutorialPage> {
             child: Column(
               children: [
                 Text(
-                  'Kindly は日々受け取っている小さな優しさに目を向けて、心がほっとする場所を作っていくアプリです。',
+                  'Kindly はポケットの中に『心がほっとする場所』を作っていくアプリです。日々の暮らしの中で、やさしさを送ったり受け取ったりした瞬間を大切に記録できます。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.text,
@@ -216,7 +218,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  'まずは、あなたの安全基地のメンバーを登録しましょう。',
+                  'まずは、あなたの安全基地のメンバーを登録してみましょう。',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: theme.colorScheme.primary,
@@ -278,7 +280,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -306,7 +308,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'あなたにやさしさを向けてくれる大切な人を登録しましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更や追加もできます。',
+            'まずは１人、大切な人を登録してみましょう。\n家族、友人、恋人など、どなたでも構いません。\nメンバーは後から変更や追加もできます。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -339,19 +341,19 @@ class _TutorialPageState extends State<TutorialPage> {
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary,
                 width: 2,
@@ -449,7 +451,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -463,7 +465,7 @@ class _TutorialPageState extends State<TutorialPage> {
               Icon(Icons.edit_note, size: 20, color: theme.colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                '最初の優しさを記録してみましょう',
+                '最初のやさしさ記録をしてみましょう',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
@@ -473,7 +475,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '最近${viewModel.kindnessGiverName}さんから受け取った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
+            '最近${viewModel.kindnessGiverName}さんから受け取った、あるいは送った小さな優しさはありませんか？\n些細なことでも構いません。この記録はスキップも可能です。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -492,8 +494,12 @@ class _TutorialPageState extends State<TutorialPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // 記録タイプ選択セクション
+        _buildRecordTypeSelector(viewModel, theme),
+        const SizedBox(height: 24),
+        // 優しさ内容入力セクション
         Text(
-          '優しさの内容',
+          viewModel.currentContentQuestionText,
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
@@ -505,29 +511,106 @@ class _TutorialPageState extends State<TutorialPage> {
           onChanged: viewModel.updateKindnessContent,
           maxLines: 4,
           decoration: InputDecoration(
-            hintText: '例：疲れているときに「お疲れ様」と声をかけてくれた',
+            hintText: viewModel.currentContentPlaceholderText,
             hintStyle: TextStyle(color: AppColors.textLight, fontSize: 13),
             filled: true,
             fillColor: theme.colorScheme.surface,
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary.withOpacity(0.2),
               ),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: BorderSide(
                 color: theme.colorScheme.primary,
                 width: 2,
               ),
             ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  // 記録タイプ選択セクション
+  Widget _buildRecordTypeSelector(
+    TutorialViewModel viewModel,
+    ThemeData theme,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '記録の種類',
+          style: theme.textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onSurface,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            borderRadius: AppBorderRadius.largeRadius,
+            color: AppColors.grey100,
+          ),
+          child: Row(
+            children:
+                viewModel.availableRecordTypes.map((type) {
+                  final isSelected = viewModel.selectedRecordType == type;
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () {
+                        viewModel.selectRecordType(type);
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: AppBorderRadius.largeRadius,
+                          color:
+                              isSelected
+                                  ? AppColors.primary
+                                  : Colors.transparent,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              type == KindnessRecordType.received
+                                  ? Icons.inbox
+                                  : Icons.send,
+                              size: 16,
+                              color:
+                                  isSelected
+                                      ? AppColors.textOnPrimary
+                                      : AppColors.primary,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              type.label,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                color:
+                                    isSelected
+                                        ? AppColors.textOnPrimary
+                                        : AppColors.primary,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
           ),
         ),
       ],
@@ -540,7 +623,7 @@ class _TutorialPageState extends State<TutorialPage> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Column(
@@ -564,12 +647,18 @@ class _TutorialPageState extends State<TutorialPage> {
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textLight,
-              height: 1.4,
-            ),
+          Consumer<TutorialViewModel>(
+            builder: (context, viewModel, child) {
+              return Text(
+                viewModel.selectedRecordType == KindnessRecordType.received
+                    ? '小さな出来事も、心の支えとなるかけがえのない記録になります：\n・笑顔であいさつをもらった瞬間\n・体調を気にかけてくれたひと言\n・話をじっくり聞いてくれたとき\n・ちょっとした手助けをもらったこと'
+                    : '小さな行動も、相手の心の支えになっています：\n・笑顔であいさつをした瞬間\n・体調を気にかけた声かけ\n・話をじっくり聞いてあげたとき\n・ちょっとした手助けをしたこと',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textLight,
+                  height: 1.4,
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -642,7 +731,7 @@ class _TutorialPageState extends State<TutorialPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(
           color: theme.colorScheme.primary.withOpacity(0.15),
           width: 1.5,
@@ -660,7 +749,7 @@ class _TutorialPageState extends State<TutorialPage> {
               ),
               const SizedBox(width: 8),
               Text(
-                'リフレクション',
+                '振り返り頻度の設定',
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: theme.colorScheme.primary,
@@ -670,7 +759,7 @@ class _TutorialPageState extends State<TutorialPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            '設定した頻度で、受け取った優しさを振り返る機会をお届けします。',
+            '設定した頻度で『安全基地レポート』をお届けします。やさしさの記録を定期的に振り返り、日常に温かな気づきを育てていきましょう。',
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textLight,
               fontSize: 13,
@@ -688,14 +777,14 @@ class _TutorialPageState extends State<TutorialPage> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppBorderRadius.largeRadius,
         border: Border.all(color: theme.colorScheme.primary.withOpacity(0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'リフレクションでできること',
+            '安全基地レポートとは？',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
               color: theme.colorScheme.primary,
@@ -705,22 +794,15 @@ class _TutorialPageState extends State<TutorialPage> {
           _buildFeatureItem(
             theme,
             Icons.summarize,
-            '受け取ったやさしさのサマリ',
-            '期間中に記録した優しさをまとめて表示',
+            '該当期間の記録のサマリ',
+            '記録したやさしさのサマリーをお届け',
           ),
           const SizedBox(height: 12),
           _buildFeatureItem(
             theme,
-            Icons.schedule,
-            '定期的な振り返り',
-            '忙しい日常でも大切なことを思い出せる',
-          ),
-          const SizedBox(height: 12),
-          _buildFeatureItem(
-            theme,
-            Icons.volunteer_activism,
-            'あたたかい気持ちを育てる',
-            '自然と大切な相手にやさしくなれる',
+            Icons.analytics,
+            '統計表示',
+            '関係性や曜日別の統計を見やすく表示',
           ),
         ],
       ),
@@ -741,7 +823,7 @@ class _TutorialPageState extends State<TutorialPage> {
           height: 32,
           decoration: BoxDecoration(
             color: theme.colorScheme.primary.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppBorderRadius.largeRadius,
           ),
           child: Icon(icon, size: 18, color: theme.colorScheme.primary),
         ),
@@ -782,7 +864,7 @@ class _TutorialPageState extends State<TutorialPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'リフレクションの頻度',
+          '振り返りの頻度',
           style: theme.textTheme.titleSmall?.copyWith(
             fontWeight: FontWeight.w600,
             color: theme.colorScheme.onSurface,
@@ -820,7 +902,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   ),
                   activeColor: theme.colorScheme.primary,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                     side: BorderSide(
                       color:
                           viewModel.selectedReflectionFrequency == frequency
@@ -862,7 +944,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: theme.colorScheme.primary),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                   ),
                 ),
                 child: Text(
@@ -882,7 +964,7 @@ class _TutorialPageState extends State<TutorialPage> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   side: BorderSide(color: AppColors.textLight),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: AppBorderRadius.largeRadius,
                   ),
                 ),
                 child: Text(
@@ -908,7 +990,7 @@ class _TutorialPageState extends State<TutorialPage> {
                 backgroundColor: theme.colorScheme.primary,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: AppBorderRadius.largeRadius,
                 ),
               ),
               child:

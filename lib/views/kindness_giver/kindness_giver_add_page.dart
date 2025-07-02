@@ -11,6 +11,7 @@ import '../../view_models/kindness_giver/kindness_giver_add_view_model.dart';
 import '../../widgets/common/bottom_navigation.dart';
 import '../../widgets/kindness_giver/gender_selection.dart';
 import '../../widgets/kindness_giver/relation_selection.dart';
+import '../../utils/constants.dart';
 
 class KindnessGiverAddPage extends StatefulWidget {
   const KindnessGiverAddPage({Key? key}) : super(key: key);
@@ -88,7 +89,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: theme.colorScheme.secondary.withOpacity(0.5),
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: AppBorderRadius.mediumRadius,
           ),
           child: Icon(
             Icons.arrow_back,
@@ -126,7 +127,7 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.secondary.withOpacity(0.3),
-              borderRadius: BorderRadius.circular(8),
+              borderRadius: AppBorderRadius.mediumRadius,
               border: Border.all(color: theme.colorScheme.secondary, width: 1),
             ),
             child: TextField(
@@ -176,11 +177,11 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: AppColors.surface,
+        borderRadius: AppBorderRadius.mediumRadius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.lightShadow,
             blurRadius: 8,
             offset: const Offset(0, 1),
           ),
@@ -199,11 +200,13 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
       children: [
         Icon(icon, size: 18, color: theme.colorScheme.primary),
         const SizedBox(width: 8),
-        Text(
-          title,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w600,
-            fontSize: 14,
+        Expanded(
+          child: Text(
+            title,
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
           ),
         ),
       ],
@@ -219,7 +222,9 @@ class _KindnessGiverAddPageState extends State<KindnessGiverAddPage> {
           backgroundColor: theme.colorScheme.primary,
           foregroundColor: theme.colorScheme.onPrimary,
           padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          shape: RoundedRectangleBorder(
+            borderRadius: AppBorderRadius.largeRadius,
+          ),
           elevation: 0,
         ),
         child:

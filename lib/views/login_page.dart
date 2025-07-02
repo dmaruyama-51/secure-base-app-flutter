@@ -91,8 +91,8 @@ class LoginPageState extends State<LoginPage> {
       children: [
         // より大きな円形デザイン
         Container(
-          width: 160,
-          height: 160,
+          width: 180,
+          height: 180,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(
@@ -112,7 +112,7 @@ class LoginPageState extends State<LoginPage> {
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Image.asset(
-              'assets/images/img_relax.png',
+              'assets/images/img_giftbox.png',
               fit: BoxFit.contain,
             ),
           ),
@@ -176,7 +176,7 @@ class LoginPageState extends State<LoginPage> {
               foregroundColor: AppColors.textOnPrimary,
               elevation: 0,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child:
@@ -247,19 +247,15 @@ class LoginPageState extends State<LoginPage> {
           ),
           decoration: InputDecoration(
             border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderRadius: AppBorderRadius.largeRadius,
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
-              borderSide: BorderSide(
-                color: AppColors.textLight.withOpacity(0.3),
-              ),
+              borderRadius: AppBorderRadius.largeRadius,
+              borderSide: BorderSide(color: AppColors.border.withOpacity(0.3)),
             ),
             focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(6),
+              borderRadius: AppBorderRadius.largeRadius,
               borderSide: const BorderSide(color: AppColors.primary, width: 2),
             ),
             fillColor: Colors.white,
@@ -280,9 +276,7 @@ class LoginPageState extends State<LoginPage> {
         // 区切り線
         Row(
           children: [
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
             const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Text(
@@ -290,9 +284,7 @@ class LoginPageState extends State<LoginPage> {
                 style: TextStyle(fontSize: 14, color: AppColors.textLight),
               ),
             ),
-            Expanded(
-              child: Divider(color: AppColors.textLight.withOpacity(0.3)),
-            ),
+            Expanded(child: Divider(color: AppColors.divider.withOpacity(0.3))),
           ],
         ),
         const SizedBox(height: 24),
@@ -303,9 +295,9 @@ class LoginPageState extends State<LoginPage> {
           child: OutlinedButton(
             onPressed: () => context.go('/register'),
             style: OutlinedButton.styleFrom(
-              side: BorderSide(color: AppColors.textLight.withOpacity(0.4)),
+              side: BorderSide(color: AppColors.border.withOpacity(0.4)),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
+                borderRadius: AppBorderRadius.largeRadius,
               ),
             ),
             child: const Text(
