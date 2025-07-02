@@ -489,20 +489,7 @@ class ReflectionListPageState extends State<ReflectionListPage> {
 
   /// 配信日をフォーマットする
   String _formatDeliveryDate(DateTime date) {
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    final targetDate = DateTime(date.year, date.month, date.day);
-    final difference = targetDate.difference(today).inDays;
-
-    if (difference == 0) {
-      return '今日';
-    } else if (difference == 1) {
-      return '明日';
-    } else if (difference > 0) {
-      return '$difference日後';
-    } else {
-      return '$date.month/$date.day';
-    }
+    return '${date.year.toString().padLeft(4, '0')}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
   Widget _buildLoadingState() {
