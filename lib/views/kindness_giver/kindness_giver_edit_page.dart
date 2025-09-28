@@ -433,14 +433,53 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     KindnessGiverEditViewModel viewModel,
     ThemeData theme,
   ) async {
+    // 優しさ記録の件数を取得
+    final recordCount = await viewModel.getKindnessRecordCount();
+
+    String message;
+    String buttonText;
+    Color buttonColor;
+
+    if (recordCount > 0) {
+      message =
+          '${widget.kindnessGiver.giverName}さんには${recordCount}件の優しさ記録が紐づいています。\n\n'
+          'このメンバーを削除することはできません。\n'
+          '代わりにアーカイブ機能をご利用いただくか、先に関連する優しさ記録を削除してください。';
+      buttonText = 'アーカイブする';
+      buttonColor = Colors.orange[700]!;
+    } else {
+      message =
+          '${widget.kindnessGiver.giverName}さんを削除しますか？\n削除すると元に戻すことはできません。';
+      buttonText = '削除';
+      buttonColor = theme.colorScheme.error;
+    }
+
     final confirmed = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: const Text('削除確認'),
-            content: Text(
-              '${widget.kindnessGiver.giverName}さんを削除しますか？\n削除すると元に戻すことはできません。',
+            title: Row(
+              children: [
+                Icon(
+                  recordCount > 0
+                      ? Icons.info_outline
+                      : Icons.warning_amber_outlined,
+                  color:
+                      recordCount > 0
+                          ? Colors.orange[700]
+                          : theme.colorScheme.error,
+                  size: 24,
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    recordCount > 0 ? '削除できません' : '削除確認',
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
             ),
+            content: Text(message),
             actions: [
               TextButton(
                 onPressed: () => Navigator.of(context).pop(false),
@@ -449,9 +488,9 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
               TextButton(
                 onPressed: () => Navigator.of(context).pop(true),
                 child: Text(
-                  '削除',
+                  buttonText,
                   style: TextStyle(
-                    color: theme.colorScheme.error,
+                    color: buttonColor,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -461,7 +500,13 @@ class _KindnessGiverEditPageState extends State<KindnessGiverEditPage> {
     );
 
     if (confirmed == true) {
-      viewModel.deleteKindnessGiver();
+      if (recordCount > 0) {
+        // 優しさ記録がある場合はアーカイブを実行
+        viewModel.archiveKindnessGiver();
+      } else {
+        // 優しさ記録がない場合は削除を実行
+        viewModel.deleteKindnessGiver();
+      }
     }
   }
 
