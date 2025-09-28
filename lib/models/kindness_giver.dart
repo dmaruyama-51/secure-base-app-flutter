@@ -254,6 +254,20 @@ class KindnessGiver {
     }
   }
 
+  /// メンバーに関連する優しさ記録の件数を取得
+  static Future<int> getKindnessRecordCount(
+    int id, {
+    KindnessGiverRepository? repository,
+  }) async {
+    final repo = repository ?? KindnessGiverRepository();
+    try {
+      return await repo.getKindnessRecordCount(id);
+    } catch (e) {
+      print('優しさ記録件数取得エラー: $e');
+      return 0;
+    }
+  }
+
   /// メンバー削除
   static Future<void> deleteKindnessGiver(
     int id, {
@@ -266,7 +280,8 @@ class KindnessGiver {
         throw Exception('削除処理が失敗しました');
       }
     } catch (e) {
-      throw Exception('やさしさをくれる人の削除に失敗しました: $e');
+      // エラーメッセージをそのまま再スロー
+      rethrow;
     }
   }
 

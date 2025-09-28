@@ -234,6 +234,27 @@ class KindnessGiverRepository {
     }
   }
 
+  /// メンバーに関連する優しさ記録の件数を取得
+  Future<int> getKindnessRecordCount(int giverId) async {
+    try {
+      final currentUser = _supabase.auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('ユーザーがログインしていません');
+      }
+
+      final response = await _supabase
+          .from('kindness_records')
+          .select('id')
+          .eq('giver_id', giverId)
+          .eq('user_id', currentUser.id);
+
+      return response.length;
+    } catch (e) {
+      print('Error getting kindness record count: $e');
+      return 0;
+    }
+  }
+
   /// メンバー削除
   Future<bool> deleteKindnessGiver(int id) async {
     try {
@@ -251,6 +272,17 @@ class KindnessGiverRepository {
       return true;
     } catch (e) {
       print('Error deleting kindness giver: $e');
+
+      // PostgreSQL外部キー制約エラーをチェック
+      final errorMessage = e.toString().toLowerCase();
+      if (errorMessage.contains('foreign key') ||
+          errorMessage.contains('violates') ||
+          errorMessage.contains('23503')) {
+        throw Exception(
+          'このメンバーには優しさ記録が紐づいているため削除できません。先に関連する優しさ記録を削除するか、アーカイブ機能をご利用ください。',
+        );
+      }
+
       throw Exception('メンバーの削除に失敗しました: ${e.toString()}');
     }
   }

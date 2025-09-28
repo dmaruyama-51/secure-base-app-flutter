@@ -107,6 +107,20 @@ class KindnessGiverEditViewModel extends ChangeNotifier {
     }
   }
 
+  /// メンバーに関連する優しさ記録の件数を取得
+  Future<int> getKindnessRecordCount() async {
+    if (_originalKindnessGiver?.id == null) return 0;
+
+    try {
+      return await KindnessGiver.getKindnessRecordCount(
+        _originalKindnessGiver!.id!,
+      );
+    } catch (e) {
+      print('優しさ記録件数取得エラー: $e');
+      return 0;
+    }
+  }
+
   /// やさしさをくれる人削除処理
   Future<void> deleteKindnessGiver() async {
     if (_originalKindnessGiver == null) {
